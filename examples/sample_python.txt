@@ -1,0 +1,33 @@
+# Sample Flask/Jinja2 Template with HTML and CSS
+# This demonstrates the CORRECT syntax (NO curly braces for Python blocks!)
+
+# Python variable assignments
+x = 10
+y = 20
+name = "Alice"
+
+# Arithmetic
+sum = x + y
+print(sum)
+
+# Conditional statement - Python style (NO BRACES!)
+if x < y:
+    print("x is less than y")
+    result = True
+else:
+    print("x is greater or equal")
+    result = False
+
+# For loop - Python style (NO BRACES!)
+for i in [1, 2, 3, 4, 5]:
+    print(i)
+    squared = i * i
+    print(squared)
+
+# Function definition - Python style (NO BRACES!)
+def greet(person):
+    message = "Hello, " + person
+    return message
+
+greeting = greet("World")
+print(greeting)
