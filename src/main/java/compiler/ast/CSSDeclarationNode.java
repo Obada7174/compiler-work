@@ -4,19 +4,17 @@ package compiler.ast;
  * AST node representing CSS declaration: property: value
  */
 public class CSSDeclarationNode extends ASTNode {
-    private String property;
     private String value;
     private boolean important;
 
     public CSSDeclarationNode(String property, String value, boolean important, int lineNumber) {
-        super(lineNumber);
-        this.property = property;
+        super(lineNumber, property);
         this.value = value;
         this.important = important;
     }
 
     public String getProperty() {
-        return property;
+        return getName();
     }
 
     public String getValue() {
@@ -36,6 +34,6 @@ public class CSSDeclarationNode extends ASTNode {
     public String getNodeDetails() {
         String importantFlag = important ? " !important" : "";
         return String.format("CSSDeclaration: %s: %s%s (line %d)",
-            property, value, importantFlag, lineNumber);
+                getName(), value, importantFlag, getLineNumber());
     }
 }

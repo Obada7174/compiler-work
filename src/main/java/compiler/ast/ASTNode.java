@@ -3,25 +3,27 @@ package compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Abstract base class for all AST nodes.
- * Demonstrates OOP principles: Abstraction and Polymorphism
- */
+
 public abstract class ASTNode {
     protected int lineNumber;
+    protected String name;                 // ← أضف هذا!
     protected List<ASTNode> children;
     protected ASTNode parent;
 
-    public ASTNode(int lineNumber) {
+    // constructor جديد يقبل name
+    public ASTNode(int lineNumber, String name) {
         this.lineNumber = lineNumber;
+        this.name = name;
         this.children = new ArrayList<>();
         this.parent = null;
     }
 
-    // Polymorphic method - subclasses override to provide specific node type
+    public ASTNode(int lineNumber) {
+        this(lineNumber, ""); // اسم فارغ افتراضي
+    }
+
     public abstract String getNodeType();
 
-    // Template method pattern - defines the algorithm structure
     public void addChild(ASTNode child) {
         if (child != null) {
             this.children.add(child);
@@ -41,13 +43,20 @@ public abstract class ASTNode {
         return lineNumber;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public List<ASTNode> getChildren() {
         return children;
     }
 
-    // Polymorphic method for printing node details
     public String getNodeDetails() {
-        return String.format("%s (line %d)", getNodeType(), lineNumber);
+        if (name != null && !name.isEmpty()) {
+            return String.format("%s '%s' (line %d)", getNodeType(), name, lineNumber);
+        } else {
+            return String.format("%s (line %d)", getNodeType(), lineNumber);
+        }
     }
 
     @Override

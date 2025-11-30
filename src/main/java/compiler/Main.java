@@ -1,13 +1,5 @@
 package compiler;
 
-import compiler.ast.ASTNode;
-import compiler.grammar.Jinja2Lexer;
-import compiler.grammar.Jinja2Parser;
-import compiler.symboltable.SymbolTable;
-import compiler.utils.ASTPrinter;
-import compiler.visitors.Jinja2ASTBuilder;
-import org.antlr.v4.runtime.*;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;

@@ -7,12 +7,10 @@ import java.util.ArrayList;
  * AST node representing CSS rule set: selector { declarations }
  */
 public class CSSRuleSetNode extends ASTNode {
-    private String selector;
     private List<CSSDeclarationNode> declarations;
 
     public CSSRuleSetNode(String selector, List<CSSDeclarationNode> declarations, int lineNumber) {
-        super(lineNumber);
-        this.selector = selector;
+        super(lineNumber, selector); // ← name = selector
         this.declarations = declarations != null ? declarations : new ArrayList<>();
 
         for (CSSDeclarationNode decl : this.declarations) {
@@ -20,8 +18,9 @@ public class CSSRuleSetNode extends ASTNode {
         }
     }
 
+    // نستخدم getName() من الكلاس الأب
     public String getSelector() {
-        return selector;
+        return getName();
     }
 
     public List<CSSDeclarationNode> getDeclarations() {
@@ -36,6 +35,6 @@ public class CSSRuleSetNode extends ASTNode {
     @Override
     public String getNodeDetails() {
         return String.format("CSSRuleSet: %s { %d declarations } (line %d)",
-            selector, declarations.size(), lineNumber);
+                getName(), declarations.size(), getLineNumber());
     }
 }

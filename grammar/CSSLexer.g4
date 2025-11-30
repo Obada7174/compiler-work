@@ -1,36 +1,16 @@
 lexer grammar CSSLexer;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CSS Lexer for Stylesheet Parsing
-// ═══════════════════════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SELECTORS
-// ═══════════════════════════════════════════════════════════════════════════
-
 HASH: '#';
 DOT: '.';
 STAR: '*';
 
-// CSS selector identifiers (element names, class names, IDs)
-IDENTIFIER: [a-zA-Z_-][a-zA-Z0-9_-]*;
-
-// Pseudo-classes and pseudo-elements
 PSEUDO_CLASS: ':' [a-zA-Z-]+;
 PSEUDO_ELEMENT: '::' [a-zA-Z-]+;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMBINATORS
-// ═══════════════════════════════════════════════════════════════════════════
 
 GT: '>';           // Child combinator
 PLUS: '+';         // Adjacent sibling combinator
 TILDE: '~';        // General sibling combinator
-// Descendant combinator is implicit (whitespace)
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DELIMITERS
-// ═══════════════════════════════════════════════════════════════════════════
 
 LBRACE: '{';
 RBRACE: '}';
@@ -43,49 +23,51 @@ SEMICOLON: ';';
 COMMA: ',';
 EQUALS: '=';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// VALUES
-// ═══════════════════════════════════════════════════════════════════════════
-
-// Numbers (integer or float)
 NUMBER: [0-9]+ ('.' [0-9]+)?;
 
-// CSS Units
-UNIT:
-    'px' | 'em' | 'rem' | '%' | 'vh' | 'vw' | 'vmin' | 'vmax'
-    | 'pt' | 'pc' | 'in' | 'cm' | 'mm' | 'ex' | 'ch'
-    | 'deg' | 'rad' | 'grad' | 'turn'
-    | 's' | 'ms'
-    | 'fr'
-    ;
+DIMENSION: NUMBER [a-zA-Z%]+;
 
 // Color values
-COLOR_HEX: '#' [0-9a-fA-F]+;
-
+COLOR_HEX
+    : '#' ([0-9a-fA-F]{3} | [0-9a-fA-F]{4} | [0-9a-fA-F]{6} | [0-9a-fA-F]{8})
+    ;
 // Strings
 STRING:
     '\'' (~['\r\n\\] | '\\' .)* '\''
     | '"' (~["\r\n\\] | '\\' .)* '"'
     ;
+CUSTOM_PROPERTY: '--' [a-zA-Z_-][a-zA-Z0-9_-]*;
+
+
+
+KEYWORD
+        : 'auto' | 'inherit' | 'initial' | 'unset'
+        | 'solid' | 'dashed' | 'dotted' | 'none'
+        | 'block' | 'inline' | 'inline-block' | 'flex' | 'grid'
+        | 'red' | 'blue' | 'green' | 'yellow' | 'black' | 'white' | 'transparent'
+        ;
+
+
+IDENTIFIER: [a-zA-Z_-][a-zA-Z0-9_-]*;
+
 
 // CSS Functions (rgb(), calc(), var(), etc.)
-FUNCTION: [a-zA-Z_-][a-zA-Z0-9_-]* '(';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SPECIAL
-// ═══════════════════════════════════════════════════════════════════════════
+FUNCTION_NAME: [a-zA-Z_-][a-zA-Z0-9_-]* '(';
 
 IMPORTANT: '!important';
 
 // URL
-URL: 'url(' (~[)]* | '\\' .)* ')';
+URL
+    : 'url(' [ \t\r\n\u000C]* STRING [ \t\r\n\u000C]* ')'
+    | 'url(' [ \t\r\n\u000C]* URL_UNQUOTED [ \t\r\n\u000C]* ')'
+    ;
 
-// At-rules (@media, @import, @keyframes, etc.)
+fragment URL_UNQUOTED
+    : ( ~[ \t\r\n\u000C()"'\\] | '\\' . )+
+    ;
+
 AT_KEYWORD: '@' [a-zA-Z-]+;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// WHITESPACE AND COMMENTS
-// ═══════════════════════════════════════════════════════════════════════════
 
 WS: [ \t\r\n]+ -> skip;
 
