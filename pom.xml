@@ -59,10 +59,13 @@
                 <version>${antlr.version}</version>
                 <configuration>
                     <sourceDirectory>grammar</sourceDirectory>
-                    <outputDirectory>target/generated-sources/grammar</outputDirectory>
+                    <outputDirectory>src/gen</outputDirectory>
                     <visitor>true</visitor>
                     <listener>true</listener>
-                    <package>grammar</package>
+                    <arguments>
+                        <argument>-package</argument>
+                        <argument>grammar</argument>
+                    </arguments>
                 </configuration>
                 <executions>
                     <execution>
