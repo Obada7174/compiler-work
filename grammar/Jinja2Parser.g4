@@ -12,14 +12,19 @@ options {
 // MAIN ENTRY POINT
 // ═══════════════════════════════════════════════════════════════════════════
 
-template: content* EOF;
+template: HTML_DOCTYPE? content* EOF;
 
 content
     : htmlElement
+    | htmlStyleTag
+    | htmlScriptTag
     | jinjaVar
     | jinjaControl
     | HTML_TEXT
     ;
+
+htmlStyleTag: HTML_STYLE_OPEN HTML_STYLE_CONTENT;
+htmlScriptTag: HTML_SCRIPT_OPEN HTML_SCRIPT_CONTENT;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HTML ELEMENTS
@@ -33,7 +38,7 @@ htmlElement
 htmlCloseTag: HTML_OPEN HTML_TAG_SLASH HTML_TAG_NAME HTML_TAG_CLOSE;
 
 htmlAttribute
-    : HTML_ATTR_NAME (HTML_ATTR_EQ attrValue)?
+    : HTML_TAG_NAME (HTML_TAG_EQUALS attrValue)?
     ;
 
 attrValue
@@ -143,7 +148,7 @@ jinjaControl
     | jinjaSet
     | jinjaMacro
     | jinjaCall
-    | jinjaFilter
+    | jinjaFilterBlock
     | jinjaWith
     | jinjaAutoescape
     ;
@@ -203,7 +208,7 @@ jinjaCall
       JINJA_STMT_OPEN JINJA_STMT_ENDCALL JINJA_STMT_CLOSE
     ;
 
-jinjaFilter
+jinjaFilterBlock
     : JINJA_STMT_OPEN JINJA_STMT_FILTER JINJA_STMT_IDENTIFIER JINJA_STMT_CLOSE
       content*
       JINJA_STMT_OPEN JINJA_STMT_ENDFILTER JINJA_STMT_CLOSE

@@ -1,8 +1,8 @@
 package compiler.visitors;
 
 import compiler.ast.*;
-import compiler.grammar.Jinja2Parser;
-import compiler.grammar.Jinja2ParserBaseVisitor;
+import grammar.Jinja2Parser;
+import grammar.Jinja2ParserBaseVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public class Jinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
         // Extract attributes
         Map<String, String> attributes = new HashMap<>();
         for (Jinja2Parser.HtmlAttributeContext attrCtx : ctx.htmlAttribute()) {
-            String attrName = attrCtx.HTML_ATTR_NAME().getText();
+            String attrName = attrCtx.HTML_TAG_NAME().getText();
             String attrValue = "";
 
             if (attrCtx.attrValue() != null) {

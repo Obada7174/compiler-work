@@ -29,7 +29,10 @@ DIMENSION: NUMBER [a-zA-Z%]+;
 
 // Color values
 COLOR_HEX
-    : '#' ([0-9a-fA-F]{3} | [0-9a-fA-F]{4} | [0-9a-fA-F]{6} | [0-9a-fA-F]{8})
+    : '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
+    | '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
+    | '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
+    | '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
     ;
 // Strings
 STRING:

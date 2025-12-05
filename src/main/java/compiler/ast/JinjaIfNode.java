@@ -46,7 +46,7 @@ public class JinjaIfNode extends ASTNode {
     @Override
     public String getNodeDetails() {
         String elseInfo = elseBlock.isEmpty() ? "" : String.format(" + %d else", elseBlock.size());
-        return String.format("JinjaIf: {% if %} (%d then%s) (line %d)",
+        return String.format("JinjaIf: {%% if %%} (%d then%s) (line %d)",
             thenBlock.size(), elseInfo, lineNumber);
     }
 }

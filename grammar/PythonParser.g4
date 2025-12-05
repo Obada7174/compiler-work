@@ -5,11 +5,18 @@ options {
 }
 
 @parser::members {
+// Semantic predicates for pattern matching validation
+// These should check if the current context allows certain patterns
+// Currently simplified - full implementation requires lookahead context
 public boolean CannotBePlusMinus() {
+    // TODO: Should check if current pattern is not followed by + or -
+    // For now, we allow it and let semantic analysis handle validation
     return true;
 }
 
 public boolean CannotBeDotLpEq() {
+    // TODO: Should check if current pattern is not followed by . or ( or =
+    // For now, we allow it and let semantic analysis handle validation
     return true;
 }
 }
@@ -17,7 +24,8 @@ public boolean CannotBeDotLpEq() {
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
-program: NEWLINE | simple_stmt | compound_stmt NEWLINE;
+// A Python program consists of zero or more statements
+program: (NEWLINE | stmt)* EOF;
 
 decorator: '@' dotted_name ('(' arglist? ')')? NEWLINE;
 
@@ -460,9 +468,15 @@ keyword_pattern
     : name '=' pattern
     ;
 
+// Named expression (walrus operator) - Python 3.8+
 test
-    : or_test ('if' or_test 'else' test)?
+    : namedexpr
     | lambdef
+    ;
+
+namedexpr
+    : or_test (':=' or_test)?  // Assignment expression (walrus operator)
+    | or_test ('if' or_test 'else' test)?
     ;
 
 test_nocond

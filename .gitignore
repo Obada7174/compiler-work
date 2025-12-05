@@ -31,3 +31,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Maven ###
+target/
+
+### ANTLR Generated Files ###
+src/gen/
+grammar/gen/
+gen/
+*.interp
+*.tokens

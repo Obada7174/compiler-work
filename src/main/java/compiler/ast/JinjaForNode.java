@@ -42,7 +42,7 @@ public class JinjaForNode extends ASTNode {
 
     @Override
     public String getNodeDetails() {
-        return String.format("JinjaFor: {% for %s in ... %} (%d statements) (line %d)",
+        return String.format("JinjaFor: {%% for %s in ... %%} (%d statements) (line %d)",
             variable, body.size(), lineNumber);
     }
 }

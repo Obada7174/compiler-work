@@ -14,6 +14,14 @@ JINJA_VAR_OPEN: '{{' -> pushMode(JINJA_VAR_MODE);
 JINJA_STMT_OPEN: '{%' -> pushMode(JINJA_STMT_MODE);
 JINJA_COMMENT: '{#' ~[#]* '#}' -> skip;
 
+// HTML Special constructs (before regular tags)
+HTML_DOCTYPE: '<!' [Dd][Oo][Cc][Tt][Yy][Pp][Ee] [ \t]+ [Hh][Tt][Mm][Ll] '>';
+HTML_COMMENT: '<!--' .*? '-->' -> skip;
+
+// Special tags with raw content (style and script)
+HTML_STYLE_OPEN: '<' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>' -> pushMode(STYLE_CONTENT_MODE);
+HTML_SCRIPT_OPEN: '<' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] ~[>]* '>' -> pushMode(SCRIPT_CONTENT_MODE);
+
 // HTML Tags
 HTML_OPEN: '<' -> pushMode(HTML_TAG_MODE);
 
@@ -163,9 +171,8 @@ mode HTML_TAG_MODE;
 HTML_TAG_CLOSE: '>' -> popMode;
 HTML_TAG_SLASH_CLOSE: '/>' -> popMode;
 HTML_TAG_SLASH: '/';
-HTML_TAG_NAME: [a-zA-Z][a-zA-Z0-9]*;
-HTML_ATTR_NAME: [a-zA-Z][a-zA-Z0-9_:-]*;
-HTML_ATTR_EQ: '=' -> pushMode(HTML_ATTR_VALUE_MODE);
+HTML_TAG_EQUALS: '=' -> pushMode(HTML_ATTR_VALUE_MODE);
+HTML_TAG_NAME: [a-zA-Z][a-zA-Z0-9_:-]*;
 HTML_TAG_WS: [ \t\r\n]+ -> skip;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -216,3 +223,19 @@ JINJA_IN_ATTR_NUMBER: [0-9]+ ('.' [0-9]+)?;
 JINJA_IN_ATTR_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
 JINJA_IN_ATTR_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 JINJA_IN_ATTR_WS: [ \t\r\n]+ -> skip;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STYLE CONTENT MODE (for <style> tags)
+// ═══════════════════════════════════════════════════════════════════════════
+
+mode STYLE_CONTENT_MODE;
+
+HTML_STYLE_CONTENT: .*? ('</' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>') -> popMode;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCRIPT CONTENT MODE (for <script> tags)
+// ═══════════════════════════════════════════════════════════════════════════
+
+mode SCRIPT_CONTENT_MODE;
+
+HTML_SCRIPT_CONTENT: .*? ('</' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] [ \t\r\n]* '>') -> popMode;

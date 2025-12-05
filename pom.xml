@@ -59,7 +59,7 @@
                 <version>${antlr.version}</version>
                 <configuration>
                     <sourceDirectory>grammar</sourceDirectory>
-                    <outputDirectory>src/gen</outputDirectory>
+                    <outputDirectory>src/gen/grammar</outputDirectory>
                     <visitor>true</visitor>
                     <listener>true</listener>
                     <arguments>
@@ -72,6 +72,27 @@
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Build Helper Plugin - Add generated sources -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/src/gen</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

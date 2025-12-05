@@ -240,6 +240,7 @@ NOT_EQ_1           : '<>';
 NOT_EQ_2           : '!=';
 AT                 : '@';
 ARROW              : '->';
+COLONEQUAL         : ':=';  // Walrus operator (Python 3.8+)
 ADD_ASSIGN         : '+=';
 SUB_ASSIGN         : '-=';
 MULT_ASSIGN        : '*=';

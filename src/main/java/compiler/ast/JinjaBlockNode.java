@@ -35,7 +35,7 @@ public class JinjaBlockNode extends ASTNode {
 
     @Override
     public String getNodeDetails() {
-        return String.format("JinjaBlock: {% block %s %} (%d items) (line %d)",
+        return String.format("JinjaBlock: {%% block %s %%} (%d items) (line %d)",
             blockName, content.size(), lineNumber);
     }
 }
