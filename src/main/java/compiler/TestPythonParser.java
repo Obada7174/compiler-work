@@ -1,10 +1,10 @@
 package compiler;
 
+import grammar.PythonLexer;
+import grammar.PythonParser;
 import org.antlr.v4.runtime.*;
 
 // Generated parser classes
-import grammar.PythonLexer;
-import grammar.PythonParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,8 +33,8 @@ public class TestPythonParser {
             lexer.addErrorListener(new BaseErrorListener() {
                 @Override
                 public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                      int line, int charPositionInLine, String msg,
-                                      RecognitionException e) {
+                                        int line, int charPositionInLine, String msg,
+                                        RecognitionException e) {
                     System.err.println("LEXER ERROR at line " + line + ":" + charPositionInLine + " - " + msg);
                 }
             });
@@ -52,8 +52,8 @@ public class TestPythonParser {
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
                 public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                      int line, int charPositionInLine, String msg,
-                                      RecognitionException e) {
+                                        int line, int charPositionInLine, String msg,
+                                        RecognitionException e) {
                     System.err.println("PARSER ERROR at line " + line + ":" + charPositionInLine + " - " + msg);
                 }
             });

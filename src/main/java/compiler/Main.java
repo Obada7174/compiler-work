@@ -5,8 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 // ANTLR Runtime imports
-import grammar.Jinja2Lexer;
-import grammar.Jinja2Parser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
