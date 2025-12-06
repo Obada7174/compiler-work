@@ -1,6 +1,8 @@
 package compiler;
 
 import org.antlr.v4.runtime.*;
+
+// Generated parser classes
 import grammar.PythonLexer;
 import grammar.PythonParser;
 

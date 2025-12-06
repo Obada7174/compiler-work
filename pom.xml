@@ -62,10 +62,7 @@
                     <outputDirectory>src/gen/grammar</outputDirectory>
                     <visitor>true</visitor>
                     <listener>true</listener>
-                    <arguments>
-                        <argument>-package</argument>
-                        <argument>grammar</argument>
-                    </arguments>
+                    <!-- Package is specified in grammar files using @header, not command-line args -->
                 </configuration>
                 <executions>
                     <execution>

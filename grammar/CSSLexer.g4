@@ -1,5 +1,9 @@
 lexer grammar CSSLexer;
 
+@header {
+package grammar;
+}
+
 HASH: '#';
 DOT: '.';
 STAR: '*';

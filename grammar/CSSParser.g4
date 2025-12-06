@@ -4,6 +4,10 @@ options {
     tokenVocab = CSSLexer;
 }
 
+@header {
+package grammar;
+}
+
 stylesheet
     : (ruleSet | atRule)* EOF
     ;

@@ -3,7 +3,8 @@ package compiler.visitors;
 import compiler.ast.*;
 import grammar.Jinja2Parser;
 import grammar.Jinja2ParserBaseVisitor;
-import org.antlr.v4.runtime.tree.TerminalNode;
+
+// Generated parser classes
 
 import java.util.ArrayList;
 import java.util.HashMap;

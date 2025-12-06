@@ -1,5 +1,9 @@
 lexer grammar Jinja2Lexer;
 
+@header {
+package grammar;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Jinja2 Template Lexer - HTML Templates with Jinja2 Constructs
 // Handles HTML tags, attributes, Jinja2 variables, and control structures

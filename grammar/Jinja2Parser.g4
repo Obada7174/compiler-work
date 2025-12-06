@@ -4,6 +4,10 @@ options {
     tokenVocab = Jinja2Lexer;
 }
 
+@header {
+package grammar;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Jinja2 Template Parser - HTML with Jinja2 Constructs
 // ═══════════════════════════════════════════════════════════════════════════

@@ -4,6 +4,10 @@ options {
     tokenVocab = PythonLexer;
 }
 
+@header {
+package grammar;
+}
+
 @parser::members {
 // Semantic predicates for pattern matching validation
 // These should check if the current context allows certain patterns

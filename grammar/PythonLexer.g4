@@ -1,5 +1,9 @@
 lexer grammar PythonLexer;
 
+@header {
+package grammar;
+}
+
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
