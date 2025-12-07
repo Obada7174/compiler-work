@@ -7,12 +7,16 @@ tokens { INDENT, DEDENT }
 
 @lexer::members {
   private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
+
   // The stack that keeps track of the indentation level.
   private java.util.Stack<Integer> indents = new java.util.Stack<>();
+
   // The amount of opened braces, brackets and parenthesis.
   private int opened = 0;
+
   // The most recently produced token.
   private Token lastToken = null;
+
   @Override
   public void emit(Token t) {
     super.setToken(t);
@@ -94,42 +98,7 @@ tokens { INDENT, DEDENT }
   }
 }
 
-NEWLINE
- : ( {atStartOfInput()}?   SPACES
-   | ( '\r'? '\n' | '\r' ) SPACES?
-   )
-   {
-     String newLine = getText().replaceAll("[^\r\n]+", "");
-     String spaces = getText().replaceAll("[\r\n]+", "");
-     int next = _input.LA(1);
-     if (opened > 0 || next == '\r' || next == '\n' || next == '#') {
-       // If we're inside a list or on a blank line, ignore all indents,
-       // dedents and line breaks.
-       skip();
-     }
-     else {
-       emit(commonToken(NEWLINE, newLine));
-       int indent = getIndentationCount(spaces);
-       int previous = indents.isEmpty() ? 0 : indents.peek();
-       if (indent == previous) {
-         // skip indents of the same size as the present indent-size
-         skip();
-       }
-       else if (indent > previous) {
-         indents.push(indent);
-         emit(commonToken(PythonLexer.INDENT, spaces));
-       }
-       else {
-         // Possibly emit more than 1 DEDENT token.
-         while(!indents.isEmpty() && indents.peek() > indent) {
-           this.emit(createDedent());
-           indents.pop();
-         }
-       }
-     }
-   }
- ;
-
+NEWLINE: '\r'? '\n';
 
 STRING: STRING_LITERAL | BYTES_LITERAL;
 
@@ -209,15 +178,15 @@ IMAG_NUMBER: ( FLOAT_NUMBER | INT_PART) [jJ];
 DOT                : '.';
 ELLIPSIS           : '...';
 STAR               : '*';
-OPEN_PAREN         : '(';
-CLOSE_PAREN        : ')';
+OPEN_PAREN         : '(' {opened++;};
+CLOSE_PAREN        : ')' {opened--;};
 COMMA              : ',';
 COLON              : ':';
 SEMI_COLON         : ';';
 POWER              : '**';
 ASSIGN             : '=';
-OPEN_BRACK         : '[';
-CLOSE_BRACK        : ']';
+OPEN_BRACK         : '[' {opened++;};
+CLOSE_BRACK        : ']' {opened--;};
 OR_OP              : '|';
 XOR                : '^';
 AND_OP             : '&';
@@ -229,8 +198,8 @@ DIV                : '/';
 MOD                : '%';
 IDIV               : '//';
 NOT_OP             : '~';
-OPEN_BRACE         : '{';
-CLOSE_BRACE        : '}';
+OPEN_BRACE         : '{' {opened++;};
+CLOSE_BRACE        : '}' {opened--;};
 LESS_THAN          : '<';
 GREATER_THAN       : '>';
 EQUALS             : '==';
@@ -353,37 +322,9 @@ fragment COMMENT: '#' ~[\r\n\f]*;
 
 fragment LINE_JOINING: '\\' SPACES? ( '\r'? '\n' | '\r' | '\f');
 
-// TODO: ANTLR seems lack of some Unicode property support...
-//$ curl https://www.unicode.org/Public/13.0.0/ucd/PropList.txt | grep Other_ID_
-//1885..1886    ; Other_ID_Start # Mn   [2] MONGOLIAN LETTER ALI GALI BALUDA..MONGOLIAN LETTER ALI GALI THREE BALUDA
-//2118          ; Other_ID_Start # Sm       SCRIPT CAPITAL P
-//212E          ; Other_ID_Start # So       ESTIMATED SYMBOL
-//309B..309C    ; Other_ID_Start # Sk   [2] KATAKANA-HIRAGANA VOICED SOUND MARK..KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK
-//00B7          ; Other_ID_Continue # Po       MIDDLE DOT
-//0387          ; Other_ID_Continue # Po       GREEK ANO TELEIA
-//1369..1371    ; Other_ID_Continue # No   [9] ETHIOPIC DIGIT ONE..ETHIOPIC DIGIT NINE
-//19DA          ; Other_ID_Continue # No       NEW TAI LUE THAM DIGIT ONE
-
 fragment UNICODE_OIDS: '\u1885' ..'\u1886' | '\u2118' | '\u212e' | '\u309b' ..'\u309c';
 
 fragment UNICODE_OIDC: '\u00b7' | '\u0387' | '\u1369' ..'\u1371' | '\u19da';
 
-/// id_start     ::=  <all characters in general categories Lu, Ll, Lt, Lm, Lo, Nl, the underscore, and characters with the Other_ID_Start property>
-fragment ID_START:
-    '_'
-    | [\p{L}]
-    | [\p{Nl}]
-    //| [\p{Other_ID_Start}]
-    | UNICODE_OIDS
-;
-
-/// id_continue  ::=  <all characters in id_start, plus characters in the categories Mn, Mc, Nd, Pc and others with the Other_ID_Continue property>
-fragment ID_CONTINUE:
-    ID_START
-    | [\p{Mn}]
-    | [\p{Mc}]
-    | [\p{Nd}]
-    | [\p{Pc}]
-    //| [\p{Other_ID_Continue}]
-    | UNICODE_OIDC
-;
+fragment ID_START: [a-z] | [A-Z] | '_';
+fragment ID_CONTINUE: ID_START | [0-9];

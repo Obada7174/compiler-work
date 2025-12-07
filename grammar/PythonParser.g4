@@ -17,7 +17,7 @@ public boolean CannotBeDotLpEq() {
 // All comments that start with "///" are copy-pasted from
 // The Python Language Reference
 
-program: NEWLINE | simple_stmt | compound_stmt NEWLINE;
+program: NEWLINE | simple_stmt | compound_stmt;
 
 decorator: '@' dotted_name ('(' arglist? ')')? NEWLINE;
 
