@@ -1,245 +1,244 @@
 lexer grammar Jinja2Lexer;
 
 @header {
-package grammar;
+  // optional package/imports
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Jinja2 Template Lexer - HTML Templates with Jinja2 Constructs
-// Handles HTML tags, attributes, Jinja2 variables, and control structures
-// ═══════════════════════════════════════════════════════════════════════════
+/*
+  Robust lexer for HTML + embedded Jinja2.
+  - Fixes: attribute-name dot escape, robust tag-mode transitions,
+    supports Jinja2 in text and inside attribute values.
+*/
+/* ---------------- DEFAULT / HTML TEXT ---------------- */
+WS: [ \t\r\n]+ -> skip ;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DEFAULT MODE - HTML Content
-// ═══════════════════════════════════════════════════════════════════════════
+// DOCTYPE and comments
+HTML_DOCTYPE
+  : '<!' [ \t\r\n]* [Dd][Oo][Cc][Tt][Yy][Pp][Ee] (~[>])* '>'
+  ;
 
-// Jinja2 Delimiters (highest priority)
-JINJA_VAR_OPEN: '{{' -> pushMode(JINJA_VAR_MODE);
-JINJA_STMT_OPEN: '{%' -> pushMode(JINJA_STMT_MODE);
-JINJA_COMMENT: '{#' ~[#]* '#}' -> skip;
+HTML_COMMENT
+  : '<!--' ( options {greedy=false;} : . )*? '-->' -> skip
+  ;
 
-// HTML Special constructs (before regular tags)
-HTML_DOCTYPE: '<!' [Dd][Oo][Cc][Tt][Yy][Pp][Ee] [ \t]+ [Hh][Tt][Mm][Ll] '>';
-HTML_COMMENT: '<!--' .*? '-->' -> skip;
+// style/script full-open tokens (lexer will push to content modes)
+HTML_STYLE_OPEN
+  : '<' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] ( ~[>])* '>' -> pushMode(STYLE_CONTENT_MODE)
+  ;
 
-// Special tags with raw content (style and script)
-HTML_STYLE_OPEN: '<' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>' -> pushMode(STYLE_CONTENT_MODE);
-HTML_SCRIPT_OPEN: '<' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] ~[>]* '>' -> pushMode(SCRIPT_CONTENT_MODE);
+HTML_SCRIPT_OPEN
+  : '<' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] ( ~[>])* '>' -> pushMode(SCRIPT_CONTENT_MODE)
+  ;
 
-// HTML Tags
-HTML_OPEN: '<' -> pushMode(HTML_TAG_MODE);
+// Jinja openings have precedence
+JINJA_VAR_OPEN    : '{{' -> pushMode(JINJA_VAR_MODE);
+JINJA_STMT_OPEN   : '{%' -> pushMode(JINJA_STMT_MODE);
+JINJA_COMMENT_OPEN: '{#' -> pushMode(JINJA_COMMENT_MODE);
 
-// HTML Text content (anything that's not a tag or Jinja2)
-HTML_TEXT: ~[<{]+ ;
+// HTML text (anything except '<' or '{')
+HTML_TEXT : (~[<{])+ ;
 
-// Whitespace
-WS: [ \t\r\n]+ -> skip;
+// When we see '<' -> go to tag mode to lex the tag name and attributes
+HTML_LT : '<' -> pushMode(HTML_TAG_MODE);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA VARIABLE MODE {{ }}
-// ═══════════════════════════════════════════════════════════════════════════
+/* ---------------- JINJA COMMENT MODE {# ... #} ---------------- */
+mode JINJA_COMMENT_MODE;
+JINJA_COMMENT_CONTENT
+  : ( options {greedy=false;} : . )*? '#}' -> popMode, skip
+  ;
 
+/* ---------------- JINJA VAR MODE {{ ... }} ---------------- */
 mode JINJA_VAR_MODE;
+JINJA_VAR_CLOSE      : '}}' -> popMode ;
+JINJA_VAR_PIPE       : '|' ;
+JINJA_VAR_DOT        : '.' ;
+JINJA_VAR_LPAREN     : '(' ;
+JINJA_VAR_RPAREN     : ')' ;
+JINJA_VAR_LBRACKET   : '[' ;
+JINJA_VAR_RBRACKET   : ']' ;
+JINJA_VAR_COMMA      : ',' ;
+JINJA_VAR_COLON      : ':' ;
+JINJA_VAR_ASSIGN     : '=' ;
+JINJA_VAR_PLUS       : '+' ;
+JINJA_VAR_MINUS      : '-' ;
+JINJA_VAR_STAR       : '*' ;
+JINJA_VAR_SLASH      : '/' ;
+JINJA_VAR_PERCENT    : '%' ;
+JINJA_VAR_POWER      : '**' ;
+JINJA_VAR_DOUBLE_SLASH: '//' ;
+JINJA_VAR_EQ         : '==' ;
+JINJA_VAR_NEQ        : '!=' ;
+JINJA_VAR_LTE        : '<=' ;
+JINJA_VAR_GTE        : '>=' ;
+JINJA_VAR_LT         : '<' ;
+JINJA_VAR_GT         : '>' ;
 
-JINJA_VAR_CLOSE: '}}' -> popMode;
-JINJA_VAR_PIPE: '|';
-JINJA_VAR_DOT: '.';
-JINJA_VAR_LPAREN: '(';
-JINJA_VAR_RPAREN: ')';
-JINJA_VAR_LBRACKET: '[';
-JINJA_VAR_RBRACKET: ']';
-JINJA_VAR_COMMA: ',';
-JINJA_VAR_COLON: ':';
-JINJA_VAR_ASSIGN: '=';
+JINJA_VAR_OR   : 'or';
+JINJA_VAR_AND  : 'and';
+JINJA_VAR_NOT  : 'not';
+JINJA_VAR_IN   : 'in';
+JINJA_VAR_IS   : 'is';
 
-// Operators
-JINJA_VAR_PLUS: '+';
-JINJA_VAR_MINUS: '-';
-JINJA_VAR_STAR: '*';
-JINJA_VAR_SLASH: '/';
-JINJA_VAR_PERCENT: '%';
-JINJA_VAR_POWER: '**';
-JINJA_VAR_DOUBLE_SLASH: '//';
+JINJA_VAR_NUMBER
+  : [0-9]+ ( '.' [0-9]+ )?
+  ;
 
-// Comparison
-JINJA_VAR_EQ: '==';
-JINJA_VAR_NEQ: '!=';
-JINJA_VAR_LT: '<';
-JINJA_VAR_GT: '>';
-JINJA_VAR_LTE: '<=';
-JINJA_VAR_GTE: '>=';
+JINJA_VAR_STRING
+  : '\'' ( ~['\r\n] )* '\''
+  | '"'  ( ~["\r\n] )* '"'
+  ;
 
-// Literals
-JINJA_VAR_NUMBER: [0-9]+ ('.' [0-9]+)?;
-JINJA_VAR_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
-JINJA_VAR_TRUE: 'True' | 'true';
-JINJA_VAR_FALSE: 'False' | 'false';
-JINJA_VAR_NONE: 'None' | 'none';
+JINJA_VAR_TRUE  : 'True' | 'true' ;
+JINJA_VAR_FALSE : 'False' | 'false' ;
+JINJA_VAR_NONE  : 'None'  | 'none' ;
 
-// Keywords
-JINJA_VAR_AND: 'and';
-JINJA_VAR_OR: 'or';
-JINJA_VAR_NOT: 'not';
-JINJA_VAR_IN: 'in';
-JINJA_VAR_IS: 'is';
+JINJA_VAR_IDENTIFIER
+  : [a-zA-Z_] [a-zA-Z0-9_]*
+  ;
 
-JINJA_VAR_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-JINJA_VAR_WS: [ \t\r\n]+ -> skip;
+JINJA_VAR_WS : [ \t\r\n]+ -> skip ;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA STATEMENT MODE {% %}
-// ═══════════════════════════════════════════════════════════════════════════
-
+/* ---------------- JINJA STATEMENT MODE {% ... %} ---------------- */
 mode JINJA_STMT_MODE;
+JINJA_STMT_CLOSE : '%}' -> popMode ;
 
-JINJA_STMT_CLOSE: '%}' -> popMode;
-
-// Jinja2 keywords
-JINJA_STMT_IF: 'if';
-JINJA_STMT_ELIF: 'elif';
-JINJA_STMT_ELSE: 'else';
-JINJA_STMT_ENDIF: 'endif';
-JINJA_STMT_FOR: 'for';
-JINJA_STMT_ENDFOR: 'endfor';
-JINJA_STMT_IN: 'in';
-JINJA_STMT_BLOCK: 'block';
-JINJA_STMT_ENDBLOCK: 'endblock';
-JINJA_STMT_EXTENDS: 'extends';
-JINJA_STMT_INCLUDE: 'include';
-JINJA_STMT_IMPORT: 'import';
-JINJA_STMT_FROM: 'from';
-JINJA_STMT_SET: 'set';
-JINJA_STMT_MACRO: 'macro';
-JINJA_STMT_ENDMACRO: 'endmacro';
-JINJA_STMT_CALL: 'call';
-JINJA_STMT_ENDCALL: 'endcall';
-JINJA_STMT_FILTER: 'filter';
-JINJA_STMT_ENDFILTER: 'endfilter';
-JINJA_STMT_WITH: 'with';
-JINJA_STMT_ENDWITH: 'endwith';
+// keywords (lowercase)
+JINJA_STMT_IF        : 'if';
+JINJA_STMT_ELIF      : 'elif';
+JINJA_STMT_ELSE      : 'else';
+JINJA_STMT_ENDIF     : 'endif';
+JINJA_STMT_FOR       : 'for';
+JINJA_STMT_ENDFOR    : 'endfor';
+JINJA_STMT_IN        : 'in';
+JINJA_STMT_BLOCK     : 'block';
+JINJA_STMT_ENDBLOCK  : 'endblock';
+JINJA_STMT_EXTENDS   : 'extends';
+JINJA_STMT_INCLUDE   : 'include';
+JINJA_STMT_IMPORT    : 'import';
+JINJA_STMT_FROM      : 'from';
+JINJA_STMT_SET       : 'set';
+JINJA_STMT_MACRO     : 'macro';
+JINJA_STMT_ENDMACRO  : 'endmacro';
+JINJA_STMT_CALL      : 'call';
+JINJA_STMT_ENDCALL   : 'endcall';
+JINJA_STMT_FILTER    : 'filter';
+JINJA_STMT_ENDFILTER : 'endfilter';
+JINJA_STMT_WITH      : 'with';
+JINJA_STMT_ENDWITH   : 'endwith';
 JINJA_STMT_AUTOESCAPE: 'autoescape';
 JINJA_STMT_ENDAUTOESCAPE: 'endautoescape';
+JINJA_STMT_AS        : 'as';
 
-// Operators
-JINJA_STMT_PIPE: '|';
-JINJA_STMT_DOT: '.';
-JINJA_STMT_LPAREN: '(';
-JINJA_STMT_RPAREN: ')';
-JINJA_STMT_LBRACKET: '[';
-JINJA_STMT_RBRACKET: ']';
-JINJA_STMT_LBRACE: '{';
-JINJA_STMT_RBRACE: '}';
-JINJA_STMT_COMMA: ',';
-JINJA_STMT_COLON: ':';
-JINJA_STMT_ASSIGN: '=';
+// operators / tokens inside statement
+JINJA_STMT_PIPE    : '|' ;
+JINJA_STMT_DOT     : '.' ;
+JINJA_STMT_LPAREN  : '(' ;
+JINJA_STMT_RPAREN  : ')' ;
+JINJA_STMT_LBRACKET: '[' ;
+JINJA_STMT_RBRACKET: ']' ;
+JINJA_STMT_LBRACE  : '{' ;
+JINJA_STMT_RBRACE  : '}' ;
+JINJA_STMT_COMMA   : ',' ;
+JINJA_STMT_COLON   : ':' ;
+JINJA_STMT_ASSIGN  : '=' ;
+JINJA_STMT_EQ      : '==' ;
+JINJA_STMT_NEQ     : '!=' ;
+JINJA_STMT_LTE     : '<=' ;
+JINJA_STMT_GTE     : '>=' ;
+JINJA_STMT_LT      : '<' ;
+JINJA_STMT_GT      : '>' ;
+JINJA_STMT_AND     : 'and' ;
+JINJA_STMT_OR      : 'or' ;
+JINJA_STMT_NOT     : 'not' ;
+JINJA_STMT_IS      : 'is' ;
+JINJA_STMT_PLUS    : '+' ;
+JINJA_STMT_MINUS   : '-' ;
+JINJA_STMT_STAR    : '*' ;
+JINJA_STMT_SLASH   : '/' ;
+JINJA_STMT_PERCENT : '%' ;
+JINJA_STMT_POWER   : '**' ;
+JINJA_STMT_DOUBLE_SLASH: '//' ;
 
-// Comparison
-JINJA_STMT_EQ: '==';
-JINJA_STMT_NEQ: '!=';
-JINJA_STMT_LT: '<';
-JINJA_STMT_GT: '>';
-JINJA_STMT_LTE: '<=';
-JINJA_STMT_GTE: '>=';
+JINJA_STMT_NUMBER
+  : [0-9]+ ( '.' [0-9]+ )?
+  ;
 
-// Logical
-JINJA_STMT_AND: 'and';
-JINJA_STMT_OR: 'or';
-JINJA_STMT_NOT: 'not';
-JINJA_STMT_IS: 'is';
+JINJA_STMT_STRING
+  : '\'' ( ~['\r\n] )* '\''
+  | '"'  ( ~["\r\n] )* '"'
+  ;
 
-// Arithmetic
-JINJA_STMT_PLUS: '+';
-JINJA_STMT_MINUS: '-';
-JINJA_STMT_STAR: '*';
-JINJA_STMT_SLASH: '/';
-JINJA_STMT_PERCENT: '%';
-JINJA_STMT_POWER: '**';
-JINJA_STMT_DOUBLE_SLASH: '//';
+JINJA_STMT_TRUE  : 'True' | 'true' ;
+JINJA_STMT_FALSE : 'False' | 'false' ;
+JINJA_STMT_NONE  : 'None'  | 'none' ;
 
-// Literals
-JINJA_STMT_NUMBER: [0-9]+ ('.' [0-9]+)?;
-JINJA_STMT_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
-JINJA_STMT_TRUE: 'True' | 'true';
-JINJA_STMT_FALSE: 'False' | 'false';
-JINJA_STMT_NONE: 'None' | 'none';
+JINJA_STMT_IDENTIFIER
+  : [a-zA-Z_] [a-zA-Z0-9_]*
+  ;
 
-JINJA_STMT_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-JINJA_STMT_WS: [ \t\r\n]+ -> skip;
+JINJA_STMT_WS : [ \t\r\n]+ -> skip ;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// HTML TAG MODE
-// ═══════════════════════════════════════════════════════════════════════════
-
+/* ---------------- HTML TAG MODE (name + attributes) ---------------- */
 mode HTML_TAG_MODE;
-
-HTML_TAG_CLOSE: '>' -> popMode;
-HTML_TAG_SLASH_CLOSE: '/>' -> popMode;
-HTML_TAG_SLASH: '/';
-HTML_TAG_EQUALS: '=' -> pushMode(HTML_ATTR_VALUE_MODE);
-HTML_TAG_NAME: [a-zA-Z][a-zA-Z0-9_:-]*;
-HTML_TAG_WS: [ \t\r\n]+ -> skip;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// HTML ATTRIBUTE VALUE MODE
-// ═══════════════════════════════════════════════════════════════════════════
+HTML_TAG_WS : [ \t\r\n\u00A0\u200B\u200C\u200D]+ -> skip ;
+HTML_TAG_NAME        : [a-zA-Z] [a-zA-Z0-9_:\-]* ;
+HTML_ATTR_NAME       : [a-zA-Z_:] [a-zA-Z0-9_:\\.]* ;
+HTML_TAG_EQUALS      : '=' -> pushMode(HTML_ATTR_VALUE_MODE);
+HTML_TAG_SLASH       : '/';
+HTML_TAG_CLOSE       : '>' -> popMode;
+HTML_TAG_SLASH_CLOSE : '/>' -> popMode;
 
 mode HTML_ATTR_VALUE_MODE;
 
-HTML_ATTR_VALUE_DQ: '"' -> pushMode(HTML_ATTR_DQ_MODE);
-HTML_ATTR_VALUE_SQ: '\'' -> pushMode(HTML_ATTR_SQ_MODE);
-HTML_ATTR_VALUE_UNQUOTED: ~[ \t\r\n"'=<>`]+ -> popMode;
+HTML_ATTR_VALUE_DQ
+  : '"' -> pushMode(HTML_ATTR_DQ_MODE)
+  ;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DOUBLE QUOTED ATTRIBUTE
-// ═══════════════════════════════════════════════════════════════════════════
+HTML_ATTR_VALUE_SQ
+  : '\'' -> pushMode(HTML_ATTR_SQ_MODE)
+  ;
 
+HTML_ATTR_VALUE_UNQUOTED
+  : (~[ \t\r\n"'=<>`])+ -> popMode
+  ;
+
+/* double quoted attribute body - allow Jinja */
 mode HTML_ATTR_DQ_MODE;
+HTML_ATTR_DQ_TEXT : ( options {greedy=false;} : . )+? ;
+HTML_ATTR_DQ_JINJA_OPEN : '{{' -> pushMode(JINJA_IN_ATTR_MODE) ;
+HTML_ATTR_DQ_JINJA_STMT_OPEN: '{%' -> pushMode(JINJA_IN_ATTR_MODE) ;
+HTML_ATTR_DQ_END : '"' -> popMode, popMode ;
 
-HTML_ATTR_DQ_TEXT: ~["{]+ ;
-HTML_ATTR_DQ_JINJA_OPEN: '{{' -> pushMode(JINJA_IN_ATTR_MODE);
-HTML_ATTR_DQ_END: '"' -> popMode, popMode;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SINGLE QUOTED ATTRIBUTE
-// ═══════════════════════════════════════════════════════════════════════════
-
+/* single quoted attribute body - allow Jinja */
 mode HTML_ATTR_SQ_MODE;
+HTML_ATTR_SQ_TEXT : ( options {greedy=false;} : . )+? ;
+HTML_ATTR_SQ_JINJA_OPEN : '{{' -> pushMode(JINJA_IN_ATTR_MODE) ;
+HTML_ATTR_SQ_JINJA_STMT_OPEN: '{%' -> pushMode(JINJA_IN_ATTR_MODE) ;
+HTML_ATTR_SQ_END : '\'' -> popMode, popMode ;
 
-HTML_ATTR_SQ_TEXT: ~['{]+ ;
-HTML_ATTR_SQ_JINJA_OPEN: '{{' -> pushMode(JINJA_IN_ATTR_MODE);
-HTML_ATTR_SQ_END: '\'' -> popMode, popMode;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA IN ATTRIBUTE MODE
-// ═══════════════════════════════════════════════════════════════════════════
-
+/* ---------------- JINJA INSIDE ATTRIBUTE (mini mode) ---------------- */
 mode JINJA_IN_ATTR_MODE;
+JINJA_IN_ATTR_CLOSE      : '}}' -> popMode ;
+JINJA_IN_ATTR_STMT_CLOSE : '%}' -> popMode ;
+JINJA_IN_ATTR_PIPE       : '|' ;
+JINJA_IN_ATTR_DOT        : '.' ;
+JINJA_IN_ATTR_LPAREN     : '(' ;
+JINJA_IN_ATTR_RPAREN     : ')' ;
+JINJA_IN_ATTR_LBRACKET   : '[' ;
+JINJA_IN_ATTR_RBRACKET   : ']' ;
+JINJA_IN_ATTR_COMMA      : ',' ;
+JINJA_IN_ATTR_NUMBER     : [0-9]+ ('.' [0-9]+)? ;
+JINJA_IN_ATTR_STRING     : '\'' ( ~['\r\n] )* '\'' | '"' ( ~["\r\n] )* '"' ;
+JINJA_IN_ATTR_IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;
+JINJA_IN_ATTR_WS : [ \t\r\n]+ -> skip ;
 
-JINJA_IN_ATTR_CLOSE: '}}' -> popMode;
-JINJA_IN_ATTR_PIPE: '|';
-JINJA_IN_ATTR_DOT: '.';
-JINJA_IN_ATTR_LPAREN: '(';
-JINJA_IN_ATTR_RPAREN: ')';
-JINJA_IN_ATTR_LBRACKET: '[';
-JINJA_IN_ATTR_RBRACKET: ']';
-JINJA_IN_ATTR_COMMA: ',';
-JINJA_IN_ATTR_NUMBER: [0-9]+ ('.' [0-9]+)?;
-JINJA_IN_ATTR_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
-JINJA_IN_ATTR_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-JINJA_IN_ATTR_WS: [ \t\r\n]+ -> skip;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// STYLE CONTENT MODE (for <style> tags)
-// ═══════════════════════════════════════════════════════════════════════════
-
+/* ---------------- STYLE / SCRIPT CONTENT MODES ---------------- */
 mode STYLE_CONTENT_MODE;
-
-HTML_STYLE_CONTENT: .*? ('</' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>') -> popMode;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SCRIPT CONTENT MODE (for <script> tags)
-// ═══════════════════════════════════════════════════════════════════════════
+HTML_STYLE_CONTENT
+  : ( options {greedy=false;} : . )*? '</' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>' -> popMode
+  ;
 
 mode SCRIPT_CONTENT_MODE;
-
-HTML_SCRIPT_CONTENT: .*? ('</' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] [ \t\r\n]* '>') -> popMode;
+HTML_SCRIPT_CONTENT
+  : ( options {greedy=false;} : . )*? '</' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] [ \t\r\n]* '>' -> popMode
+  ;
