@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 parser grammar PythonParser;
 
-options { tokenVocab=PythonLexer; }ل
+options { tokenVocab=PythonLexer; }
 
 // STARTING RULES
 // ==============
