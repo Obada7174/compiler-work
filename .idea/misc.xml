@@ -26,7 +26,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/grammar/Jinja2Lexer.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="D:\codes-folder\compiler\Test1\src\gen\grammar" />
+          <option name="outputDir" value="D:\compiler\compiler-work\src\gen\grammar" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />
@@ -36,7 +36,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/grammar/Jinja2Parser.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="D:\codes-folder\compiler\Test1\src\gen\grammar" />
+          <option name="outputDir" value="D:\compiler\compiler-work\src\gen\grammar" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />
@@ -46,7 +46,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/grammar/PythonLexer.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="D:\codes-folder\compiler\Test1\src\gen" />
+          <option name="outputDir" value="D:\compiler\compiler-work\src\gen\grammar" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />
@@ -56,7 +56,27 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/grammar/PythonParser.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\Users\user\IdeaProjects\compiler-work\src\gen" />
+          <option name="outputDir" value="D:\compiler\compiler-work\src\gen\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/grammar/CSSLexer.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\compiler\compiler-work\src\gen\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/grammar/CSSParser.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\compiler\compiler-work\src\gen\grammar" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />
@@ -74,7 +94,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="20" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_23" default="true" project-jdk-name="20" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
