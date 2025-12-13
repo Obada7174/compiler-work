@@ -513,8 +513,7 @@ comparison
     : expr (comp_op expr)*
     ;
 
-// <> isn't actually a valid comparison operator in Python. It's here for the
-// sake of a __future__ import described in PEP 401 (which really works :-)
+
 comp_op
     : '<'
     | '>'

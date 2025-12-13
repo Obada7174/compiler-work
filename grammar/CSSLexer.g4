@@ -1,20 +1,19 @@
 lexer grammar CSSLexer;
 
-@header {
-package grammar;
-}
-
 HASH: '#';
 DOT: '.';
 STAR: '*';
+CSS_VAR: '--' [a-zA-Z0-9_-]+;
+AND: 'and';
+
+IDENTIFIER: [a-zA-Z_-][a-zA-Z0-9_-]*;
 
 PSEUDO_CLASS: ':' [a-zA-Z-]+;
 PSEUDO_ELEMENT: '::' [a-zA-Z-]+;
 
-GT: '>';           // Child combinator
-PLUS: '+';         // Adjacent sibling combinator
-TILDE: '~';        // General sibling combinator
-
+GT: '>';
+PLUS: '+';
+TILDE: '~';
 
 LBRACE: '{';
 RBRACE: '}';
@@ -26,51 +25,37 @@ COLON: ':';
 SEMICOLON: ';';
 COMMA: ',';
 EQUALS: '=';
+MULTIPLY: STAR;
+PLUS_OP: PLUS;
+MINUS_OP: '-';
+DIVIDE: '/';
 
 NUMBER: [0-9]+ ('.' [0-9]+)?;
 
-DIMENSION: NUMBER [a-zA-Z%]+;
 
-// Color values
-COLOR_HEX
-    : '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
-    | '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
-    | '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
-    | '#' [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
+UNIT:
+    'px' | 'em' | 'rem' | '%' | 'vh' | 'vw' | 'vmin' | 'vmax'
+    | 'pt' | 'pc' | 'in' | 'cm' | 'mm' | 'ex' | 'ch'
+    | 'deg' | 'rad' | 'grad' | 'turn'
+    | 's' | 'ms'
+    | 'fr'
     ;
-// Strings
+
+COLOR_HEX: '#' [0-9a-fA-F]+;
+
 STRING:
     '\'' (~['\r\n\\] | '\\' .)* '\''
     | '"' (~["\r\n\\] | '\\' .)* '"'
     ;
-CUSTOM_PROPERTY: '--' [a-zA-Z_-][a-zA-Z0-9_-]*;
 
-
-
-KEYWORD
-        : 'auto' | 'inherit' | 'initial' | 'unset'
-        | 'solid' | 'dashed' | 'dotted' | 'none'
-        | 'block' | 'inline' | 'inline-block' | 'flex' | 'grid'
-        | 'red' | 'blue' | 'green' | 'yellow' | 'black' | 'white' | 'transparent'
-        ;
-
-
-IDENTIFIER: [a-zA-Z_-][a-zA-Z0-9_-]*;
-
-
-// CSS Functions (rgb(), calc(), var(), etc.)
-FUNCTION_NAME: [a-zA-Z_-][a-zA-Z0-9_-]* '(';
 
 IMPORTANT: '!important';
-
-// URL
 URL
-    : 'url(' [ \t\r\n\u000C]* STRING [ \t\r\n\u000C]* ')'
-    | 'url(' [ \t\r\n\u000C]* URL_UNQUOTED [ \t\r\n\u000C]* ')'
+    : 'url(' ( ESCAPED_CHAR | ~[)\\] )* ')'
     ;
 
-fragment URL_UNQUOTED
-    : ( ~[ \t\r\n\u000C()"'\\] | '\\' . )+
+fragment ESCAPED_CHAR
+    : '\\' .
     ;
 
 AT_KEYWORD: '@' [a-zA-Z-]+;

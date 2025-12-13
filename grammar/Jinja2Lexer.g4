@@ -4,35 +4,25 @@ lexer grammar Jinja2Lexer;
 package grammar;
 }
 
-/*
-  Robust lexer for HTML + embedded Jinja2.
-  - Non-greedy style/script content handling
-  - Jinja2 in attributes support
-  - Fixed unquoted attribute character class (removed '=' from forbidden set)
-  - Relaxed DOCTYPE rule
-*/
-
-/* ---------------------------
-   DEFAULT MODE - HTML Content
-   --------------------------- */
-
-// Jinja2 Delimiters (highest priority so they are recognized in default text)
 JINJA_VAR_OPEN    : '{{' -> pushMode(JINJA_VAR_MODE);
 JINJA_STMT_OPEN   : '{%' -> pushMode(JINJA_STMT_MODE);
 JINJA_COMMENT_OPEN: '{#' -> pushMode(JINJA_COMMENT_MODE);
 
-// Jinja comment mode (skipped)
 mode JINJA_COMMENT_MODE;
-JINJA_COMMENT_CONTENT : ( options { greedy=false; } : .*? ) '#}' -> popMode, skip ;
+JINJA_COMMENT_CONTENT
+    : ( options { greedy=false; } : .*? ) '#}' -> popMode, skip
+    ;
 
-// Back to DEFAULT
-mode DEFAULT_MODE; // explicit name for human reading (ANTLR default mode remains unnamed)
+mode DEFAULT_MODE;
 
-/* HTML constructs before tags */
-HTML_DOCTYPE : '<!' ~[>]* '>' ;
-HTML_COMMENT : '<!--' ( options { greedy=false; } : .*? ) '-->' -> skip ;
+HTML_DOCTYPE
+    : '<!' ~[>]* '>'
+    ;
 
-// style & script: match opening tag and push content mode (allow attributes in opening tag)
+HTML_COMMENT
+    : '<!--' ( options { greedy=false; } : .*? ) '-->' -> skip
+    ;
+
 HTML_STYLE_OPEN
     : '<' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] ( ~[>]* ) '>' -> pushMode(STYLE_CONTENT_MODE)
     ;
@@ -41,21 +31,22 @@ HTML_SCRIPT_OPEN
     : '<' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] ( ~[>]* ) '>' -> pushMode(SCRIPT_CONTENT_MODE)
     ;
 
-// Generic tag open (we emit '<' then parser will read tag name token produced in HTML_TAG_MODE)
-HTML_OPEN : '<' -> pushMode(HTML_TAG_MODE);
+HTML_OPEN
+    : '<' -> pushMode(HTML_TAG_MODE)
+    ;
 
-// Text content (anything up to next '<' or '{' start)
-HTML_TEXT: ~[<{ \t\r\n] ~[<{]* ;
+HTML_TEXT
+    : (~[<{])+
+    ;
 
-/* whitespace */
-WS : [ \t\r\n]+ -> skip ;
+WS
+    : [ \t\r\n]+ -> skip
+    ;
 
-/* ---------------------------
-   JINJA VARIABLE MODE {{ ... }}
-   --------------------------- */
 mode JINJA_VAR_MODE;
 
 JINJA_VAR_CLOSE: '}}' -> popMode;
+
 JINJA_VAR_PIPE: '|';
 JINJA_VAR_DOT: '.';
 JINJA_VAR_LPAREN: '(';
@@ -80,7 +71,7 @@ JINJA_VAR_LTE: '<=';
 JINJA_VAR_GTE: '>=';
 
 JINJA_VAR_NUMBER: [0-9]+ ('.' [0-9]+)?;
-JINJA_VAR_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
+JINJA_VAR_STRING: '\'' (~['\r\n\\])* ( '\\' . ~['\r\n\\]* )* '\'' | '"' (~["\r\n\\])* ( '\\' . ~["\r\n\\]* )* '"' ;
 JINJA_VAR_TRUE: 'True' | 'true';
 JINJA_VAR_FALSE: 'False' | 'false';
 JINJA_VAR_NONE: 'None' | 'none';
@@ -94,9 +85,6 @@ JINJA_VAR_IS: 'is';
 JINJA_VAR_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 JINJA_VAR_WS: [ \t\r\n]+ -> skip ;
 
-/* ---------------------------
-   JINJA STATEMENT MODE {% ... %}
-   --------------------------- */
 mode JINJA_STMT_MODE;
 
 JINJA_STMT_CLOSE: '%}' -> popMode;
@@ -125,6 +113,7 @@ JINJA_STMT_WITH: 'with';
 JINJA_STMT_ENDWITH: 'endwith';
 JINJA_STMT_AUTOESCAPE: 'autoescape';
 JINJA_STMT_ENDAUTOESCAPE: 'endautoescape';
+JINJA_STMT_AS: 'as';
 
 JINJA_STMT_PIPE: '|';
 JINJA_STMT_DOT: '.';
@@ -158,7 +147,7 @@ JINJA_STMT_POWER: '**';
 JINJA_STMT_DOUBLE_SLASH: '//';
 
 JINJA_STMT_NUMBER: [0-9]+ ('.' [0-9]+)?;
-JINJA_STMT_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
+JINJA_STMT_STRING: '\'' (~['\r\n\\])* ( '\\' . ~['\r\n\\]* )* '\'' | '"' (~["\r\n\\])* ( '\\' . ~["\r\n\\]* )* '"' ;
 JINJA_STMT_TRUE: 'True' | 'true';
 JINJA_STMT_FALSE: 'False' | 'false';
 JINJA_STMT_NONE: 'None' | 'none';
@@ -166,60 +155,45 @@ JINJA_STMT_NONE: 'None' | 'none';
 JINJA_STMT_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 JINJA_STMT_WS: [ \t\r\n]+ -> skip ;
 
-/* ---------------------------
-   HTML TAG MODE (after seeing '<')
-   --------------------------- */
 mode HTML_TAG_MODE;
 
-HTML_TAG_CLOSE     : '>' -> popMode ;
+HTML_TAG_CLOSE      : '>' -> popMode ;
 HTML_TAG_SLASH_CLOSE: '/>' -> popMode ;
-HTML_TAG_SLASH     : '/' ;
-HTML_TAG_EQUALS    : '=' -> pushMode(HTML_ATTR_VALUE_MODE) ;
-HTML_TAG_NAME      : [a-zA-Z][a-zA-Z0-9_:-]* ;
-HTML_TAG_WS        : [ \t\r\n]+ -> skip ;
+HTML_TAG_SLASH      : '/' ;
+HTML_TAG_EQUALS     : '=' -> pushMode(HTML_ATTR_VALUE_MODE) ;
+HTML_TAG_NAME       : [a-zA-Z][a-zA-Z0-9_:-]* ;
+HTML_TAG_WS         : [ \t\r\n]+ -> skip ;
 
-/* ---------------------------
-   HTML ATTRIBUTE VALUE MODE
-   --------------------------- */
 mode HTML_ATTR_VALUE_MODE;
 
-// Double-quoted
-HTML_ATTR_VALUE_DQ   : '"' -> pushMode(HTML_ATTR_DQ_MODE) ;
-// Single-quoted
-HTML_ATTR_VALUE_SQ   : '\'' -> pushMode(HTML_ATTR_SQ_MODE) ;
-
-// Unquoted values: allow '=' inside values (so remove it from forbidden set).
-// Important: we forbid < and > and quotes and backtick; whitespace ends the unquoted value.
-HTML_ATTR_VALUE_UNQUOTED
-    : (~[ \t\r\n"'<>`])+  // consume until delimiter
-      -> popMode
+HTML_ATTR_VALUE_DQ
+    : '"' -> pushMode(HTML_ATTR_DQ_MODE)
     ;
+
+HTML_ATTR_VALUE_SQ
+    : '\'' -> pushMode(HTML_ATTR_SQ_MODE)
+    ;
+
+HTML_ATTR_VALUE_UNQUOTED
+    : (~[ \t\r\n"'<>`])+ -> popMode
+    ;
+
 HTML_ATTR_VALUE_UNEXPECTED
     : {true}? -> popMode
     ;
 
-/* ---------------------------
-   DOUBLE-QUOTED ATTRIBUTE CONTENT
-   --------------------------- */
 mode HTML_ATTR_DQ_MODE;
 
-// text inside double quotes: stop on either '{{' (jinja) or closing quote
 HTML_ATTR_DQ_TEXT       : ( options { greedy=false; } : (~['{"])+ ) ;
 HTML_ATTR_DQ_JINJA_OPEN : '{{' -> pushMode(JINJA_IN_ATTR_MODE) ;
 HTML_ATTR_DQ_END        : '"' -> popMode, popMode ;
 
-/* ---------------------------
-   SINGLE-QUOTED ATTRIBUTE CONTENT
-   --------------------------- */
 mode HTML_ATTR_SQ_MODE;
 
 HTML_ATTR_SQ_TEXT       : ( options { greedy=false; } : (~['{'])+ ) ;
 HTML_ATTR_SQ_JINJA_OPEN : '{{' -> pushMode(JINJA_IN_ATTR_MODE) ;
 HTML_ATTR_SQ_END        : '\'' -> popMode, popMode ;
 
-/* ---------------------------
-   JINJA IN ATTRIBUTE MODE (handles tokens inside {{ ... }} when inside attr)
-   --------------------------- */
 mode JINJA_IN_ATTR_MODE;
 
 JINJA_IN_ATTR_CLOSE: '}}' -> popMode;
@@ -231,30 +205,19 @@ JINJA_IN_ATTR_LBRACKET: '[';
 JINJA_IN_ATTR_RBRACKET: ']';
 JINJA_IN_ATTR_COMMA: ',';
 JINJA_IN_ATTR_NUMBER: [0-9]+ ('.' [0-9]+)?;
-JINJA_IN_ATTR_STRING: '\'' (~['\r\n])* '\'' | '"' (~["\r\n])* '"';
+JINJA_IN_ATTR_STRING: '\'' (~['\r\n\\])* ( '\\' . ~['\r\n\\]* )* '\'' | '"' (~["\r\n\\])* ( '\\' . ~["\r\n\\]* )* '"' ;
 JINJA_IN_ATTR_IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 JINJA_IN_ATTR_WS: [ \t\r\n]+ -> skip ;
 
-
-/* ---------------------------
-   STYLE CONTENT MODE (non-greedy until </style>)
-   --------------------------- */
 mode STYLE_CONTENT_MODE;
 
 HTML_STYLE_CONTENT
     : ( options { greedy=false; } : .*? ) ('</' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>') -> popMode
     ;
 
-/* ---------------------------
-   SCRIPT CONTENT MODE (non-greedy until </script>)
-   --------------------------- */
 mode SCRIPT_CONTENT_MODE;
 
 HTML_SCRIPT_CONTENT
     : ( options { greedy=false; } : .*? ) ('</' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] [ \t\r\n]* '>') -> popMode
     ;
 
-/* ---------------------------
-   CATCH-ALL (if any single char remains)
-   --------------------------- */
-ANY_CHAR : . ; // fallback to ensure the lexer always produces tokens (avoid hard EOF hang)

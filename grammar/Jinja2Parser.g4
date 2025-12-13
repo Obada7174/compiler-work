@@ -1,44 +1,37 @@
 parser grammar Jinja2Parser;
 
-options {
-    tokenVocab = Jinja2Lexer;
-}
+options { tokenVocab = Jinja2Lexer; }
 
 @header {
 package grammar;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Jinja2 Template Parser - HTML with Jinja2 Constructs
-// ═══════════════════════════════════════════════════════════════════════════
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MAIN ENTRY POINT
-// ═══════════════════════════════════════════════════════════════════════════
+template
+    : HTML_DOCTYPE? content* EOF
+    ;
 
-template: HTML_DOCTYPE? (htmlElement | jinjaVar | jinjaControl | HTML_TEXT)* EOF;
 content
-    : htmlElement
-    | htmlStyleTag
+    : htmlStyleTag
     | htmlScriptTag
+    | htmlElement
     | jinjaVar
     | jinjaControl
+    | HTML_COMMENT
     | HTML_TEXT
     ;
 
 htmlStyleTag: HTML_STYLE_OPEN HTML_STYLE_CONTENT;
 htmlScriptTag: HTML_SCRIPT_OPEN HTML_SCRIPT_CONTENT;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// HTML ELEMENTS
-// ═══════════════════════════════════════════════════════════════════════════
-
 htmlElement
-    : HTML_OPEN HTML_TAG_NAME htmlAttribute* HTML_TAG_CLOSE htmlContent* htmlCloseTag
-    | HTML_OPEN HTML_TAG_NAME htmlAttribute* HTML_TAG_SLASH_CLOSE  // Self-closing
+    : HTML_OPEN HTML_TAG_NAME htmlAttribute* HTML_TAG_CLOSE htmlContent* htmlCloseTag?
+    | HTML_OPEN HTML_TAG_NAME htmlAttribute* HTML_TAG_SLASH_CLOSE
     ;
 
-htmlCloseTag: HTML_OPEN HTML_TAG_SLASH HTML_TAG_NAME HTML_TAG_CLOSE;
+htmlCloseTag
+    : HTML_OPEN HTML_TAG_SLASH HTML_TAG_NAME HTML_TAG_CLOSE
+    ;
 
 htmlAttribute
     : HTML_TAG_NAME (HTML_TAG_EQUALS attrValue)?
@@ -64,12 +57,9 @@ htmlContent
     : htmlElement
     | jinjaVar
     | jinjaControl
+    | HTML_COMMENT
     | HTML_TEXT
     ;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA2 VARIABLES {{ }}
-// ═══════════════════════════════════════════════════════════════════════════
 
 jinjaVar
     : JINJA_VAR_OPEN jinjaExpression (JINJA_VAR_PIPE jinjaFilter)* JINJA_VAR_CLOSE
@@ -117,10 +107,6 @@ jinjaDictItems: jinjaDictItem (JINJA_VAR_COMMA jinjaDictItem)* JINJA_VAR_COMMA?;
 
 jinjaDictItem: jinjaExpression JINJA_VAR_COLON jinjaExpression;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA2 IN ATTRIBUTES
-// ═══════════════════════════════════════════════════════════════════════════
-
 jinjaInAttr
     : HTML_ATTR_DQ_JINJA_OPEN jinjaInAttrExpr (JINJA_IN_ATTR_PIPE JINJA_IN_ATTR_IDENTIFIER)* JINJA_IN_ATTR_CLOSE
     | HTML_ATTR_SQ_JINJA_OPEN jinjaInAttrExpr (JINJA_IN_ATTR_PIPE JINJA_IN_ATTR_IDENTIFIER)* JINJA_IN_ATTR_CLOSE
@@ -136,10 +122,6 @@ jinjaInAttrExpr
     ;
 
 jinjaAttrArgList: jinjaInAttrExpr (JINJA_IN_ATTR_COMMA jinjaInAttrExpr)*;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA2 CONTROL STRUCTURES {% %}
-// ═══════════════════════════════════════════════════════════════════════════
 
 jinjaControl
     : jinjaIf
@@ -230,10 +212,6 @@ jinjaAutoescape
     ;
 
 jinjaStmtParamList: JINJA_STMT_IDENTIFIER (JINJA_STMT_COMMA JINJA_STMT_IDENTIFIER)*;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// JINJA2 STATEMENT EXPRESSIONS
-// ═══════════════════════════════════════════════════════════════════════════
 
 jinjaStmtExpression
     : jinjaStmtExpression JINJA_STMT_OR jinjaStmtExpression                           # JinjaStmtOrExpr

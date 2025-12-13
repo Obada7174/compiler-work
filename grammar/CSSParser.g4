@@ -4,17 +4,27 @@ options {
     tokenVocab = CSSLexer;
 }
 
-@header {
-package grammar;
-}
-
 stylesheet
     : (ruleSet | atRule)* EOF
     ;
 
 atRule
-    : AT_KEYWORD value? LBRACE ruleSet* RBRACE
-    | AT_KEYWORD value? SEMICOLON
+    : AT_KEYWORD atRulePrelude
+      (SEMICOLON | LBRACE ruleSet* RBRACE)
+    ;
+
+atRulePrelude
+    : (IDENTIFIER
+     | CSS_VAR
+     | STRING
+     | NUMBER
+     | UNIT
+     | AND
+     | LPAREN
+     | RPAREN
+     | COLON
+     | value
+     )*
     ;
 
 ruleSet
@@ -25,7 +35,6 @@ selectorList
     : selector (COMMA selector)*
     ;
 
-
 selector
     : simpleSelector (combinator simpleSelector)*
     ;
@@ -35,43 +44,68 @@ simpleSelector
     ;
 
 selectorPart
-    : IDENTIFIER                                      # ElementSelector
+    : PSEUDO_ELEMENT                                  # PseudoElementSelector
+    | PSEUDO_CLASS                                    # PseudoClassSelector
+    | IDENTIFIER                                      # ElementSelector
     | DOT IDENTIFIER                                  # ClassSelector
     | HASH IDENTIFIER                                 # IdSelector
     | STAR                                            # UniversalSelector
-    | PSEUDO_CLASS                                    # PseudoClassSelector
-    | PSEUDO_ELEMENT                                  # PseudoElementSelector
-    | LBRACKET IDENTIFIER (EQUALS value)? RBRACKET   # AttributeSelector
+    | LBRACKET IDENTIFIER (EQUALS value)? RBRACKET    # AttributeSelector
     ;
 
 combinator
-    : GT          // Child: ul > li
-    | PLUS        // Adjacent sibling: h1 + p
-    | TILDE       // General sibling: h1 ~ p
-    // Descendant combinator (space) is implicit when no combinator token
-    ;
+    : GT
+    | PLUS
+    | TILDE
 
+    ;
 
 declaration
-    : IDENTIFIER COLON value IMPORTANT? SEMICOLON?
+    : (IDENTIFIER | CSS_VAR) COLON value IMPORTANT? SEMICOLON?
     ;
 
+
+   expression
+        : expression PLUS_OP expression
+        | expression MINUS_OP expression
+        | expression MULTIPLY expression
+        | expression DIVIDE expression
+        | NUMBER UNIT?
+        | LPAREN expression RPAREN
+        ;
 
 value
-    : valueItem (COMMA valueItem)*
+    : valueComponent+
     ;
 
-valueItem
-    : DIMENSION                                       # DimensionValue
-    | NUMBER                                          # NumberValue
-    | COLOR_HEX                                       # ColorValue
-    | STRING                                          # StringValue
-    | IDENTIFIER                                      # IdentifierValue
-    | functionCall                                    # FunctionValue
-    | URL                                             # UrlValue
+valueComponent
+    : functionCall        # FunctionValue
+    | NUMBER UNIT?        # NumberValue
+    | COLOR_HEX           # ColorValue
+    | STRING              # StringValue
+    | CSS_VAR             # CssVariableValue
+    | IDENTIFIER          # IdentifierValue
+    | URL                 # UrlValue
+    | LPAREN              # LeftParenValue
+    | RPAREN              # RightParenValue
+    | PLUS_OP             # PlusOperator
+    | MINUS_OP            # MinusOperator
+    | MULTIPLY            # MultiplyOperator
+    | DIVIDE              # DivideOperator
+    | COMMA               # CommaValue
     ;
 
 functionCall
-    : IDENTIFIER LPAREN value? RPAREN   // rgb(255,0,0)
+    : IDENTIFIER LPAREN functionArguments? RPAREN
     ;
+
+
+functionArguments
+    : expression (COMMA expression)*
+    ;
+
+inlineStyle
+    : declaration+
+    ;
+
 
