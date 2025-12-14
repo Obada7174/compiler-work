@@ -10,9 +10,9 @@ users = [
 ]
 
 items = [
-    {'title': 'Item 1', 'description': 'First item', 'color': '#ff0000'},
-    {'title': 'Item 2', 'description': 'Second item', 'color': '#00ff00'},
-    {'title': 'Item 3', 'description': 'Third item', 'color': '#0000ff'}
+    {'title': 'Item 1', 'description': 'First item', 'color': '#ff0000','price':3443},
+    {'title': 'Item 2', 'description': 'Second item', 'color': '#00ff00','price':3443},
+    {'title': 'Item 3', 'description': 'Third item', 'color': '#0000ff','price':3443}
 ]
 
 @app.route('/')
@@ -21,7 +21,7 @@ def index():
         'name': 'John Doe',
         'is_logged_in': True
     }
-    return render_template('index.html', 
+    return render_template('index.html',
                          page_title='Home Page',
                          heading='Welcome',
                          user=user,
@@ -50,9 +50,11 @@ class User:
     def __init__(self, name, email):
         self.name = name
         self.email = email
-    
+
     def get_display_name(self):
         return f"{self.name} <{self.email}>"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
