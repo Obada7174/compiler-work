@@ -4,13 +4,14 @@ lexer grammar Jinja2Lexer;
 package grammar;
 }
 
+// Modes for Jinja2
 JINJA_VAR_OPEN    : '{{' -> pushMode(JINJA_VAR_MODE);
 JINJA_STMT_OPEN   : '{%' -> pushMode(JINJA_STMT_MODE);
 JINJA_COMMENT_OPEN: '{#' -> pushMode(JINJA_COMMENT_MODE);
 
 mode JINJA_COMMENT_MODE;
 JINJA_COMMENT_CONTENT
-    : ( options { greedy=false; } : .*? ) '#}' -> popMode, skip
+    : .*? '#}' -> popMode, skip
     ;
 
 mode DEFAULT_MODE;
@@ -20,15 +21,15 @@ HTML_DOCTYPE
     ;
 
 HTML_COMMENT
-    : '<!--' ( options { greedy=false; } : .*? ) '-->' -> skip
+    : '<!--' .*? '-->' -> skip
     ;
 
 HTML_STYLE_OPEN
-    : '<' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] ( ~[>]* ) '>' -> pushMode(STYLE_CONTENT_MODE)
+    : '<' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] ~[>]* '>' -> pushMode(STYLE_CONTENT_MODE)
     ;
 
 HTML_SCRIPT_OPEN
-    : '<' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] ( ~[>]* ) '>' -> pushMode(SCRIPT_CONTENT_MODE)
+    : '<' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] ~[>]* '>' -> pushMode(SCRIPT_CONTENT_MODE)
     ;
 
 HTML_OPEN
@@ -184,13 +185,13 @@ HTML_ATTR_VALUE_UNEXPECTED
 
 mode HTML_ATTR_DQ_MODE;
 
-HTML_ATTR_DQ_TEXT       : ( options { greedy=false; } : (~['{"])+ ) ;
+HTML_ATTR_DQ_TEXT       : (~['{"])+ ;
 HTML_ATTR_DQ_JINJA_OPEN : '{{' -> pushMode(JINJA_IN_ATTR_MODE) ;
 HTML_ATTR_DQ_END        : '"' -> popMode, popMode ;
 
 mode HTML_ATTR_SQ_MODE;
 
-HTML_ATTR_SQ_TEXT       : ( options { greedy=false; } : (~['{'])+ ) ;
+HTML_ATTR_SQ_TEXT       : (~['{'])+ ;
 HTML_ATTR_SQ_JINJA_OPEN : '{{' -> pushMode(JINJA_IN_ATTR_MODE) ;
 HTML_ATTR_SQ_END        : '\'' -> popMode, popMode ;
 
@@ -212,12 +213,11 @@ JINJA_IN_ATTR_WS: [ \t\r\n]+ -> skip ;
 mode STYLE_CONTENT_MODE;
 
 HTML_STYLE_CONTENT
-    : ( options { greedy=false; } : .*? ) ('</' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>') -> popMode
+    : .*? ('</' [ \t\r\n]* [Ss][Tt][Yy][Ll][Ee] [ \t\r\n]* '>') -> popMode
     ;
 
 mode SCRIPT_CONTENT_MODE;
 
 HTML_SCRIPT_CONTENT
-    : ( options { greedy=false; } : .*? ) ('</' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] [ \t\r\n]* '>') -> popMode
+    : .*? ('</' [ \t\r\n]* [Ss][Cc][Rr][Ii][Pp][Tt] [ \t\r\n]* '>') -> popMode
     ;
-

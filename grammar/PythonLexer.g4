@@ -1,9 +1,5 @@
 lexer grammar PythonLexer;
 
-@header {
-package grammar;
-}
-
 @members {
     private java.util.Stack<Integer> indents = new java.util.Stack<>();
     private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
@@ -43,10 +39,8 @@ package grammar;
     }
 }
 
-// ─── COMMENTS ───
 COMMENT : '#' ~[\r\n]* -> channel(HIDDEN);
 
-// ─── WHITESPACE + INDENT/DEDENT ───
 WS
     : [ \t\r\n]+ {
         String text = getText();
@@ -74,7 +68,6 @@ WS
         }
     } -> skip;
 
-// ─── KEYWORDS ───
 DEF: 'def';
 CLASS: 'class';
 IF: 'if';
@@ -100,7 +93,7 @@ NONE: 'None';
 TRUE: 'True';
 FALSE: 'False';
 
-// ─── SYMBOLS ───
+
 LPAREN: '(';
 RPAREN: ')';
 LBRACK: '[';
@@ -127,7 +120,7 @@ GT: '>';
 AT: '@';
 SEMI: ';';
 
-// ─── LITERALS ───
+
 NUMBER: [0-9]+ ('.' [0-9]+)?;
 STRING
     : '\'' (~['\\\r\n] | '\\' .)* '\''
@@ -138,9 +131,7 @@ FSTRING
     | 'f\'' (~['\\\r\n] | '\\' . | '{' .*? '}')* '\''
     ;
 
-// ─── IDENTIFIERS ───
 NAME: [a-zA-Z_] [a-zA-Z_0-9]*;
 
-// ─── INDENTATION TOKENS ───
 INDENT: '<INDENT>';
 DEDENT: '<DEDENT>';

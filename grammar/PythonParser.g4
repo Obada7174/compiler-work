@@ -12,7 +12,6 @@ stmt
     | decorated
     ;
 
-// ─── SIMPLE STATEMENTS ───
 simple_stmt
     : small_stmt (SEMI small_stmt)* SEMI?
     ;
@@ -29,7 +28,6 @@ expr_stmt
     : expr
     ;
 
-// ─── COMPOUND STATEMENTS ───
 compound_stmt
     : funcdef
     | classdef
@@ -39,7 +37,6 @@ compound_stmt
     | try_stmt
     ;
 
-// ─── DECORATORS ───
 decorated
     : decorator+ (funcdef | classdef)
     ;
@@ -48,7 +45,6 @@ decorator
     : AT atom_expr call
     ;
 
-// ─── FUNCTION & CLASS ───
 funcdef
     : DEF NAME parameters COLON suite
     ;
@@ -57,7 +53,6 @@ classdef
     : CLASS NAME (LPAREN (dotted_name (COMMA dotted_name)*)? RPAREN)? COLON suite
     ;
 
-// ─── CONTROL FLOW ───
 if_stmt
     : IF expr COLON suite (ELIF expr COLON suite)* (ELSE COLON suite)?
     ;
@@ -74,7 +69,6 @@ try_stmt
     : TRY COLON suite (EXCEPT (NAME (AS NAME)?)? COLON suite)+ (FINALLY COLON suite)?
     ;
 
-// ─── RETURN / IMPORT ───
 return_stmt
     : RETURN expr?
     ;
@@ -88,14 +82,11 @@ dotted_name
     : NAME (DOT NAME)*
     ;
 
-// ─── SUITE (BLOCK) ───
-// ✅ التعديل الوحيد: السماح بكتلة من العبارات مباشرة دون INDENT/DEDENT
 suite
     : simple_stmt
     | stmt+
     ;
 
-// ─── EXPRESSIONS ───
 expr
     : comparison
     ;
@@ -118,7 +109,6 @@ trailer
     | LBRACK expr RBRACK
     ;
 
-// ─── FUNCTION CALLS ───
 call
     : LPAREN (arglist)? RPAREN
     ;
@@ -158,7 +148,7 @@ dictItem
     : (STRING | NAME) COLON expr
     ;
 
-// ─── PARAMETERS & ASSIGNMENT ───
+
 parameters
     : LPAREN (NAME (COMMA NAME)*)? RPAREN
     ;

@@ -2,23 +2,19 @@ parser grammar Jinja2Parser;
 
 options { tokenVocab = Jinja2Lexer; }
 
-@header {
-package grammar;
-}
-
-
 template
-    : HTML_DOCTYPE? content* EOF
+    : HTML_DOCTYPE? content* EOF                 # TemplateNode
     ;
 
 content
-    : htmlStyleTag
-    | htmlScriptTag
-    | htmlElement
-    | jinjaVar
-    | jinjaControl
-    | HTML_COMMENT
-    | HTML_TEXT
+    : htmlStyleTag                               # StyleContent
+    | htmlScriptTag                              # ScriptContent
+    | htmlElement                                # HtmlElementContent
+    | htmlCloseTag                               # HtmlCloseContent
+    | jinjaVar                                   # JinjaVarContent
+    | jinjaControl                               # JinjaControlContent
+    | HTML_COMMENT                               # HtmlCommentContent
+    | HTML_TEXT                                  # HtmlTextContent
     ;
 
 htmlStyleTag: HTML_STYLE_OPEN HTML_STYLE_CONTENT;
@@ -124,18 +120,18 @@ jinjaInAttrExpr
 jinjaAttrArgList: jinjaInAttrExpr (JINJA_IN_ATTR_COMMA jinjaInAttrExpr)*;
 
 jinjaControl
-    : jinjaIf
-    | jinjaFor
-    | jinjaBlock
-    | jinjaExtends
-    | jinjaInclude
-    | jinjaImport
-    | jinjaSet
-    | jinjaMacro
-    | jinjaCall
-    | jinjaFilterBlock
-    | jinjaWith
-    | jinjaAutoescape
+    : jinjaIf    # JinjaIfControl
+    | jinjaFor   # JinjaForControl
+    | jinjaBlock # JinjaBlockControl
+    | jinjaExtends  # JinjaExtendsControl
+    | jinjaInclude  # JinjaIncludeControl
+    | jinjaImport  # JinjaImportControl
+    | jinjaSet  # JinjaSetControl
+    | jinjaMacro # JinjaMacroControl
+    | jinjaCall  # JinjaCallControl
+    | jinjaFilterBlock # JinjaFilterBlockControl
+    | jinjaWith  # JinjaWithControl
+    | jinjaAutoescape # JinjaAutoescapeControl
     ;
 
 jinjaIf
@@ -144,14 +140,18 @@ jinjaIf
       (JINJA_STMT_OPEN JINJA_STMT_ELIF jinjaStmtExpression JINJA_STMT_CLOSE content*)*
       (JINJA_STMT_OPEN JINJA_STMT_ELSE JINJA_STMT_CLOSE content*)?
       JINJA_STMT_OPEN JINJA_STMT_ENDIF JINJA_STMT_CLOSE
+      # JinjaIfStmt
     ;
+
 
 jinjaFor
     : JINJA_STMT_OPEN JINJA_STMT_FOR jinjaStmtTarget JINJA_STMT_IN jinjaStmtExpression JINJA_STMT_CLOSE
       content*
       (JINJA_STMT_OPEN JINJA_STMT_ELSE JINJA_STMT_CLOSE content*)?
       JINJA_STMT_OPEN JINJA_STMT_ENDFOR JINJA_STMT_CLOSE
+      # JinjaForStmt
     ;
+
 
 jinjaStmtTarget
     : JINJA_STMT_IDENTIFIER

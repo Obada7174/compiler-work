@@ -9,26 +9,25 @@ stylesheet
     ;
 
 atRule
-    : AT_KEYWORD atRulePrelude
-      (SEMICOLON | LBRACE ruleSet* RBRACE)
+    : AT_KEYWORD atRulePrelude (SEMICOLON | LBRACE ruleSet* RBRACE)
     ;
 
 atRulePrelude
     : (IDENTIFIER
-     | CSS_VAR
-     | STRING
-     | NUMBER
-     | UNIT
-     | AND
-     | LPAREN
-     | RPAREN
-     | COLON
-     | value
-     )*
+       | CSS_VAR
+       | STRING
+       | NUMBER
+       | UNIT
+       | AND
+       | LPAREN
+       | RPAREN
+       | COLON
+       | value
+      )*
     ;
 
 ruleSet
-    : selectorList LBRACE declaration* RBRACE
+    : selectorList LBRACE declaration* RBRACE   # RuleSetNode
     ;
 
 selectorList
@@ -36,7 +35,7 @@ selectorList
     ;
 
 selector
-    : simpleSelector (combinator simpleSelector)*
+    : simpleSelector (combinator simpleSelector)* # SelectorNode
     ;
 
 simpleSelector
@@ -44,35 +43,24 @@ simpleSelector
     ;
 
 selectorPart
-    : PSEUDO_ELEMENT                                  # PseudoElementSelector
-    | PSEUDO_CLASS                                    # PseudoClassSelector
-    | IDENTIFIER                                      # ElementSelector
-    | DOT IDENTIFIER                                  # ClassSelector
-    | HASH IDENTIFIER                                 # IdSelector
-    | STAR                                            # UniversalSelector
-    | LBRACKET IDENTIFIER (EQUALS value)? RBRACKET    # AttributeSelector
+    : PSEUDO_ELEMENT                               # PseudoElementSelector
+    | PSEUDO_CLASS                                 # PseudoClassSelector
+    | IDENTIFIER                                   # ElementSelector
+    | DOT IDENTIFIER                               # ClassSelector
+    | HASH IDENTIFIER                              # IdSelector
+    | STAR                                         # UniversalSelector
+    | LBRACKET IDENTIFIER (EQUALS value)? RBRACKET # AttributeSelector
     ;
 
 combinator
     : GT
     | PLUS
     | TILDE
-
     ;
 
 declaration
-    : (IDENTIFIER | CSS_VAR) COLON value IMPORTANT? SEMICOLON?
+    : (IDENTIFIER | CSS_VAR) COLON value IMPORTANT? SEMICOLON? # DeclarationNode
     ;
-
-
-   expression
-        : expression PLUS_OP expression
-        | expression MINUS_OP expression
-        | expression MULTIPLY expression
-        | expression DIVIDE expression
-        | NUMBER UNIT?
-        | LPAREN expression RPAREN
-        ;
 
 value
     : valueComponent+
@@ -96,16 +84,18 @@ valueComponent
     ;
 
 functionCall
-    : IDENTIFIER LPAREN functionArguments? RPAREN
+    : IDENTIFIER LPAREN functionArguments? RPAREN # FunctionCallNode
     ;
-
 
 functionArguments
     : expression (COMMA expression)*
     ;
 
-inlineStyle
-    : declaration+
+expression
+    : expression PLUS_OP expression       # AddExpr
+    | expression MINUS_OP expression      # SubExpr
+    | expression MULTIPLY expression      # MulExpr
+    | expression DIVIDE expression        # DivExpr
+    | NUMBER UNIT?                        # NumberExpr
+    | LPAREN expression RPAREN            # ParenExpr
     ;
-
-
