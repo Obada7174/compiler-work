@@ -1,5 +1,4 @@
 lexer grammar Jinja2Lexer;
-
 @header {
 package grammar;
 }

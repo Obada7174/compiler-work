@@ -2,7 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>compiler</groupId>
@@ -10,31 +11,38 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Flask/Jinja2/Python/CSS Compiler</name>
+    <name>Flask / Jinja2 / Python / CSS Compiler</name>
     <description>ANTLR4-based compiler for Flask applications with Jinja2 templates</description>
 
+    <!-- ===================================================== -->
+    <!-- Properties -->
+    <!-- ===================================================== -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <antlr.version>4.13.2</antlr.version>
     </properties>
-
+    <!-- ===================================================== -->
+    <!-- Dependencies -->
+    <!-- ===================================================== -->
     <dependencies>
-        <!-- ANTLR4 Runtime -->
+
+        <!-- ANTLR Runtime -->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>${antlr.version}</version>
         </dependency>
 
-        <!-- JUnit 5 for Testing -->
+        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -42,28 +50,29 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Apache Commons for utilities -->
+        <!-- Apache Commons -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.14.0</version>
         </dependency>
+
     </dependencies>
 
+    <!-- ===================================================== -->
+    <!-- Build -->
+    <!-- ===================================================== -->
     <build>
         <plugins>
-            <!-- ANTLR4 Maven Plugin -->
+
+            <!-- ============================================= -->
+            <!-- ANTLR4 Maven Plugin (STANDARD CONFIGURATION) -->
+            <!-- ============================================= -->
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
-                <configuration>
-                    <sourceDirectory>grammar</sourceDirectory>
-                    <outputDirectory>src/gen/grammar</outputDirectory>
-                    <visitor>true</visitor>
-                    <listener>true</listener>
-                    <!-- Package is specified in grammar files using @header, not command-line args -->
-                </configuration>
+
                 <executions>
                     <execution>
                         <goals>
@@ -71,30 +80,17 @@
                         </goals>
                     </execution>
                 </executions>
+
+                <configuration>
+                    <visitor>true</visitor>
+                    <listener>true</listener>
+                </configuration>
             </plugin>
 
-            <!-- Build Helper Plugin - Add generated sources -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.basedir}/src/gen</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 
+            <!-- ============================================= -->
             <!-- Maven Compiler Plugin -->
+            <!-- ============================================= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -105,7 +101,18 @@
                 </configuration>
             </plugin>
 
+            <!-- ============================================= -->
+            <!-- Maven Surefire Plugin -->
+            <!-- ============================================= -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.2</version>
+            </plugin>
+
+            <!-- ============================================= -->
             <!-- Maven Jar Plugin -->
+            <!-- ============================================= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -120,17 +127,21 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Shade Plugin for creating fat JAR -->
+            <!-- ============================================= -->
+            <!-- Maven Shade Plugin (Fat JAR) -->
+            <!-- ============================================= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.1</version>
+
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -143,12 +154,7 @@
                 </executions>
             </plugin>
 
-            <!-- Maven Surefire Plugin for Testing -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.2</version>
-            </plugin>
         </plugins>
     </build>
+
 </project>

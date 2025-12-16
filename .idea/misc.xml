@@ -46,7 +46,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/grammar/PythonLexer.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="D:\codes-folder\compiler\Test1\src\gen" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\src\gen\grammar" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />
@@ -57,6 +57,66 @@
           <option name="fileName" value="$PROJECT_DIR$/grammar/PythonParser.g4" />
           <option name="autoGen" value="true" />
           <option name="outputDir" value="C:\Users\user\IdeaProjects\compiler-work\src\gen" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/antlr4/grammar/Jinja2Lexer.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\target\generated-sources\antlr4\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/antlr4/grammar/Jinja2Parser.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\target\generated-sources\antlr4\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/antlr4/grammar/PythonLexer.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\target\generated-sources\antlr4\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/antlr4/grammar/PythonParser.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\target\generated-sources\antlr4\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/antlr4/grammar/CSSLexer.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\target\generated-sources\antlr4\grammar" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/antlr4/grammar/CSSParser.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="D:\codes-folder\compiler\Test1\target\generated-sources\antlr4\grammar" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />

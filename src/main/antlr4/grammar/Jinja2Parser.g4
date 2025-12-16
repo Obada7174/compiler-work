@@ -1,4 +1,7 @@
 parser grammar Jinja2Parser;
+@header {
+package grammar;
+}
 
 options { tokenVocab = Jinja2Lexer; }
 

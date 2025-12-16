@@ -1,5 +1,7 @@
 parser grammar CSSParser;
-
+@header {
+package grammar;
+}
 options {
     tokenVocab = CSSLexer;
 }

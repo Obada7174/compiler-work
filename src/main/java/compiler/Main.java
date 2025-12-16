@@ -5,15 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 // ANTLR Runtime imports
-import grammar.Jinja2Lexer;
-import grammar.Jinja2Parser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-
+import grammar.*;
 // Generated parser/lexer imports
 
 // Compiler internal imports

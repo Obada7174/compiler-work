@@ -1,14 +1,12 @@
 package compiler;
 
-import grammar.PythonLexer;
-import grammar.PythonParser;
 import org.antlr.v4.runtime.*;
-
 // Generated parser classes
-
+import grammar.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 
 public class TestPythonParser {
     public static void main(String[] args) {

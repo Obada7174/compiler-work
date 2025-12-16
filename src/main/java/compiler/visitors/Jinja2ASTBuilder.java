@@ -1,8 +1,7 @@
 package compiler.visitors;
 
 import compiler.ast.*;
-import grammar.Jinja2Parser;
-import grammar.Jinja2ParserBaseVisitor;
+import grammar.*;
 
 // Generated parser classes
 

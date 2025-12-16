@@ -1,5 +1,7 @@
 lexer grammar PythonLexer;
-
+@header {
+package grammar;
+}
 @members {
     private java.util.Stack<Integer> indents = new java.util.Stack<>();
     private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();

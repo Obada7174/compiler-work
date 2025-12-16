@@ -1,6 +1,9 @@
 parser grammar PythonParser;
-
+@header {
+package grammar;
+}
 options { tokenVocab=PythonLexer; }
+
 
 file_input
     : stmt* EOF
