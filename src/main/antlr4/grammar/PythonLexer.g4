@@ -1,75 +1,85 @@
 lexer grammar PythonLexer;
+
+options {
+    superClass = PythonLexerBase;
+}
+
 @header {
 package grammar;
 }
+
+tokens { INDENT, DEDENT }
+
 @members {
-    private java.util.Stack<Integer> indents = new java.util.Stack<>();
-    private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
+    // Implement abstract methods from PythonLexerBase
+    @Override
+    protected int getNewlineTokenType() {
+        return NEWLINE;
+    }
 
     @Override
-    public Token nextToken() {
-        if (!tokens.isEmpty()) return tokens.poll();
-
-        Token t = super.nextToken();
-        if (t.getType() == EOF) {
-            // Close all remaining indents
-            while (!indents.isEmpty()) {
-                tokens.add(createIndentToken(DEDENT));
-                indents.pop();
-            }
-            tokens.add(t);
-            return tokens.poll();
-        }
-        return t;
+    protected int getIndentTokenType() {
+        return INDENT;
     }
 
-    private Token createIndentToken(int type) {
-        return new CommonToken(_tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, -1, -1);
-    }
-
-    private void handleIndent(int indent) {
-        int prev = indents.isEmpty() ? 0 : indents.peek();
-        if (indent > prev) {
-            indents.push(indent);
-            tokens.add(createIndentToken(INDENT));
-        } else if (indent < prev) {
-            while (!indents.isEmpty() && indent < indents.peek()) {
-                indents.pop();
-                tokens.add(createIndentToken(DEDENT));
-            }
-        }
+    @Override
+    protected int getDedentTokenType() {
+        return DEDENT;
     }
 }
 
+// ─── COMMENTS ──────────────────────────────
 COMMENT : '#' ~[\r\n]* -> channel(HIDDEN);
 
-WS
-    : [ \t\r\n]+ {
-        String text = getText();
-        int pos = 0;
-        while (pos < text.length()) {
-            char c = text.charAt(pos);
-            if (c == '\n' || c == '\r') {
-                // Normalize \r\n to \n
-                if (c == '\r' && pos + 1 < text.length() && text.charAt(pos + 1) == '\n') {
-                    pos += 2;
-                } else {
-                    pos++;
-                }
-                // Count indentation on next line
-                int indent = 0;
-                int temp = pos;
-                while (temp < text.length()) {
-                    char ch = text.charAt(temp);
-                    if (ch == ' ') { indent++; temp++; }
-                    else if (ch == '\t') { indent += 8; temp++; } // tab=8
-                    else break;
-                }
-                handleIndent(indent);
-            } else { pos++; }
+// ─── NEWLINE + INDENT/DEDENT ──────────────
+NEWLINE
+    : ('\r'? '\n' | '\r') [ \t]* {
+        // Skip NEWLINE inside parens/brackets/braces
+        if (isInsideParens()) {
+            skip();
+            return;
         }
-    } -> skip;
 
+        // Skip blank lines and comment-only lines
+        int la = _input.LA(1);
+        if (la == '\r' || la == '\n' || la == '#' || la == -1) {
+            skip();
+            return;
+        }
+
+        // Extract indentation part (everything after newline chars)
+        String text = getText();
+        int nlEnd = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '\r' || c == '\n') {
+                nlEnd = i + 1;
+                if (c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') {
+                    nlEnd++;
+                }
+            } else {
+                break;
+            }
+        }
+
+        String indentText = text.substring(nlEnd);
+
+        // Emit NEWLINE token FIRST
+        setType(NEWLINE);
+
+        // Then handle indentation (queues INDENT/DEDENT)
+        handleNewline(indentText);
+    }
+    ;
+
+// ─── LINE CONTINUATION ─────────────────────
+LINE_CONTINUATION : '\\' ('\r'? '\n' | '\r') -> skip;
+
+// ─── WHITESPACE ────────────────────────────
+WS : [ \t]+ -> skip;
+
+// ─── KEYWORDS ──────────────────────────────
 DEF: 'def';
 CLASS: 'class';
 IF: 'if';
@@ -86,6 +96,8 @@ TRY: 'try';
 EXCEPT: 'except';
 FINALLY: 'finally';
 WITH: 'with';
+MATCH: 'match';
+CASE: 'case';
 AND: 'and';
 OR: 'or';
 NOT: 'not';
@@ -95,45 +107,27 @@ NONE: 'None';
 TRUE: 'True';
 FALSE: 'False';
 
+// ─── DELIMITERS ────────────────────────────
+LPAREN: '(' {incParenDepth();};
+RPAREN: ')' {decParenDepth();};
+LBRACK: '[' {incParenDepth();};
+RBRACK: ']' {decParenDepth();};
+LBRACE: '{' {incParenDepth();};
+RBRACE: '}' {decParenDepth();};
 
-LPAREN: '(';
-RPAREN: ')';
-LBRACK: '[';
-RBRACK: ']';
-LBRACE: '{';
-RBRACE: '}';
-COLON: ':';
-COMMA: ',';
-DOT: '.';
-ASSIGN: '=';
-PLUS: '+';
-MINUS: '-';
-STAR: '*';
-DIV: '/';
-MOD: '%';
-POW: '**';
-FLOORDIV: '//';
-EQ: '==';
-NE: '!=';
-LE: '<=';
-GE: '>=';
-LT: '<';
-GT: '>';
-AT: '@';
-SEMI: ';';
+COLON: ':'; COMMA: ','; DOT: '.'; ASSIGN: '='; PLUS: '+'; MINUS: '-'; STAR: '*'; DIV: '/';
+MOD: '%'; POW: '**'; FLOORDIV: '//'; EQ: '=='; NE: '!='; LE: '<='; GE: '>='; LT: '<'; GT: '>'; AT: '@'; SEMI: ';'; PIPE: '|';
 
-
-NUMBER: [0-9]+ ('.' [0-9]+)?;
+// ─── LITERALS ──────────────────────────────
+NUMBER : [0-9]+ ('.' [0-9]+)?;
 STRING
-    : '\'' (~['\\\r\n] | '\\' .)* '\''
+    : '\'\'\'' .*? '\'\'\''
+    | '"""' .*? '"""'
+    | '\'' (~['\\\r\n] | '\\' .)* '\''
     | '"' (~["\\\r\n] | '\\' .)* '"'
     ;
 FSTRING
     : 'f"' (~["\\\r\n] | '\\' . | '{' .*? '}')* '"'
     | 'f\'' (~['\\\r\n] | '\\' . | '{' .*? '}')* '\''
     ;
-
-NAME: [a-zA-Z_] [a-zA-Z_0-9]*;
-
-INDENT: '<INDENT>';
-DEDENT: '<DEDENT>';
+NAME : [a-zA-Z_] [a-zA-Z_0-9]*;

@@ -57,7 +57,7 @@ public class TestPythonParser {
             });
 
             // Parse the code
-            PythonParser.ProgramContext tree = parser.program();
+            PythonParser.File_inputContext tree = parser.file_input();
 
             System.out.println("✓ Syntax Analysis completed");
             System.out.println("  Parse tree root: " + tree.getClass().getSimpleName());

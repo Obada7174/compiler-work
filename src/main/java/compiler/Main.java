@@ -15,7 +15,7 @@ import grammar.*;
 // Generated parser/lexer imports
 
 // Compiler internal imports
-import compiler.visitors.Jinja2ASTBuilder;
+// import compiler.visitors.Jinja2ASTBuilder;
 import compiler.ast.ASTNode;
 import compiler.utils.ASTPrinter;
 import compiler.symboltable.SymbolTable;
@@ -110,12 +110,12 @@ public class Main {
             System.out.println("┌─ STAGE 3: AST Construction ─────────────────┐");
             System.out.println("│  Using Visitor Pattern...");
 
-            Jinja2ASTBuilder astBuilder = new Jinja2ASTBuilder();
-            ASTNode ast = astBuilder.visit(parseTree);
+            // Jinja2ASTBuilder astBuilder = new Jinja2ASTBuilder();
+            // ASTNode ast = astBuilder.visit(parseTree);
 
-            System.out.println("│  ✓ AST construction completed");
-            System.out.println("│  → Root node type: " + ast.getNodeType());
-            System.out.println("│  → Child count: " + ast.getChildren().size());
+            // System.out.println("│  ✓ AST construction completed");
+            // System.out.println("│  → Root node type: " + ast.getNodeType());
+            // System.out.println("│  → Child count: " + ast.getChildren().size());
             System.out.println("└──────────────────────────────────────────────┘\n");
 
             // ═══════════════════════════════════════════════════════════════
@@ -125,7 +125,7 @@ public class Main {
             System.out.println("│  Printing AST with details...");
             System.out.println("└──────────────────────────────────────────────┘");
 
-            ASTPrinter.printWithStats(ast);
+            // ASTPrinter.printWithStats(ast);
 
             // ═══════════════════════════════════════════════════════════════
             // STAGE 5: SYMBOL TABLE DEMONSTRATION

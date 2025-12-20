@@ -2,11 +2,13 @@ parser grammar PythonParser;
 @header {
 package grammar;
 }
-options { tokenVocab=PythonLexer; }
 
+options {
+     tokenVocab=PythonLexer;
+ }
 
 file_input
-    : stmt* EOF
+    : (stmt | NEWLINE)* EOF
     ;
 
 stmt
@@ -16,7 +18,7 @@ stmt
     ;
 
 simple_stmt
-    : small_stmt (SEMI small_stmt)* SEMI?
+    : small_stmt (SEMI small_stmt)* SEMI? NEWLINE
     ;
 
 small_stmt
@@ -45,7 +47,7 @@ decorated
     ;
 
 decorator
-    : AT atom_expr call
+    : AT atom_expr call? NEWLINE
     ;
 
 funcdef
@@ -61,11 +63,11 @@ if_stmt
     ;
 
 for_stmt
-    : FOR NAME IN expr COLON suite
+    : FOR NAME IN expr COLON suite (ELSE COLON suite)?
     ;
 
 while_stmt
-    : WHILE expr COLON suite
+    : WHILE expr COLON suite (ELSE COLON suite)?
     ;
 
 try_stmt
@@ -87,7 +89,7 @@ dotted_name
 
 suite
     : simple_stmt
-    | stmt+
+    | NEWLINE INDENT stmt+ DEDENT
     ;
 
 expr
@@ -150,7 +152,6 @@ dictLit
 dictItem
     : (STRING | NAME) COLON expr
     ;
-
 
 parameters
     : LPAREN (NAME (COMMA NAME)*)? RPAREN

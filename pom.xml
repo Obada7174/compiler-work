@@ -82,8 +82,11 @@
                 </executions>
 
                 <configuration>
+                    <sourceDirectory>src/main/antlr4/grammar</sourceDirectory>
+                    <outputDirectory>target/generated-sources/antlr4/grammar</outputDirectory>
                     <visitor>true</visitor>
                     <listener>true</listener>
+                    <treatWarningsAsErrors>false</treatWarningsAsErrors>
                 </configuration>
             </plugin>
 
