@@ -12,7 +12,7 @@ public class TestPythonParser {
     public static void main(String[] args) {
         try {
             // Read the test Python file
-            String pythonCode = new String(Files.readAllBytes(Paths.get("C:\\Users\\Lenovo\\Desktop\\flask-compiler2\\compiler-work\\examples\\app.py")));
+            String pythonCode = new String(Files.readAllBytes(Paths.get("test_python_full.py")));
 
             System.out.println("═══════════════════════════════════════════════════════════");
             System.out.println("  Testing Python Parser");
@@ -56,8 +56,12 @@ public class TestPythonParser {
                 }
             });
 
+            // Parse the code
+            PythonParser.File_inputContext tree = parser.file_input();
 
             System.out.println("✓ Syntax Analysis completed");
+            System.out.println("  Parse tree root: " + tree.getClass().getSimpleName());
+
             System.out.println("\n═══════════════════════════════════════════════════════════");
             System.out.println("  Python Parser Test PASSED!");
             System.out.println("═══════════════════════════════════════════════════════════\n");
