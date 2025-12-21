@@ -63,4 +63,10 @@ public abstract class ASTNode {
     public String toString() {
         return getNodeDetails();
     }
+    public void print(String indent) {
+        System.out.println(indent + getNodeType() + " (" + getNodeDetails() + ")");
+        for (ASTNode child : children) {
+            child.print(indent + "  ");
+        }
+    }
 }

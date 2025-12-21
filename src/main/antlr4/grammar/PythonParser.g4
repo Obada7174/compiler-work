@@ -147,6 +147,7 @@ dictLit
     : LBRACE (dictItem (COMMA dictItem)*)? RBRACE
     ;
 
+
 dictItem
     : (STRING | NAME) COLON expr
     ;

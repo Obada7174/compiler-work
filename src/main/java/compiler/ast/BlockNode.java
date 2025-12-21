@@ -6,11 +6,11 @@ import java.util.ArrayList;
 /**
  * AST node representing Jinja2 block {% block name %} ... {% endblock %}
  */
-public class JinjaBlockNode extends ASTNode {
+public class BlockNode extends ASTNode {
     private String blockName;
     private List<ASTNode> content;
 
-    public JinjaBlockNode(String blockName, List<ASTNode> content, int lineNumber) {
+    public BlockNode(String blockName, List<ASTNode> content, int lineNumber) {
         super(lineNumber);
         this.blockName = blockName;
         this.content = content != null ? content : new ArrayList<>();
