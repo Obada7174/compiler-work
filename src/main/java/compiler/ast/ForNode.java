@@ -1,43 +1,25 @@
 package compiler.ast;
 
-import java.util.List;
-import java.util.ArrayList;
-
-public class ForNode extends ASTNode {
-    private String variable;
+public class ForNode extends StatementNode {
+    private IdentifierNode target;
     private ExpressionNode iterable;
-    private List<ASTNode> body;
+    private BlockNode body;
+    private BlockNode elseBlock;
 
-    public ForNode(String variable, ExpressionNode iterable, List<ASTNode> body, int lineNumber)
-    {
-        super(lineNumber);
-        this.variable = variable;
+    public ForNode(int lineNumber, IdentifierNode target, ExpressionNode iterable, BlockNode body, BlockNode elseBlock) {
+        super(lineNumber, "For");
+        this.target = target;
         this.iterable = iterable;
-        this.body = body != null ? body : new ArrayList<>();
+        this.body = body;
+        this.elseBlock = elseBlock;
 
+        addChild(target);
         addChild(iterable);
-        for (ASTNode node : this.body) addChild(node);
+        addChild(body);
+        if (elseBlock != null) addChild(elseBlock);
     }
-
-    public String getVariable() {
-        return variable;
-    }
-
-    public ExpressionNode getIterable() {
-        return iterable;
-    }
-
-    public List<ASTNode> getBody() {
-        return body;
-    }
-
     @Override
     public String getNodeType() {
         return "For";
-    }
-
-    @Override
-    public String getNodeDetails() {
-        return String.format("For: (%s in ...) (%d statements) (line %d)", variable, body.size(), lineNumber);
     }
 }

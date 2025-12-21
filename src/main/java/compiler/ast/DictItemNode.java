@@ -2,22 +2,18 @@ package compiler.ast;
 
 import compiler.ast.ASTNode;
 import compiler.ast.ExpressionNode;
-
-public class DictItemNode extends ASTNode {
+public class DictItemNode extends ExpressionNode {
     private ExpressionNode key;
     private ExpressionNode value;
-
-    public DictItemNode(ExpressionNode key, ExpressionNode value, int line) {
-        super(line);
-        this.key = key;
-        this.value = value;
+    public DictItemNode(ExpressionNode key, ExpressionNode value, int lineNumber) {
+        super(lineNumber);
+        this.key = key; this.value = value;
         addChild(key);
         addChild(value);
     }
 
-    public ExpressionNode getKey() { return key; }
-    public ExpressionNode getValue() { return value; }
-
     @Override
-    public String getNodeType() { return "DictItem"; }
+    public String getNodeType() {
+        return "Dict item";
+    }
 }

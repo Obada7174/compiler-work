@@ -1,30 +1,22 @@
 package compiler.ast;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class WhileNode extends ASTNode {
+public class WhileNode extends StatementNode {
     private ExpressionNode condition;
-    private List<ASTNode> body;
+    private ASTNode body;
+    private ASTNode elseBody;
 
-    public WhileNode(ExpressionNode condition, List<ASTNode> body, int lineNumber) {
-        super(lineNumber);
+    public WhileNode(ExpressionNode condition, ASTNode body, ASTNode elseBody, int lineNumber) {
+        super(lineNumber, "While");
         this.condition = condition;
-        this.body = body != null ? body : new ArrayList<>();
-
+        this.body = body;
+        this.elseBody = elseBody;
         addChild(condition);
-        for (ASTNode node : this.body) addChild(node);
+        addChild(body);
+        if (elseBody != null) addChild(elseBody);
     }
 
-    public ExpressionNode getCondition() { return condition; }
-    public List<ASTNode> getBody() { return body; }
-
     @Override
-    public String getNodeType() { return "While"; }
-
-    @Override
-    public String getNodeDetails() {
-        return String.format("While: (%d statements) (line %d)", body.size(), lineNumber);
+    public String getNodeType() {
+        return "While";
     }
 }

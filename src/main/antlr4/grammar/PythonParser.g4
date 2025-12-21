@@ -1,15 +1,18 @@
 parser grammar PythonParser;
+
 @header {
 package grammar;
 }
 
 options {
-     tokenVocab=PythonLexer;
- }
+    tokenVocab = PythonLexer;
+}
 
 file_input
     : (stmt | NEWLINE)* EOF
     ;
+
+// ───────────────── STATEMENTS ─────────────────
 
 stmt
     : simple_stmt
@@ -22,24 +25,26 @@ simple_stmt
     ;
 
 small_stmt
-    : assignment
-    | return_stmt
-    | import_stmt
-    | expr_stmt
-    | PASS
+    : assignment        # assignmentStmt
+    | return_stmt       # returnStmt
+    | import_stmt       # importStmt
+    | expr_stmt         # exprStmt
+    | PASS              # passStmt
     ;
 
 expr_stmt
     : expr
     ;
 
+// ──────────────── COMPOUND STATEMENTS ────────────────
+
 compound_stmt
-    : funcdef
-    | classdef
-    | if_stmt
-    | for_stmt
-    | while_stmt
-    | try_stmt
+    : funcdef           # functionDefStmt
+    | classdef          # classDefStmt
+    | if_stmt           # ifStmt
+    | for_stmt          # forStmt
+    | while_stmt        # whileStmt
+    | try_stmt          # tryStmt
     ;
 
 decorated
@@ -50,6 +55,8 @@ decorator
     : AT atom_expr call? NEWLINE
     ;
 
+// ───────────────── DEFINITIONS ─────────────────
+
 funcdef
     : DEF NAME parameters COLON suite
     ;
@@ -58,50 +65,71 @@ classdef
     : CLASS NAME (LPAREN (dotted_name (COMMA dotted_name)*)? RPAREN)? COLON suite
     ;
 
+// ───────────────── CONTROL FLOW ─────────────────
+
 if_stmt
-    : IF expr COLON suite (ELIF expr COLON suite)* (ELSE COLON suite)?
+    : IF expr COLON suite
+      (ELIF expr COLON suite)*
+      (ELSE COLON suite)?
     ;
 
 for_stmt
-    : FOR NAME IN expr COLON suite (ELSE COLON suite)?
+    : FOR NAME IN expr COLON suite
+      (ELSE COLON suite)?
     ;
 
 while_stmt
-    : WHILE expr COLON suite (ELSE COLON suite)?
+    : WHILE expr COLON suite
+      (ELSE COLON suite)?
     ;
 
 try_stmt
-    : TRY COLON suite (EXCEPT (NAME (AS NAME)?)? COLON suite)+ (FINALLY COLON suite)?
+    : TRY COLON suite
+      (EXCEPT (NAME (AS NAME)?)? COLON suite)+
+      (FINALLY COLON suite)?
     ;
+
+// ───────────────── SIMPLE STATEMENTS ─────────────────
 
 return_stmt
     : RETURN expr?
     ;
 
 import_stmt
-    : IMPORT dotted_name (COMMA dotted_name)*
-    | FROM dotted_name IMPORT (NAME (COMMA NAME)*)?
+    : IMPORT dotted_name (COMMA dotted_name)*         # importNames
+    | FROM dotted_name IMPORT (NAME (COMMA NAME)*)?  # importFrom
     ;
+
+assignment
+    : atom_expr ASSIGN expr
+    ;
+
+// ───────────────── NAMES ─────────────────
 
 dotted_name
     : NAME (DOT NAME)*
     ;
+
+// ───────────────── SUITE / BLOCK ─────────────────
 
 suite
     : simple_stmt
     | NEWLINE INDENT stmt+ DEDENT
     ;
 
+// ───────────────── EXPRESSIONS ─────────────────
+
 expr
     : comparison
     ;
 
 comparison
-    : arith_expr ((EQ|NE|LT|GT|LE|GE) arith_expr)?
+    : arith_expr
+      ((EQ | NE | LT | GT | LE | GE) arith_expr)?
     ;
 
 arith_expr
-    : atom_expr ((PLUS|MINUS|STAR|DIV|MOD) atom_expr)*
+    : atom_expr ((PLUS | MINUS | STAR | DIV | MOD) atom_expr)*
     ;
 
 atom_expr
@@ -109,13 +137,13 @@ atom_expr
     ;
 
 trailer
-    : call
-    | DOT NAME
-    | LBRACK expr RBRACK
+    : call               # callTrailer
+    | DOT NAME           # memberAccessTrailer
+    | LBRACK expr RBRACK # indexAccessTrailer
     ;
 
 call
-    : LPAREN (arglist)? RPAREN
+    : LPAREN arglist? RPAREN
     ;
 
 arglist
@@ -127,19 +155,22 @@ argument
     | expr               # positionalArg
     ;
 
-// ─── ATOMS ───
+// ───────────────── ATOMS ─────────────────
+
 atom
-    : NAME
-    | NUMBER
-    | STRING
-    | FSTRING
-    | TRUE
-    | FALSE
-    | NONE
-    | listLit
-    | dictLit
-    | LPAREN expr? RPAREN
+    : NAME                       # nameAtom
+    | NUMBER                     # numberAtom
+    | STRING                     # stringAtom
+    | FSTRING                    # fstringAtom
+    | TRUE                       # trueAtom
+    | FALSE                      # falseAtom
+    | NONE                       # noneAtom
+    | listLit                    # listAtom
+    | dictLit                    # dictAtom
+    | LPAREN expr? RPAREN        # parenAtom
     ;
+
+// ───────────────── LITERALS ─────────────────
 
 listLit
     : LBRACK (expr (COMMA expr)*)? RBRACK
@@ -149,15 +180,12 @@ dictLit
     : LBRACE (dictItem (COMMA dictItem)*)? RBRACE
     ;
 
-
 dictItem
     : (STRING | NAME) COLON expr
     ;
 
+// ───────────────── PARAMETERS ─────────────────
+
 parameters
     : LPAREN (NAME (COMMA NAME)*)? RPAREN
-    ;
-
-assignment
-    : atom_expr ASSIGN expr
     ;

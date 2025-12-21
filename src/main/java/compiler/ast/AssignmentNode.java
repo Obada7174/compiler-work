@@ -1,14 +1,13 @@
 package compiler.ast;
 
-public class AssignmentNode extends ASTNode {
-    private ExpressionNode target;
+public class AssignmentNode extends StatementNode {
+    private IdentifierNode target;
     private ExpressionNode value;
 
-    public AssignmentNode(ExpressionNode target, ExpressionNode value, int lineNumber) {
-        super(lineNumber);
+    public AssignmentNode(IdentifierNode target, ExpressionNode value, int lineNumber) {
+        super(lineNumber, "assignment");
         this.target = target;
         this.value = value;
-
         addChild(target);
         addChild(value);
     }
@@ -20,7 +19,6 @@ public class AssignmentNode extends ASTNode {
     public ExpressionNode getValue() {
         return value;
     }
-
     @Override
     public String getNodeType() {
         return "Assignment";

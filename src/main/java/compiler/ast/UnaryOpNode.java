@@ -1,11 +1,11 @@
 package compiler.ast;
 
 /**
- * Expression node representing unary operations (-, not, ~)
+ * Node representing a unary operation (-, not, ~)
  */
 public class UnaryOpNode extends ExpressionNode {
-    private String operator;
-    private ExpressionNode operand;
+    private final String operator;
+    private final ExpressionNode operand;
 
     public UnaryOpNode(String operator, ExpressionNode operand, int lineNumber) {
         super(lineNumber);
@@ -14,17 +14,17 @@ public class UnaryOpNode extends ExpressionNode {
         addChild(operand);
     }
 
+    @Override
+    public String getNodeType() {
+        return "UnaryOp";
+    }
+
     public String getOperator() {
         return operator;
     }
 
     public ExpressionNode getOperand() {
         return operand;
-    }
-
-    @Override
-    public String getNodeType() {
-        return "UnaryOp";
     }
 
     @Override

@@ -6,16 +6,10 @@ import compiler.ast.ExpressionNode;
 import java.util.List;
 
 public class DictLiteralNode extends ExpressionNode {
-    private List<DictItemNode> items;
-
-    public DictLiteralNode(List<DictItemNode> items, int line) {
-        super(line);
-        this.items = items;
-        for (DictItemNode item : items) addChild(item);
-    }
-
-    public List<DictItemNode> getItems() { return items; }
+    public DictLiteralNode(int lineNumber) { super(lineNumber); }
 
     @Override
-    public String getNodeType() { return "DictLiteral"; }
+    public String getNodeType() {
+        return "Dict Literal";
+    }
 }

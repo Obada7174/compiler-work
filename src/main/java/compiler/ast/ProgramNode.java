@@ -1,10 +1,9 @@
 package compiler.ast;
 
 /**
- * Root node of the AST representing the entire program/template
+ * Node representing the entire program
  */
 public class ProgramNode extends ASTNode {
-
     public ProgramNode(int lineNumber) {
         super(lineNumber);
     }

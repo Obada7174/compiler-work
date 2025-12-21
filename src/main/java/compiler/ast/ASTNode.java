@@ -3,14 +3,14 @@ package compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+// ───────────────── BASE NODE ─────────────────
 
 public abstract class ASTNode {
     protected int lineNumber;
-    protected String name;                 // ← أضف هذا!
+    protected String name;
     protected List<ASTNode> children;
     protected ASTNode parent;
 
-    // constructor جديد يقبل name
     public ASTNode(int lineNumber, String name) {
         this.lineNumber = lineNumber;
         this.name = name;
@@ -19,7 +19,7 @@ public abstract class ASTNode {
     }
 
     public ASTNode(int lineNumber) {
-        this(lineNumber, ""); // اسم فارغ افتراضي
+        this(lineNumber, "");
     }
 
     public abstract String getNodeType();
@@ -63,8 +63,9 @@ public abstract class ASTNode {
     public String toString() {
         return getNodeDetails();
     }
+
     public void print(String indent) {
-        System.out.println(indent + getNodeType() + " (" + getNodeDetails() + ")");
+        System.out.println(indent + getNodeDetails());
         for (ASTNode child : children) {
             child.print(indent + "  ");
         }

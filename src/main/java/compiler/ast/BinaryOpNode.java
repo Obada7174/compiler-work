@@ -1,13 +1,10 @@
 package compiler.ast;
 
-/**
- * Expression node representing binary operations (+, -, *, /, ==, !=, etc.)
- * Demonstrates composition pattern
- */
+
 public class BinaryOpNode extends ExpressionNode {
-    private String operator;
-    private ExpressionNode left;
-    private ExpressionNode right;
+    private final String operator;
+    private final ExpressionNode left;
+    private final ExpressionNode right;
 
     public BinaryOpNode(String operator, ExpressionNode left, ExpressionNode right, int lineNumber) {
         super(lineNumber);
@@ -16,6 +13,11 @@ public class BinaryOpNode extends ExpressionNode {
         this.right = right;
         addChild(left);
         addChild(right);
+    }
+
+    @Override
+    public String getNodeType() {
+        return "BinaryOp";
     }
 
     public String getOperator() {
@@ -28,11 +30,6 @@ public class BinaryOpNode extends ExpressionNode {
 
     public ExpressionNode getRight() {
         return right;
-    }
-
-    @Override
-    public String getNodeType() {
-        return "BinaryOp";
     }
 
     @Override

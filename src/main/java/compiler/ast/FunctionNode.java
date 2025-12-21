@@ -3,29 +3,24 @@ package compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionNode extends ASTNode {
-    private List<ASTNode> body;
-    private String name;
+public class FunctionNode extends StatementNode {
+    private String functionName;
+    private List<IdentifierNode> parameters;
 
-    public FunctionNode(String name, int lineNumber) {
-        super(lineNumber, name);
-        this.name = name;
-        this.body = new ArrayList<>();
+    public FunctionNode(String functionName, int lineNumber) {
+        super(lineNumber, "FunctionDef");
+        this.functionName = functionName;
+        this.parameters = new ArrayList<>();
     }
-
+    public void setBody(BlockNode body) {
+        addChild(body);
+    }
+    public void addParameter(IdentifierNode param) {
+        parameters.add(param);
+        addChild(param);
+    }
     @Override
     public String getNodeType() {
-        return "Function";
-    }
-
-    public void setBody(List<ASTNode> body) {
-        this.body = body;
-        for (ASTNode child : body) {
-            addChild(child);
-        }
-    }
-
-    public List<ASTNode> getBody() {
-        return body;
+        return "FunctionDef";
     }
 }

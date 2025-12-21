@@ -1,12 +1,7 @@
 package compiler.ast;
 
-/**
- * Abstract base class for all statement nodes.
- * Demonstrates inheritance from ASTNode
- */
 public abstract class StatementNode extends ASTNode {
-
-    public StatementNode(int lineNumber) {
+    public StatementNode(int lineNumber, String className) {
         super(lineNumber);
     }
 

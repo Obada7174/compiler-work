@@ -5,23 +5,10 @@ package compiler.ast;
  */
 public class BooleanLiteralNode extends ExpressionNode {
     private boolean value;
-
-    public BooleanLiteralNode(boolean value, int lineNumber) {
-        super(lineNumber);
-        this.value = value;
-    }
-
-    public boolean getValue() {
-        return value;
-    }
-
+    public BooleanLiteralNode(boolean value, int lineNumber) { super(lineNumber); this.value = value; }
+    public boolean getValue() { return value; }
     @Override
-    public String getNodeType() {
-        return "BooleanLiteral";
-    }
-
-    @Override
-    public String getNodeDetails() {
-        return String.format("BooleanLiteral: %s (line %d)", value, lineNumber);
-    }
+    public String getNodeType() { return "BooleanLiteral"; }
 }
+
+

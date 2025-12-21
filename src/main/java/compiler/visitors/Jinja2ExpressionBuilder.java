@@ -47,6 +47,11 @@ public class Jinja2ExpressionBuilder
     }
 
     @Override
+    public ASTNode visitContent(Jinja2Parser.ContentContext ctx) {
+        return null;
+    }
+
+    @Override
     public ExpressionNode visitJinjaAndExpr(
             Jinja2Parser.JinjaAndExprContext ctx) {
         return visit(ctx.getChild(0));

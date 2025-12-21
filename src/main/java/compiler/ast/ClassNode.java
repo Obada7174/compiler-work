@@ -1,31 +1,23 @@
 package compiler.ast;
 
-import java.util.ArrayList;
+import compiler.ast.ASTNode;
+import compiler.ast.StatementNode;
+
 import java.util.List;
 
-public class ClassNode extends ASTNode {
-    private List<ASTNode> body;
-    private String name;
+public class ClassNode extends StatementNode {
+    private String className;
+    private List<String> baseClasses;
 
-    public ClassNode(String name, int lineNumber) {
-        super(lineNumber, name);
-        this.name = name;
-        this.body = new ArrayList<>();
+    public ClassNode(String className, List<String> baseClasses, ASTNode body, int lineNumber) {
+        super(lineNumber, className);
+        this.className = className;
+        this.baseClasses = baseClasses;
+        addChild(body);
     }
 
     @Override
     public String getNodeType() {
-        return "Class";
-    }
-
-    public void setBody(List<ASTNode> body) {
-        this.body = body;
-        for (ASTNode child : body) {
-            addChild(child);
-        }
-    }
-
-    public List<ASTNode> getBody() {
-        return body;
+        return "ClassDef";
     }
 }
