@@ -247,4 +247,123 @@ public class SymbolTable {
         scopeStack.push(new Scope(currentLevel));
         System.out.println("Symbol table reset to initial state");
     }
+
+    /**
+     * Define a new symbol in current scope
+     * Helper method for easy symbol declaration
+     */
+    public void define(String name, String type, Object value) {
+        Symbol symbol = new Symbol(name, type, value, currentLevel);
+        insert(name, symbol);
+    }
+
+    /**
+     * Define a new symbol in current scope with default null value
+     */
+    public void define(String name, String type) {
+        define(name, type, null);
+    }
+
+    /**
+     * Resolve a symbol (lookup with error message if not found)
+     */
+    public Symbol resolve(String name) {
+        Symbol symbol = lookup(name);
+        if (symbol == null) {
+            System.out.println("  ⚠ Warning: Symbol '" + name + "' not defined");
+        }
+        return symbol;
+    }
+
+    /**
+     * Get type of a symbol
+     */
+    public String getType(String name) {
+        Symbol symbol = lookup(name);
+        return symbol != null ? symbol.getType() : null;
+    }
+
+    /**
+     * Get value of a symbol
+     */
+    public Object getValue(String name) {
+        Symbol symbol = lookup(name);
+        return symbol != null ? symbol.getValue() : null;
+    }
+
+    /**
+     * Check if symbol exists in current scope only
+     */
+    public boolean isDeclaredInCurrentScope(String name) {
+        return lookupCurrent(name) != null;
+    }
+
+    /**
+     * Get all symbols from current scope only
+     */
+    public List<Symbol> getCurrentScopeSymbols() {
+        if (scopeStack.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(scopeStack.peek().getSymbols().values());
+    }
+
+    /**
+     * Get symbol count in all scopes
+     */
+    public int getSymbolCount() {
+        return getAllSymbols().size();
+    }
+
+    /**
+     * Print symbol table in compact format
+     */
+    public void printCompact() {
+        System.out.println("\n═══ Symbol Table ═══");
+        for (Symbol symbol : getAllSymbols()) {
+            System.out.println("  " + symbol);
+        }
+        System.out.println("═══════════════════\n");
+    }
+
+    /**
+     * Export symbol table as JSON-like string (for debugging/serialization)
+     */
+    public String toJSON() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append("  \"currentLevel\": ").append(currentLevel).append(",\n");
+        sb.append("  \"scopes\": [\n");
+
+        int scopeIndex = 0;
+        for (Scope scope : scopeStack) {
+            if (scopeIndex > 0) {
+                sb.append(",\n");
+            }
+            sb.append("    {\n");
+            sb.append("      \"level\": ").append(scope.getLevel()).append(",\n");
+            sb.append("      \"symbols\": [\n");
+
+            int symbolIndex = 0;
+            for (Symbol symbol : scope.getSymbols().values()) {
+                if (symbolIndex > 0) {
+                    sb.append(",\n");
+                }
+                sb.append("        {");
+                sb.append("\"name\": \"").append(symbol.getName()).append("\", ");
+                sb.append("\"type\": \"").append(symbol.getType()).append("\", ");
+                sb.append("\"value\": \"").append(symbol.getValue()).append("\"");
+                sb.append("}");
+                symbolIndex++;
+            }
+
+            sb.append("\n      ]\n");
+            sb.append("    }");
+            scopeIndex++;
+        }
+
+        sb.append("\n  ]\n");
+        sb.append("}");
+        return sb.toString();
+    }
 }

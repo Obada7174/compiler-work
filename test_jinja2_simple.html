@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ page_title }}</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.name }}!</h1>
+
+    <div class="container">
+        <p>Your email: {{ user.email }}</p>
+
+        {% if user.is_premium %}
+            <div class="premium-badge">Premium User</div>
+        {% else %}
+            <div class="regular-badge">Regular User</div>
+        {% endif %}
+
+        <h2>Your Items:</h2>
+        <ul>
+            {% for item in user.items %}
+                <li>{{ item.name }} - ${{ item.price }}</li>
+            {% endfor %}
+        </ul>
+
+        {% block content %}
+            <p>Default content</p>
+        {% endblock %}
+    </div>
+</body>
+</html>

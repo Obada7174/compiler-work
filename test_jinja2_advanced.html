@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <header>
+        <h1>{{ site_name }}</h1>
+        <nav>
+            {% for link in navigation %}
+                <a href="{{ link.url }}">{{ link.title }}</a>
+            {% endfor %}
+        </nav>
+    </header>
+{% endblock %}
+
+{% block main_content %}
+    <article>
+        <h2>{{ article.title }}</h2>
+        <p>By {{ article.author }} on {{ article.date }}</p>
+
+        {% if article.tags %}
+            <div class="tags">
+                {% for tag in article.tags %}
+                    <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="content">
+            {{ article.body | safe }}
+        </div>
+
+        {% if article.comments %}
+            <section class="comments">
+                <h3>Comments ({{ article.comments | length }})</h3>
+                {% for comment in article.comments %}
+                    <div class="comment">
+                        <strong>{{ comment.author }}</strong>: {{ comment.text }}
+                    </div>
+                {% endfor %}
+            </section>
+        {% else %}
+            <p>No comments yet.</p>
+        {% endif %}
+    </article>
+{% endblock %}
+
+{% block footer %}
+    <footer>
+        <p>&copy; {{ current_year }} {{ site_name }}</p>
+    </footer>
+{% endblock %}
