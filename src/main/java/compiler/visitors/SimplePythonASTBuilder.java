@@ -48,14 +48,41 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSmall_stmt(PythonParser.Small_stmtContext ctx) {
-        if (ctx.expr_stmt() != null) {
-            return visit(ctx.expr_stmt());
+        if (ctx.assignment() != null) {
+            return visit(ctx.assignment());
         } else if (ctx.return_stmt() != null) {
             return visit(ctx.return_stmt());
         } else if (ctx.import_stmt() != null) {
             return visit(ctx.import_stmt());
+        } else if (ctx.expr_stmt() != null) {
+            return visit(ctx.expr_stmt());
         }
         return null;
+    }
+
+    @Override
+    public ASTNode visitAssignment(PythonParser.AssignmentContext ctx) {
+        int lineNumber = ctx.start.getLine();
+
+        // Get target (left side)
+        List<ExpressionNode> targets = new ArrayList<>();
+        if (ctx.atom_expr() != null) {
+            ASTNode targetNode = visit(ctx.atom_expr());
+            if (targetNode instanceof ExpressionNode) {
+                targets.add((ExpressionNode) targetNode);
+            }
+        }
+
+        // Get value (right side)
+        ExpressionNode value = null;
+        if (ctx.expr() != null) {
+            ASTNode valueNode = visit(ctx.expr());
+            if (valueNode instanceof ExpressionNode) {
+                value = (ExpressionNode) valueNode;
+            }
+        }
+
+        return new AssignmentNode(targets, value, lineNumber);
     }
 
     @Override
@@ -306,7 +333,28 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitComparison(PythonParser.ComparisonContext ctx) {
         if (ctx.arith_expr() != null && !ctx.arith_expr().isEmpty()) {
-            return visit(ctx.arith_expr(0));
+            ASTNode left = visit(ctx.arith_expr(0));
+
+            // Check if there's a comparison operator
+            if (ctx.arith_expr().size() > 1) {
+                int lineNumber = ctx.start.getLine();
+                String operator = "";
+
+                if (ctx.EQ() != null) operator = "==";
+                else if (ctx.NE() != null) operator = "!=";
+                else if (ctx.LT() != null) operator = "<";
+                else if (ctx.GT() != null) operator = ">";
+                else if (ctx.LE() != null) operator = "<=";
+                else if (ctx.GE() != null) operator = ">=";
+
+                ASTNode right = visit(ctx.arith_expr(1));
+
+                if (left instanceof ExpressionNode && right instanceof ExpressionNode) {
+                    return new ComparisonNode(operator, (ExpressionNode) left, (ExpressionNode) right, lineNumber);
+                }
+            }
+
+            return left;
         }
         return null;
     }
@@ -314,7 +362,38 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitArith_expr(PythonParser.Arith_exprContext ctx) {
         if (ctx.atom_expr() != null && !ctx.atom_expr().isEmpty()) {
-            return visit(ctx.atom_expr(0));
+            ASTNode left = visit(ctx.atom_expr(0));
+
+            // Handle binary operations (PLUS, MINUS, STAR, DIV, MOD)
+            if (ctx.atom_expr().size() > 1) {
+                int lineNumber = ctx.start.getLine();
+
+                // Process all operators from left to right
+                for (int i = 1; i < ctx.atom_expr().size(); i++) {
+                    String operator = "";
+
+                    // Determine which operator is at position i-1
+                    if (ctx.PLUS() != null && !ctx.PLUS().isEmpty() && ctx.PLUS().size() >= i) {
+                        operator = "+";
+                    } else if (ctx.MINUS() != null && !ctx.MINUS().isEmpty() && ctx.MINUS().size() >= i) {
+                        operator = "-";
+                    } else if (ctx.STAR() != null && !ctx.STAR().isEmpty() && ctx.STAR().size() >= i) {
+                        operator = "*";
+                    } else if (ctx.DIV() != null && !ctx.DIV().isEmpty() && ctx.DIV().size() >= i) {
+                        operator = "/";
+                    } else if (ctx.MOD() != null && !ctx.MOD().isEmpty() && ctx.MOD().size() >= i) {
+                        operator = "%";
+                    }
+
+                    ASTNode right = visit(ctx.atom_expr(i));
+
+                    if (left instanceof ExpressionNode && right instanceof ExpressionNode && !operator.isEmpty()) {
+                        left = new BinaryOpNode(operator, (ExpressionNode) left, (ExpressionNode) right, lineNumber);
+                    }
+                }
+            }
+
+            return left;
         }
         return null;
     }
@@ -346,25 +425,56 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
     // Helper method to process trailers
     private ASTNode visitTrailerWithBase(PythonParser.TrailerContext ctx, ASTNode base) {
         int lineNumber = ctx.start.getLine();
-        String trailerText = ctx.getText();
 
-        // Function call: starts with '('
-        if (trailerText.startsWith("(")) {
+        // Function call: has call() child
+        if (ctx.call() != null) {
             List<ExpressionNode> arguments = new ArrayList<>();
+
+            // Extract arguments from arglist
+            if (ctx.call().arglist() != null) {
+                PythonParser.ArglistContext arglist = ctx.call().arglist();
+                if (arglist.argument() != null) {
+                    for (PythonParser.ArgumentContext argCtx : arglist.argument()) {
+                        ASTNode argNode = visit(argCtx);
+                        if (argNode instanceof ExpressionNode) {
+                            arguments.add((ExpressionNode) argNode);
+                        }
+                    }
+                }
+            }
+
             if (base instanceof ExpressionNode) {
                 return new FunctionCallNode((ExpressionNode) base, arguments, lineNumber);
             }
         }
 
-        // Attribute access: starts with '.'
-        if (trailerText.startsWith(".")) {
-            String memberName = trailerText.substring(1); // Remove the dot
+        // Attribute access: has DOT and NAME
+        if (ctx.DOT() != null && ctx.NAME() != null) {
+            String memberName = ctx.NAME().getText();
             if (base instanceof ExpressionNode) {
                 return new MemberAccessNode((ExpressionNode) base, memberName, lineNumber);
             }
         }
 
         return base;
+    }
+
+    @Override
+    public ASTNode visitPositionalArg(PythonParser.PositionalArgContext ctx) {
+        // Visit the expression in the positional argument
+        if (ctx.expr() != null) {
+            return visit(ctx.expr());
+        }
+        return null;
+    }
+
+    @Override
+    public ASTNode visitKeywordArg(PythonParser.KeywordArgContext ctx) {
+        // Visit the expression in the keyword argument (value part)
+        if (ctx.expr() != null) {
+            return visit(ctx.expr());
+        }
+        return null;
     }
 
     @Override
@@ -389,8 +499,68 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
             return new BooleanLiteralNode(false, lineNumber);
         } else if (ctx.NONE() != null) {
             return new NoneLiteralNode(lineNumber);
+        } else if (ctx.listLit() != null) {
+            return visit(ctx.listLit());
+        } else if (ctx.dictLit() != null) {
+            return visit(ctx.dictLit());
+        } else if (ctx.expr() != null) {
+            // Parenthesized expression
+            return visit(ctx.expr());
         }
 
         return null;
+    }
+
+    @Override
+    public ASTNode visitListLit(PythonParser.ListLitContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        List<ExpressionNode> elements = new ArrayList<>();
+
+        if (ctx.expr() != null) {
+            for (PythonParser.ExprContext exprCtx : ctx.expr()) {
+                ASTNode element = visit(exprCtx);
+                if (element instanceof ExpressionNode) {
+                    elements.add((ExpressionNode) element);
+                }
+            }
+        }
+
+        return new ListLiteralNode(elements, lineNumber);
+    }
+
+    @Override
+    public ASTNode visitDictLit(PythonParser.DictLitContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        java.util.Map<ExpressionNode, ExpressionNode> entries = new java.util.LinkedHashMap<>();
+
+        if (ctx.dictItem() != null) {
+            for (PythonParser.DictItemContext itemCtx : ctx.dictItem()) {
+                // Get key
+                ExpressionNode key = null;
+                if (itemCtx.STRING() != null) {
+                    String keyText = itemCtx.STRING().getText();
+                    String keyValue = keyText.length() > 2 ? keyText.substring(1, keyText.length() - 1) : keyText;
+                    key = new StringLiteralNode(keyValue, lineNumber);
+                } else if (itemCtx.NAME() != null) {
+                    String keyText = itemCtx.NAME().getText();
+                    key = new StringLiteralNode(keyText, lineNumber);
+                }
+
+                // Get value
+                ExpressionNode value = null;
+                if (itemCtx.expr() != null) {
+                    ASTNode valueNode = visit(itemCtx.expr());
+                    if (valueNode instanceof ExpressionNode) {
+                        value = (ExpressionNode) valueNode;
+                    }
+                }
+
+                if (key != null && value != null) {
+                    entries.put(key, value);
+                }
+            }
+        }
+
+        return new DictionaryLiteralNode(entries, lineNumber);
     }
 }
