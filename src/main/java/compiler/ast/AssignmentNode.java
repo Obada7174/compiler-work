@@ -1,24 +1,36 @@
 package compiler.ast;
 
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * Statement node representing variable assignment
+ * target = value or target1, target2 = value1, value2
+ */
 public class AssignmentNode extends StatementNode {
-    private IdentifierNode target;
+    private List<ExpressionNode> targets;
     private ExpressionNode value;
 
-    public AssignmentNode(IdentifierNode target, ExpressionNode value, int lineNumber) {
-        super(lineNumber, "assignment");
-        this.target = target;
+    public AssignmentNode(List<ExpressionNode> targets, ExpressionNode value, int lineNumber) {
+        super(lineNumber);
+        this.targets = targets != null ? targets : new ArrayList<>();
         this.value = value;
-        addChild(target);
+
+        // Add targets and value as children
+        for (ExpressionNode target : this.targets) {
+            addChild(target);
+        }
         addChild(value);
     }
 
-    public ExpressionNode getTarget() {
-        return target;
+    public List<ExpressionNode> getTargets() {
+        return targets;
     }
 
     public ExpressionNode getValue() {
         return value;
     }
+
     @Override
     public String getNodeType() {
         return "Assignment";
@@ -26,6 +38,6 @@ public class AssignmentNode extends StatementNode {
 
     @Override
     public String getNodeDetails() {
-        return String.format("Assignment: %s = ... (line %d)", target.getNodeDetails(), lineNumber);
+        return String.format("Assignment: %d target(s) (line %d)", targets.size(), lineNumber);
     }
 }

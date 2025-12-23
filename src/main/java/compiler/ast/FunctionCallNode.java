@@ -1,29 +1,47 @@
 package compiler.ast;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
-public class FunctionCallNode extends ASTNode {
+/**
+ * Expression node representing function calls func(arg1, arg2, ...)
+ * Used by both Python and Jinja2
+ */
+public class FunctionCallNode extends ExpressionNode {
     private ExpressionNode function;
-    private List<ExpressionNode> args;
+    private List<ExpressionNode> arguments;
 
-    public FunctionCallNode(ExpressionNode function, List<ExpressionNode> args, int lineNumber) {
+    public FunctionCallNode(ExpressionNode function, List<ExpressionNode> arguments, int lineNumber) {
         super(lineNumber);
         this.function = function;
-        this.args = args != null ? args : new ArrayList<>();
+        this.arguments = arguments != null ? arguments : new ArrayList<>();
 
+        // Add function and all arguments as children
         addChild(function);
-        for (ExpressionNode arg : this.args) addChild(arg);
+        for (ExpressionNode arg : this.arguments) {
+            addChild(arg);
+        }
     }
 
-    public ExpressionNode getFunction() { return function; }
-    public List<ExpressionNode> getArgs() { return args; }
+    public ExpressionNode getFunction() {
+        return function;
+    }
+
+    public List<ExpressionNode> getArguments() {
+        return arguments;
+    }
 
     @Override
-    public String getNodeType() { return "FunctionCall"; }
+    public String getNodeType() {
+        return "FunctionCall";
+    }
 
     @Override
     public String getNodeDetails() {
-        return String.format("Call: %s(%d args) (line %d)", function.getName(), args.size(), lineNumber);
+        String funcName = "...";
+        if (function instanceof IdentifierNode) {
+            funcName = ((IdentifierNode) function).getName();
+        }
+        return String.format("FunctionCall: %s(%d args) (line %d)", funcName, arguments.size(), lineNumber);
     }
 }

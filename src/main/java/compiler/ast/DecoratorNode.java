@@ -1,26 +1,43 @@
 package compiler.ast;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
- * Represents a single decorator (@something)
+ * AST node representing decorator
+ * @decorator_name or @decorator_name(args)
  */
 public class DecoratorNode extends ASTNode {
-    private final ASTNode expression; // عادة IdentifierNode أو أي ExpressionNode
-    private final FunctionCallNode call; // optional, null if no call
+    private ExpressionNode decoratorExpr;
+    private List<ExpressionNode> arguments;
 
-    public DecoratorNode(int lineNumber, String name, ASTNode expression, FunctionCallNode call) {
-        super(lineNumber, name);
-        this.expression = expression;
-        this.call = call;
+    public DecoratorNode(ExpressionNode decoratorExpr, List<ExpressionNode> arguments, int lineNumber) {
+        super(lineNumber);
+        this.decoratorExpr = decoratorExpr;
+        this.arguments = arguments != null ? arguments : new ArrayList<>();
 
-        addChild(expression);
-        if (call != null) addChild(call);
+        addChild(decoratorExpr);
+        for (ExpressionNode arg : this.arguments) {
+            addChild(arg);
+        }
+    }
+
+    public ExpressionNode getDecoratorExpr() {
+        return decoratorExpr;
+    }
+
+    public List<ExpressionNode> getArguments() {
+        return arguments;
     }
 
     @Override
     public String getNodeType() {
-        return "DecoratorNode";
+        return "Decorator";
     }
 
-    public ASTNode getExpression() { return expression; }
-    public FunctionCallNode getCall() { return call; }
+    @Override
+    public String getNodeDetails() {
+        String argsInfo = arguments.isEmpty() ? "" : String.format("(%d args)", arguments.size());
+        return String.format("Decorator: @...%s (line %d)", argsInfo, lineNumber);
+    }
 }
