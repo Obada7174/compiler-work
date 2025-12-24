@@ -7,7 +7,7 @@ public class PositionalArgNode extends ExpressionNode {
     private final ExpressionNode value;
 
     public PositionalArgNode(ExpressionNode value, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"PositionalArg");
         this.value = value;
         addChild(value);
     }

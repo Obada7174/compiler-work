@@ -14,7 +14,7 @@ public class WhileStatementNode extends StatementNode {
 
     public WhileStatementNode(ExpressionNode condition, List<ASTNode> body,
                              List<ASTNode> elseBlock, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"While");
         this.condition = condition;
         this.body = body != null ? body : new ArrayList<>();
         this.elseBlock = elseBlock != null ? elseBlock : new ArrayList<>();

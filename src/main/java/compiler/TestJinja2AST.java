@@ -1,7 +1,7 @@
 package compiler;
 
 import compiler.ast.*;
-import compiler.ast.ASTPrinter;
+import compiler.visitors.ASTPrinter;
 import compiler.visitors.SimpleJinja2ASTBuilder;
 import grammar.Jinja2Lexer;
 import grammar.Jinja2Parser;

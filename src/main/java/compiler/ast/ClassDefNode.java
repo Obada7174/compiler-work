@@ -15,7 +15,7 @@ public class ClassDefNode extends StatementNode {
 
     public ClassDefNode(String className, List<ExpressionNode> baseClasses,
                        List<ASTNode> body, List<DecoratorNode> decorators, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Class Def");
         this.className = className;
         this.name = className;
         this.baseClasses = baseClasses != null ? baseClasses : new ArrayList<>();

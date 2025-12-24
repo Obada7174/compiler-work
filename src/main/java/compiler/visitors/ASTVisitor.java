@@ -2,10 +2,7 @@ package compiler.visitors;
 
 import compiler.ast.*;
 
-/**
- * Visitor interface for traversing the Abstract Syntax Tree
- * Implements the Visitor design pattern for AST traversal
- */
+
 public interface ASTVisitor<T> {
 
     // Base visit method
@@ -54,7 +51,7 @@ public interface ASTVisitor<T> {
     // Jinja2 specific
     T visitJinjaIf(JinjaIfNode node);
     T visitJinjaFor(JinjaForNode node);
-    T visitJinjaBlock(JinjaBlockNode node);
+    T visitJinjaBlock(BlockNode node);
     T visitJinja2Var(Jinja2VarNode node);
 
     // HTML/CSS specific (if needed)

@@ -15,7 +15,7 @@ public class ForStatementNode extends StatementNode {
 
     public ForStatementNode(ExpressionNode target, ExpressionNode iterable,
                            List<ASTNode> body, List<ASTNode> elseBlock, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"For Statement");
         this.target = target;
         this.iterable = iterable;
         this.body = body != null ? body : new ArrayList<>();

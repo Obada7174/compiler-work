@@ -15,7 +15,7 @@ public class ImportStatementNode extends StatementNode {
 
     public ImportStatementNode(String moduleName, List<String> importedNames,
                               List<String> aliases, boolean isFromImport, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Import Statement");
         this.moduleName = moduleName;
         this.importedNames = importedNames != null ? importedNames : new ArrayList<>();
         this.aliases = aliases != null ? aliases : new ArrayList<>();

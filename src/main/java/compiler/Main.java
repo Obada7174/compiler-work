@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 // ANTLR Runtime imports
+import compiler.visitors.SimpleJinja2ASTBuilder;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -20,15 +21,6 @@ import compiler.ast.ASTNode;
 import compiler.utils.ASTPrinter;
 import compiler.symboltable.SymbolTable;
 
-/**
- * Main entry point for the Flask/Jinja2/HTML/CSS Compiler
- * Demonstrates all academic requirements:
- * 1. Lexer and Parser (ANTLR4)
- * 2. AST with OOP (inheritance, polymorphism)
- * 3. Visitor pattern for AST construction
- * 4. Symbol Table with operations
- * 5. AST Printer for visualization
- */
 public class Main {
 
     public static void main(String[] args) {
@@ -110,12 +102,12 @@ public class Main {
             System.out.println("┌─ STAGE 3: AST Construction ─────────────────┐");
             System.out.println("│  Using Visitor Pattern...");
 
-            // Jinja2ASTBuilder astBuilder = new Jinja2ASTBuilder();
-            // ASTNode ast = astBuilder.visit(parseTree);
+             SimpleJinja2ASTBuilder astBuilder = new SimpleJinja2ASTBuilder();
+             ASTNode ast = astBuilder.visit(parseTree);
 
-            // System.out.println("│  ✓ AST construction completed");
-            // System.out.println("│  → Root node type: " + ast.getNodeType());
-            // System.out.println("│  → Child count: " + ast.getChildren().size());
+             System.out.println("│  ✓ AST construction completed");
+             System.out.println("│  → Root node type: " + ast.getNodeType());
+             System.out.println("│  → Child count: " + ast.getChildren().size());
             System.out.println("└──────────────────────────────────────────────┘\n");
 
             // ═══════════════════════════════════════════════════════════════
@@ -125,7 +117,7 @@ public class Main {
             System.out.println("│  Printing AST with details...");
             System.out.println("└──────────────────────────────────────────────┘");
 
-            // ASTPrinter.printWithStats(ast);
+             ASTPrinter.printWithStats(ast);
 
             // ═══════════════════════════════════════════════════════════════
             // STAGE 5: SYMBOL TABLE DEMONSTRATION
@@ -221,30 +213,13 @@ public class Main {
      */
     private static String getDefaultExample() {
         return """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>{{ page_title }}</title>
-            </head>
-            <body>
-                <h1>Welcome to {{ site_name }}</h1>
-
-                {% if user.is_logged_in %}
-                    <p>Hello, {{ user.name }}!</p>
-                {% else %}
-                    <p>Please log in</p>
-                {% endif %}
-
-                <div class="products">
                     {% for product in products %}
-                        <div class="product-card">
-                            <h3>{{ product.name }}</h3>
-                            <p>Price: ${{ product.price }}</p>
-                        </div>
+                      <div class="product-card">
+                        <h3>{{ product.name }}</h3>
+                        <p>Price: ${{ product.price }}</p>
+                      </div>
                     {% endfor %}
-                </div>
-            </body>
-            </html>
-            """;
+                                
+                """;
     }
 }

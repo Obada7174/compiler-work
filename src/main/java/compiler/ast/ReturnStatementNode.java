@@ -8,7 +8,7 @@ public class ReturnStatementNode extends StatementNode {
     private ExpressionNode value;
 
     public ReturnStatementNode(ExpressionNode value, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Return");
         this.value = value;
         if (value != null) {
             addChild(value);

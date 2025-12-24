@@ -11,7 +11,7 @@ public class Jinja2VarNode extends ASTNode {
     private List<String> filters;
 
     public Jinja2VarNode(ExpressionNode expression, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Jinja2Var");
         this.expression = expression;
         this.filters = new ArrayList<>();
         addChild(expression);

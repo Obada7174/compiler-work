@@ -12,7 +12,7 @@ public class AssignmentNode extends StatementNode {
     private ExpressionNode value;
 
     public AssignmentNode(List<ExpressionNode> targets, ExpressionNode value, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Assignment");
         this.targets = targets != null ? targets : new ArrayList<>();
         this.value = value;
 

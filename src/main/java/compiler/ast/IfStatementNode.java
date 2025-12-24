@@ -13,7 +13,7 @@ public class IfStatementNode extends StatementNode {
     private List<ASTNode> elseBlock;
 
     public IfStatementNode(ExpressionNode condition, List<ASTNode> thenBlock, List<ASTNode> elseBlock, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"If Statement");
         this.condition = condition;
         this.thenBlock = thenBlock != null ? thenBlock : new ArrayList<>();
         this.elseBlock = elseBlock != null ? elseBlock : new ArrayList<>();

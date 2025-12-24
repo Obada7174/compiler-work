@@ -15,7 +15,7 @@ public class TryStatementNode extends StatementNode {
 
     public TryStatementNode(List<ASTNode> tryBlock, List<ExceptClauseNode> exceptClauses,
                            List<ASTNode> elseBlock, List<ASTNode> finallyBlock, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Try");
         this.tryBlock = tryBlock != null ? tryBlock : new ArrayList<>();
         this.exceptClauses = exceptClauses != null ? exceptClauses : new ArrayList<>();
         this.elseBlock = elseBlock != null ? elseBlock : new ArrayList<>();

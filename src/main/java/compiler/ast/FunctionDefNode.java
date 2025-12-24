@@ -17,7 +17,7 @@ public class FunctionDefNode extends StatementNode {
     public FunctionDefNode(String functionName, List<ParameterNode> parameters,
                           List<ASTNode> body, List<DecoratorNode> decorators,
                           ExpressionNode returnType, int lineNumber) {
-        super(lineNumber);
+        super(lineNumber,"Function Def");
         this.functionName = functionName;
         this.name = functionName;
         this.parameters = parameters != null ? parameters : new ArrayList<>();

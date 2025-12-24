@@ -295,7 +295,7 @@ public class SymbolTableBuilder {
      * Process Jinja2 for loop: {% for var in iterable %}
      */
     private void processJinjaFor(JinjaForNode node) {
-        String variableName = node.getVariable();
+        String variableName = node.getTargetName();
         int line = node.getLineNumber();
 
         // Check if loop variable is already declared

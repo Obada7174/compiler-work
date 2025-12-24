@@ -1,7 +1,7 @@
 package compiler;
 
 import compiler.ast.*;
-import compiler.ast.ASTPrinter;
+import compiler.visitors.ASTPrinter;
 import compiler.visitors.SimplePythonASTBuilder;
 import grammar.PythonLexer;
 import grammar.PythonParser;

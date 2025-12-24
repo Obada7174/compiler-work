@@ -1,6 +1,7 @@
 
 import compiler.ast.*;
-import compiler.visitors.Jinja2ASTBuilder;
+
+import compiler.visitors.SimpleJinja2ASTBuilder;
 import grammar.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -30,7 +31,7 @@ public class VerifyJinja2AST {
         ParseTree tree = parser.template();
 
         // Build AST
-        Jinja2ASTBuilder builder = new Jinja2ASTBuilder();
+        SimpleJinja2ASTBuilder builder = new SimpleJinja2ASTBuilder();
         ASTNode ast = builder.visit(tree);
 
         System.out.println("AST TREE:");

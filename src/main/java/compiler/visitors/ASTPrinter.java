@@ -1,14 +1,10 @@
-package compiler.ast;
+package compiler.visitors;
 
-/**
- * Utility class for printing and traversing the Abstract Syntax Tree
- * Provides formatted output showing tree structure with indentation
- */
+import compiler.ast.ASTNode;
+
+
 public class ASTPrinter {
 
-    /**
-     * Print a single node's information
-     */
     public static void printNode(ASTNode node) {
         if (node == null) {
             System.out.println("(null node)");
@@ -17,19 +13,11 @@ public class ASTPrinter {
         System.out.println(node.getNodeDetails());
     }
 
-    /**
-     * Print the entire AST tree with proper indentation
-     */
     public static void printTree(ASTNode root) {
         printTree(root, "", true);
     }
 
-    /**
-     * Recursively print tree with formatting
-     * @param node Current node
-     * @param prefix Prefix for current line
-     * @param isTail Whether this is the last child
-     */
+
     private static void printTree(ASTNode node, String prefix, boolean isTail) {
         if (node == null) {
             return;

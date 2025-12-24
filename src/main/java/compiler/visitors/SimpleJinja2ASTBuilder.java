@@ -15,9 +15,9 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitTemplateNode(Jinja2Parser.TemplateNodeContext ctx) {
         int lineNumber = ctx.start != null ? ctx.start.getLine() : 1;
+
         ProgramNode program = new ProgramNode(lineNumber);
 
-        // Process all content nodes
         if (ctx.content() != null) {
             for (Jinja2Parser.ContentContext contentCtx : ctx.content()) {
                 ASTNode child = visit(contentCtx);
@@ -29,6 +29,39 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
 
         return program;
     }
+
+
+    @Override
+    public ASTNode visitContent(Jinja2Parser.ContentContext ctx) {
+        if (ctx == null) return null;
+
+        ProgramNode container = new ProgramNode(ctx.start != null ? ctx.start.getLine() : 1);
+
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ASTNode child = visit(ctx.getChild(i));
+            if (child != null) {
+                if (child instanceof ProgramNode) {
+                    // flatten children
+                    for (ASTNode grandchild : ((ProgramNode) child).getChildren()) {
+                        container.addChild(grandchild);
+                    }
+                } else {
+                    container.addChild(child);
+                }
+            }
+        }
+
+        // إذا كان هناك طفل واحد فقط، أرجعه مباشرة بدل الحاوية
+        if (container.getChildren().isEmpty()) return null;
+        if (container.getChildren().size() == 1) return container.getChildren().get(0);
+        return container;
+    }
+
+    private ExpressionNode buildExpression(ASTNode node) {
+        if (node instanceof ExpressionNode) return (ExpressionNode) node;
+        return null; // fallback
+    }
+
 
     @Override
     public ASTNode visitHtmlTextContent(Jinja2Parser.HtmlTextContentContext ctx) {
@@ -164,16 +197,15 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitJinjaIdentifierExpr(Jinja2Parser.JinjaIdentifierExprContext ctx) {
-        int lineNumber = ctx.start != null ? ctx.start.getLine() : 1;
         String name = ctx.JINJA_VAR_IDENTIFIER() != null ? ctx.JINJA_VAR_IDENTIFIER().getText() : "";
-        return new IdentifierNode(name, lineNumber);
+        return new IdentifierNode(name, ctx.start.getLine());
     }
+
 
     @Override
     public ASTNode visitJinjaNumberExpr(Jinja2Parser.JinjaNumberExprContext ctx) {
-        int lineNumber = ctx.start != null ? ctx.start.getLine() : 1;
-        double value = ctx.JINJA_VAR_NUMBER() != null ? Double.parseDouble(ctx.JINJA_VAR_NUMBER().getText()) : 0.0;
-        return new NumberLiteralNode(value, lineNumber);
+        double value = ctx.JINJA_VAR_NUMBER() != null ? Double.parseDouble(ctx.JINJA_VAR_NUMBER().getText()) : 0;
+        return new NumberLiteralNode(value, ctx.start.getLine());
     }
 
     @Override
@@ -184,6 +216,13 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
         String value = text.length() > 2 ? text.substring(1, text.length() - 1) : text;
         return new StringLiteralNode(value, lineNumber);
     }
+
+    @Override
+    public ASTNode visitTemplate(Jinja2Parser.TemplateContext ctx) {
+        // This rule is never used because the grammar labels it as #TemplateNode
+        return visitChildren(ctx);
+    }
+
 
     @Override
     public ASTNode visitJinjaMemberAccessExpr(Jinja2Parser.JinjaMemberAccessExprContext ctx) {
@@ -260,42 +299,29 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
         }
 
         // Create if node with empty else block for now
-        return new JinjaIfNode(condition, thenBlock, new ArrayList<>(), lineNumber);
+        return new JinjaIfNode(lineNumber);
     }
 
     @Override
     public ASTNode visitJinjaForStmt(Jinja2Parser.JinjaForStmtContext ctx) {
-        int lineNumber = ctx.start != null ? ctx.start.getLine() : 1;
+        String target = ctx.jinjaStmtTarget().JINJA_STMT_IDENTIFIER(0).getText();
+        ExpressionNode iterable = buildExpression(visit(ctx.jinjaStmtExpression()));
 
-        // Get target variable name
-        String target = "";
-        if (ctx.jinjaStmtTarget() != null && ctx.jinjaStmtTarget().JINJA_STMT_IDENTIFIER(0) != null) {
-            target = ctx.jinjaStmtTarget().JINJA_STMT_IDENTIFIER(0).getText();
-        }
+        JinjaForNode forNode = new JinjaForNode(target, iterable, ctx.start.getLine());
 
-        // Get iterable expression
-        ExpressionNode iterable = null;
-        if (ctx.jinjaStmtExpression() != null) {
-            ASTNode iterNode = visit(ctx.jinjaStmtExpression());
-            if (iterNode instanceof ExpressionNode) {
-                iterable = (ExpressionNode) iterNode;
-            }
-        }
-
-        // Collect body content
         List<ASTNode> body = new ArrayList<>();
         if (ctx.content() != null) {
             for (Jinja2Parser.ContentContext contentCtx : ctx.content()) {
                 ASTNode child = visit(contentCtx);
-                if (child != null) {
-                    body.add(child);
-                }
+                if (child != null) body.add(child);
             }
         }
-
-        // Create for node with collected body
-        return new JinjaForNode(target, iterable, body, lineNumber);
+        forNode.setBody(body);
+        return forNode;
     }
+
+
+
 
     @Override
     public ASTNode visitJinjaBlock(Jinja2Parser.JinjaBlockContext ctx) {
@@ -319,7 +345,7 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
         }
 
         // Create block node with collected content
-        return new JinjaBlockNode(blockName, content, lineNumber);
+        return new BlockNode(blockName, content, lineNumber);
     }
 
     // Jinja Control Structure Visitors
