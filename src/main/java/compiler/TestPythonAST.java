@@ -17,21 +17,10 @@ import java.nio.file.Paths;
 public class TestPythonAST {
 
     public static void main(String[] args) {
-        // Only test files with SUPPORTED grammar features
+        // Test files with SUPPORTED grammar features
         String[] testFiles = {
-            "test_python.py"
-            // Note: test_python_full.py contains UNSUPPORTED features:
-            // - Type hints (x: int, -> List[str])
-            // - Default parameters with *args/**kwargs
-            // - Lambda expressions
-            // - Decorators (@decorator)
-            // - Comprehensions [x for x in ...]
-            // - Match statements
-            // - With statements
-            // - Async/await
-            // - Unpacking (*rest)
-            // - Walrus operator (:=)
-            // - Global/nonlocal keywords
+            "test_python.py",
+            "examples/app.py"  // Flask app with decorators
         };
 
         for (String filename : testFiles) {

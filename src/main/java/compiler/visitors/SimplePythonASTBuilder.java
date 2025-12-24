@@ -34,6 +34,8 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
             return visit(ctx.simple_stmt());
         } else if (ctx.compound_stmt() != null) {
             return visit(ctx.compound_stmt());
+        } else if (ctx.decorated() != null) {
+            return visit(ctx.decorated());
         }
         return null;
     }
@@ -138,6 +140,68 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
             return visit(ctx.try_stmt());
         }
         return null;
+    }
+
+    @Override
+    public ASTNode visitDecorated(PythonParser.DecoratedContext ctx) {
+        int lineNumber = ctx.start.getLine();
+
+        // Collect all decorators
+        List<DecoratorNode> decorators = new ArrayList<>();
+        if (ctx.decorator() != null) {
+            for (PythonParser.DecoratorContext decoratorCtx : ctx.decorator()) {
+                ASTNode decoratorNode = visit(decoratorCtx);
+                if (decoratorNode instanceof DecoratorNode) {
+                    decorators.add((DecoratorNode) decoratorNode);
+                }
+            }
+        }
+
+        // Get the decorated function or class
+        ASTNode decorated = null;
+        if (ctx.funcdef() != null) {
+            decorated = visit(ctx.funcdef());
+            if (decorated instanceof FunctionDefNode) {
+                ((FunctionDefNode) decorated).setDecorators(decorators);
+            }
+        } else if (ctx.classdef() != null) {
+            decorated = visit(ctx.classdef());
+            if (decorated instanceof ClassDefNode) {
+                ((ClassDefNode) decorated).setDecorators(decorators);
+            }
+        }
+
+        return decorated;
+    }
+
+    @Override
+    public ASTNode visitDecorator(PythonParser.DecoratorContext ctx) {
+        int lineNumber = ctx.start.getLine();
+
+        // Get decorator expression (atom_expr)
+        ExpressionNode decoratorExpr = null;
+        if (ctx.atom_expr() != null) {
+            ASTNode exprNode = visit(ctx.atom_expr());
+            if (exprNode instanceof ExpressionNode) {
+                decoratorExpr = (ExpressionNode) exprNode;
+            }
+        }
+
+        // Get decorator arguments if present (call)
+        List<ExpressionNode> arguments = new ArrayList<>();
+        if (ctx.call() != null && ctx.call().arglist() != null) {
+            PythonParser.ArglistContext arglist = ctx.call().arglist();
+            if (arglist.argument() != null) {
+                for (PythonParser.ArgumentContext argCtx : arglist.argument()) {
+                    ASTNode argNode = visit(argCtx);
+                    if (argNode instanceof ExpressionNode) {
+                        arguments.add((ExpressionNode) argNode);
+                    }
+                }
+            }
+        }
+
+        return new DecoratorNode(decoratorExpr, arguments, lineNumber);
     }
 
     @Override
