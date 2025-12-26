@@ -124,8 +124,8 @@ expr
     ;
 
 comparison
-    : arith_expr
-      ((EQ | NE | LT | GT | LE | GE) arith_expr)?
+    : arith_expr                          # singleArithExpr
+    | arith_expr (EQ | NE | LT | GT | LE | GE) arith_expr # binaryComparison
     ;
 
 arith_expr

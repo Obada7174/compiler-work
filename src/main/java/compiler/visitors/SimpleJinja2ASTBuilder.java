@@ -87,36 +87,46 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
     public ASTNode visitHtmlElement(Jinja2Parser.HtmlElementContext ctx) {
         int lineNumber = ctx.start != null ? ctx.start.getLine() : 1;
 
-        // Create a container node for all children
-        ProgramNode container = new ProgramNode(lineNumber);
+        // Get tag name
+        String tagName = "";
+        org.antlr.v4.runtime.tree.TerminalNode tagNameNode = ctx.HTML_TAG_NAME();
+        if (tagNameNode != null) {
+            tagName = tagNameNode.getText();
+        }
+
+        // Get attributes
+        java.util.Map<String, String> attributes = new java.util.LinkedHashMap<>();
+        if (ctx.htmlAttribute() != null) {
+            for (Jinja2Parser.HtmlAttributeContext attrCtx : ctx.htmlAttribute()) {
+                org.antlr.v4.runtime.tree.TerminalNode attrNameNode = attrCtx.HTML_TAG_NAME();
+                String attrName = attrNameNode != null ? attrNameNode.getText() : "";
+                String attrValue = "";
+                if (attrCtx.attrValue() != null) {
+                    attrValue = attrCtx.attrValue().getText();
+                }
+                if (!attrName.isEmpty()) {
+                    attributes.put(attrName, attrValue);
+                }
+            }
+        }
+
+        // Check if self-closing
+        boolean selfClosing = ctx.HTML_TAG_SLASH_CLOSE() != null;
+
+        // Create the HTML element node
+        HTMLElementNode htmlElement = new HTMLElementNode(tagName, attributes, selfClosing, lineNumber);
 
         // Process all nested content
         if (ctx.htmlContent() != null) {
             for (Jinja2Parser.HtmlContentContext contentCtx : ctx.htmlContent()) {
                 ASTNode child = visit(contentCtx);
                 if (child != null) {
-                    // If child is also a container with multiple children, flatten it
-                    if (child instanceof ProgramNode && child.getChildren().size() > 1) {
-                        for (ASTNode grandchild : child.getChildren()) {
-                            container.addChild(grandchild);
-                        }
-                    } else {
-                        container.addChild(child);
-                    }
+                    htmlElement.addChild(child);
                 }
             }
         }
 
-        // If container has only one child, return that child directly
-        if (container.getChildren().size() == 1) {
-            return container.getChildren().get(0);
-        }
-        // If container has multiple children, return the container
-        else if (container.getChildren().size() > 1) {
-            return container;
-        }
-
-        return null;
+        return htmlElement;
     }
 
     @Override
@@ -449,7 +459,16 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
 
     @Override
     protected ASTNode defaultResult() {
-        // Return null as default - will be filtered out
+        // Return null as default
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        // - will be filtered out
         return null;
     }
 }

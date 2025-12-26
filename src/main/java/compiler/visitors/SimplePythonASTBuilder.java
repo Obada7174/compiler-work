@@ -1,13 +1,18 @@
 package compiler.visitors;
 
 import compiler.ast.*;
-import grammar.*;
+
+import grammar.PythonParser;
+import grammar.PythonParserBaseVisitor;
+import grammar.PythonParser.TrailerContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * Enhanced Python AST Builder with support for more Python constructs
+ * Enhanced Python AST Builder with support for more Python constructs.
  */
 public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
 
@@ -34,36 +39,32 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
             return visit(ctx.simple_stmt());
         } else if (ctx.compound_stmt() != null) {
             return visit(ctx.compound_stmt());
+        } else if (ctx.decorated() != null) {
+            return visit(ctx.decorated());
         }
         return null;
     }
 
+    @Override
+    public ASTNode visitSimple_stmt(PythonParser.Simple_stmtContext ctx) {
+        if (ctx.small_stmt() != null && !ctx.small_stmt().isEmpty()) {
+            return visit(ctx.small_stmt(0));
+        }
+        return null;
+    }
 
     @Override
-    public ASTNode visitAssignmentStmt(PythonParser.AssignmentStmtContext ctx) {
+    public ASTNode visitAssignment(PythonParser.AssignmentContext ctx) {
         int lineNumber = ctx.start.getLine();
-
-        ExpressionNode target =
-                (ExpressionNode) visit(ctx.assignment().atom_expr());
-        ExpressionNode value =
-                (ExpressionNode) visit(ctx.assignment().expr());
-
         List<ExpressionNode> targets = new ArrayList<>();
-        targets.add(target);
+        if (ctx.atom_expr() != null) {
+            ASTNode targetNode = visit(ctx.atom_expr());
+            if (targetNode instanceof ExpressionNode) {
+                targets.add((ExpressionNode) targetNode);
+            }
+        }
 
-        return new AssignmentNode(targets, value, lineNumber);
-    }
-
-    @Override
-    public ASTNode visitExprStmt(PythonParser.ExprStmtContext ctx) {
-        return visit(ctx.expr_stmt().expr());
-    }
-
-    @Override
-    public ASTNode visitReturn_stmt(PythonParser.Return_stmtContext ctx) {
-        int lineNumber = ctx.start.getLine();
         ExpressionNode value = null;
-
         if (ctx.expr() != null) {
             ASTNode valueNode = visit(ctx.expr());
             if (valueNode instanceof ExpressionNode) {
@@ -71,16 +72,107 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
             }
         }
 
+        return new AssignmentNode(targets, value, lineNumber);
+    }
+
+    @Override
+    public ASTNode visitExpr_stmt(PythonParser.Expr_stmtContext ctx) {
+        if (ctx.expr() != null) {
+            return visit(ctx.expr());
+        }
+        return null;
+    }
+
+    @Override
+    public ASTNode visitReturn_stmt(PythonParser.Return_stmtContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        ExpressionNode value = null;
+        if (ctx.expr() != null) {
+            ASTNode valueNode = visit(ctx.expr());
+            if (valueNode instanceof ExpressionNode) {
+                value = (ExpressionNode) valueNode;
+            }
+        }
         return new ReturnStatementNode(value, lineNumber);
     }
 
+    @Override
+    public ASTNode visitDecorated(PythonParser.DecoratedContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        List<DecoratorNode> decorators = new ArrayList<>();
+        if (ctx.decorator() != null) {
+            for (PythonParser.DecoratorContext decoratorCtx : ctx.decorator()) {
+                ASTNode decoratorNode = visit(decoratorCtx);
+                if (decoratorNode instanceof DecoratorNode) {
+                    decorators.add((DecoratorNode) decoratorNode);
+                }
+            }
+        }
 
+        ASTNode decorated = null;
+        if (ctx.funcdef() != null) {
+            decorated = visit(ctx.funcdef());
+            if (decorated instanceof FunctionDefNode) {
+                ((FunctionDefNode) decorated).setDecorators(decorators);
+            }
+        } else if (ctx.classdef() != null) {
+            decorated = visit(ctx.classdef());
+            if (decorated instanceof ClassDefNode) {
+                ((ClassDefNode) decorated).setDecorators(decorators);
+            }
+        }
 
-
+        return decorated;
+    }
 
     @Override
-    public ASTNode visitIfStmt(PythonParser.IfStmtContext ctx) {
-        return visit(ctx.if_stmt());
+    public ASTNode visitDecorator(PythonParser.DecoratorContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        ExpressionNode decoratorExpr = null;
+        if (ctx.atom_expr() != null) {
+            ASTNode exprNode = visit(ctx.atom_expr());
+            if (exprNode instanceof ExpressionNode) {
+                decoratorExpr = (ExpressionNode) exprNode;
+            }
+        }
+
+        List<ExpressionNode> arguments = new ArrayList<>();
+        if (ctx.call() != null && ctx.call().arglist() != null) {
+            PythonParser.ArglistContext arglist = ctx.call().arglist();
+            if (arglist.argument() != null) {
+                for (PythonParser.ArgumentContext argCtx : arglist.argument()) {
+                    ASTNode argNode = visit(argCtx);
+                    if (argNode instanceof ExpressionNode) {
+                        arguments.add((ExpressionNode) argNode);
+                    }
+                }
+            }
+        }
+
+        return new DecoratorNode(decoratorExpr, arguments, lineNumber);
+    }
+
+    @Override
+    public ASTNode visitIf_stmt(PythonParser.If_stmtContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        ExpressionNode condition = null;
+        if (ctx.expr() != null && !ctx.expr().isEmpty()) {
+            ASTNode condNode = visit(ctx.expr(0));
+            if (condNode instanceof ExpressionNode) condition = (ExpressionNode) condNode;
+        }
+
+        List<ASTNode> thenBlock = new ArrayList<>();
+        List<ASTNode> elseBlock = new ArrayList<>();
+        if (ctx.suite() != null && !ctx.suite().isEmpty()) {
+            ASTNode suiteNode = visit(ctx.suite(0));
+            if (suiteNode != null) thenBlock.addAll(suiteNode.getChildren());
+            if (ctx.suite().size() > 1) {
+                ASTNode elseNode = visit(ctx.suite(1));
+                if (elseNode != null) elseBlock.addAll(elseNode.getChildren());
+            }
+        }
+
+        return new IfStatementNode(condition, thenBlock, elseBlock, lineNumber);
     }
 
     @Override
@@ -88,10 +180,8 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         int lineNumber = ctx.start.getLine();
         String functionName = ctx.NAME() != null ? ctx.NAME().getText() : "unknown";
 
-        // Parse parameters (simplified)
         List<ParameterNode> parameters = new ArrayList<>();
         if (ctx.parameters() != null) {
-            // Try to extract parameter names from text
             String paramsText = ctx.parameters().getText();
             if (!paramsText.equals("()") && paramsText.length() > 2) {
                 String[] paramNames = paramsText.substring(1, paramsText.length() - 1).split(",");
@@ -104,306 +194,238 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
             }
         }
 
-        // Parse function body
         List<ASTNode> body = new ArrayList<>();
         if (ctx.suite() != null) {
             ASTNode suiteNode = visit(ctx.suite());
-            if (suiteNode != null) {
-                body.addAll(suiteNode.getChildren());
-            }
+            if (suiteNode != null) body.addAll(suiteNode.getChildren());
         }
 
-        return new FunctionDefNode(functionName, parameters, body,
-                                  new ArrayList<>(), null, lineNumber);
+        return new FunctionDefNode(functionName, parameters, body, new ArrayList<>(), null, lineNumber);
     }
 
     @Override
     public ASTNode visitClassdef(PythonParser.ClassdefContext ctx) {
         int lineNumber = ctx.start.getLine();
         String className = ctx.NAME() != null ? ctx.NAME().getText() : "unknown";
-
-        // Get base classes (simplified)
         List<ExpressionNode> baseClasses = new ArrayList<>();
-
-        // Get class body
         List<ASTNode> body = new ArrayList<>();
         if (ctx.suite() != null) {
             ASTNode suiteNode = visit(ctx.suite());
-            if (suiteNode != null) {
-                body.addAll(suiteNode.getChildren());
-            }
+            if (suiteNode != null) body.addAll(suiteNode.getChildren());
         }
-
         return new ClassDefNode(className, baseClasses, body, new ArrayList<>(), lineNumber);
     }
 
     @Override
-    public ASTNode visitPassStmt(PythonParser.PassStmtContext ctx) {
-        return new PassNode(ctx.start.getLine());
-    }
-
-
-    @Override
     public ASTNode visitFor_stmt(PythonParser.For_stmtContext ctx) {
         int lineNumber = ctx.start.getLine();
-
-        // Get loop variable
-        String target = "";
-        if (ctx.NAME() != null) {
-            target = ctx.NAME().getText();
-        }
-
-        // Get iterable expression
+        String target = ctx.NAME() != null ? ctx.NAME().getText() : "";
         ExpressionNode iterable = null;
         if (ctx.expr() != null) {
             ASTNode iterNode = visit(ctx.expr());
-            if (iterNode instanceof ExpressionNode) {
-                iterable = (ExpressionNode) iterNode;
-            }
+            if (iterNode instanceof ExpressionNode) iterable = (ExpressionNode) iterNode;
         }
 
-        // Get loop body
         List<ASTNode> body = new ArrayList<>();
         if (ctx.suite() != null && !ctx.suite().isEmpty()) {
             ASTNode suiteNode = visit(ctx.suite(0));
-            if (suiteNode != null) {
-                body.addAll(suiteNode.getChildren());
-            }
+            if (suiteNode != null) body.addAll(suiteNode.getChildren());
         }
 
-        List<ASTNode> elseBlock = new ArrayList<>();
-        IdentifierNode targetNode = new IdentifierNode(target, lineNumber);
-        return new ForStatementNode(targetNode, iterable, body, elseBlock, lineNumber);
+        return new ForStatementNode(new IdentifierNode(target, lineNumber), iterable, body, new ArrayList<>(), lineNumber);
     }
 
     @Override
     public ASTNode visitWhile_stmt(PythonParser.While_stmtContext ctx) {
         int lineNumber = ctx.start.getLine();
-
-        // Get condition
         ExpressionNode condition = null;
         if (ctx.expr() != null) {
             ASTNode condNode = visit(ctx.expr());
-            if (condNode instanceof ExpressionNode) {
-                condition = (ExpressionNode) condNode;
-            }
+            if (condNode instanceof ExpressionNode) condition = (ExpressionNode) condNode;
         }
 
-        // Get loop body
         List<ASTNode> body = new ArrayList<>();
         if (ctx.suite() != null && !ctx.suite().isEmpty()) {
             ASTNode suiteNode = visit(ctx.suite(0));
-            if (suiteNode != null) {
-                body.addAll(suiteNode.getChildren());
-            }
+            if (suiteNode != null) body.addAll(suiteNode.getChildren());
         }
 
-        List<ASTNode> elseBlock = new ArrayList<>();
-        return new WhileStatementNode(condition, body, elseBlock, lineNumber);
+        return new WhileStatementNode(condition, body, new ArrayList<>(), lineNumber);
     }
 
     @Override
     public ASTNode visitTry_stmt(PythonParser.Try_stmtContext ctx) {
         int lineNumber = ctx.start.getLine();
-
-        // Get try block
         List<ASTNode> tryBlock = new ArrayList<>();
         if (ctx.suite() != null && !ctx.suite().isEmpty()) {
             ASTNode suiteNode = visit(ctx.suite(0));
-            if (suiteNode != null) {
-                tryBlock.addAll(suiteNode.getChildren());
-            }
+            if (suiteNode != null) tryBlock.addAll(suiteNode.getChildren());
         }
-
-        List<ExceptClauseNode> exceptClauses = new ArrayList<>();
-        List<ASTNode> elseBlock = new ArrayList<>();
-        List<ASTNode> finallyBlock = new ArrayList<>();
-
-        return new TryStatementNode(tryBlock, exceptClauses, elseBlock, finallyBlock, lineNumber);
+        return new TryStatementNode(tryBlock, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), lineNumber);
     }
 
     @Override
     public ASTNode visitSuite(PythonParser.SuiteContext ctx) {
         ProgramNode container = new ProgramNode(ctx.start != null ? ctx.start.getLine() : 1);
-
         if (ctx.stmt() != null) {
             for (PythonParser.StmtContext stmtCtx : ctx.stmt()) {
                 ASTNode node = visit(stmtCtx);
-                if (node != null) {
-                    container.addChild(node);
-                }
+                if (node != null) container.addChild(node);
             }
         }
-
         return container;
     }
 
     @Override
     public ASTNode visitExpr(PythonParser.ExprContext ctx) {
-        if (ctx.comparison() != null) {
-            return visit(ctx.comparison());
-        }
+        if (ctx.comparison() != null) return visit(ctx.comparison());
         return null;
     }
 
     @Override
-    public ASTNode visitComparison(PythonParser.ComparisonContext ctx) {
-        if (ctx.arith_expr() != null && !ctx.arith_expr().isEmpty()) {
-            ASTNode left = visit(ctx.arith_expr(0));
-
-            // Check if there's a comparison operator
-            if (ctx.arith_expr().size() > 1) {
-                int lineNumber = ctx.start.getLine();
-                String operator = "";
-
-                if (ctx.EQ() != null) operator = "==";
-                else if (ctx.NE() != null) operator = "!=";
-                else if (ctx.LT() != null) operator = "<";
-                else if (ctx.GT() != null) operator = ">";
-                else if (ctx.LE() != null) operator = "<=";
-                else if (ctx.GE() != null) operator = ">=";
-
-                ASTNode right = visit(ctx.arith_expr(1));
-
-                if (left instanceof ExpressionNode && right instanceof ExpressionNode) {
-                    return new ComparisonNode(operator, (ExpressionNode) left, (ExpressionNode) right, lineNumber);
-                }
-            }
-
-            return left;
-        }
-        return null;
+    public ASTNode visitSingleArithExpr(PythonParser.SingleArithExprContext ctx) {
+        return visit(ctx.arith_expr());
     }
+
+    @Override
+    public ASTNode visitBinaryComparison(PythonParser.BinaryComparisonContext ctx) {
+        ExpressionNode left = (ExpressionNode) visit(ctx.arith_expr(0));
+        ExpressionNode right = (ExpressionNode) visit(ctx.arith_expr(1));
+        String operator = ctx.getChild(1).getText(); // EQ, NE, LT, ...
+        return new ComparisonNode(operator, left, right, ctx.start.getLine());
+    }
+
+
 
     @Override
     public ASTNode visitArith_expr(PythonParser.Arith_exprContext ctx) {
         if (ctx.atom_expr() != null && !ctx.atom_expr().isEmpty()) {
             ASTNode left = visit(ctx.atom_expr(0));
-
-            // Handle binary operations (PLUS, MINUS, STAR, DIV, MOD)
             if (ctx.atom_expr().size() > 1) {
                 int lineNumber = ctx.start.getLine();
-
-                // Process all operators from left to right
                 for (int i = 1; i < ctx.atom_expr().size(); i++) {
                     String operator = "";
-
-                    // Determine which operator is at position i-1
-                    if (ctx.PLUS() != null && !ctx.PLUS().isEmpty() && ctx.PLUS().size() >= i) {
-                        operator = "+";
-                    } else if (ctx.MINUS() != null && !ctx.MINUS().isEmpty() && ctx.MINUS().size() >= i) {
-                        operator = "-";
-                    } else if (ctx.STAR() != null && !ctx.STAR().isEmpty() && ctx.STAR().size() >= i) {
-                        operator = "*";
-                    } else if (ctx.DIV() != null && !ctx.DIV().isEmpty() && ctx.DIV().size() >= i) {
-                        operator = "/";
-                    } else if (ctx.MOD() != null && !ctx.MOD().isEmpty() && ctx.MOD().size() >= i) {
-                        operator = "%";
-                    }
+                    if (ctx.PLUS() != null && !ctx.PLUS().isEmpty() && ctx.PLUS().size() >= i) operator = "+";
+                    else if (ctx.MINUS() != null && !ctx.MINUS().isEmpty() && ctx.MINUS().size() >= i) operator = "-";
+                    else if (ctx.STAR() != null && !ctx.STAR().isEmpty() && ctx.STAR().size() >= i) operator = "*";
+                    else if (ctx.DIV() != null && !ctx.DIV().isEmpty() && ctx.DIV().size() >= i) operator = "/";
+                    else if (ctx.MOD() != null && !ctx.MOD().isEmpty() && ctx.MOD().size() >= i) operator = "%";
 
                     ASTNode right = visit(ctx.atom_expr(i));
-
                     if (left instanceof ExpressionNode && right instanceof ExpressionNode && !operator.isEmpty()) {
                         left = new BinaryOpNode(operator, (ExpressionNode) left, (ExpressionNode) right, lineNumber);
                     }
                 }
             }
-
             return left;
         }
         return null;
     }
-    @Override
-    public ASTNode visitNameAtom(PythonParser.NameAtomContext ctx) {
-        return new IdentifierNode(ctx.NAME().getText(), ctx.start.getLine());
-    }
 
     @Override
-    public ASTNode visitNumberAtom(PythonParser.NumberAtomContext ctx) {
-        return new NumberLiteralNode(
-                Double.parseDouble(ctx.NUMBER().getText()),
-                ctx.start.getLine()
-        );
+    public ASTNode visitAtom_expr(PythonParser.Atom_exprContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        ASTNode base = ctx.atom() != null ? visit(ctx.atom()) : null;
+        if (base == null) return null;
+        if (ctx.trailer() != null && !ctx.trailer().isEmpty()) {
+            for (PythonParser.TrailerContext trailerCtx : ctx.trailer()) {
+                base = visitTrailerWithBase(trailerCtx, base);
+            }
+        }
+        return base;
     }
 
-    @Override
-    public ASTNode visitStringAtom(PythonParser.StringAtomContext ctx) {
-        String raw = ctx.STRING().getText();
-        return new StringLiteralNode(
-                raw.substring(1, raw.length() - 1),
-                ctx.start.getLine()
-        );
+    private ASTNode visitTrailerWithBase(PythonParser.TrailerContext ctx, ASTNode base) {
+        int lineNumber = ctx.start.getLine();
+        if (ctx.call() != null) {
+            List<ExpressionNode> arguments = new ArrayList<>();
+            if (ctx.call().arglist() != null && ctx.call().arglist().argument() != null) {
+                for (PythonParser.ArgumentContext argCtx : ctx.call().arglist().argument()) {
+                    ASTNode argNode = visit(argCtx);
+                    if (argNode instanceof ExpressionNode) arguments.add((ExpressionNode) argNode);
+                }
+            }
+            if (base instanceof ExpressionNode) return new FunctionCallNode((ExpressionNode) base, arguments, lineNumber);
+        }
+
+        if (ctx.DOT() != null && ctx.NAME() != null && base instanceof ExpressionNode) {
+            return new MemberAccessNode((ExpressionNode) base, ctx.NAME().getText(), lineNumber);
+        }
+
+        return base;
     }
 
     @Override
     public ASTNode visitPositionalArg(PythonParser.PositionalArgContext ctx) {
-        // Visit the expression in the positional argument
-        if (ctx.expr() != null) {
-            return visit(ctx.expr());
-        }
-        return null;
+        return ctx.expr() != null ? visit(ctx.expr()) : null;
     }
 
     @Override
     public ASTNode visitKeywordArg(PythonParser.KeywordArgContext ctx) {
-        // Visit the expression in the keyword argument (value part)
-        if (ctx.expr() != null) {
-            return visit(ctx.expr());
-        }
-        return null;
+        return ctx.expr() != null ? visit(ctx.expr()) : null;
     }
 
+    @Override
+    public ASTNode visitAtom(PythonParser.AtomContext ctx) {
+        int lineNumber = ctx.start.getLine();
+        if (ctx.NAME() != null) return new IdentifierNode(ctx.NAME().getText(), lineNumber);
+        if (ctx.NUMBER() != null) return new NumberLiteralNode(Double.parseDouble(ctx.NUMBER().getText()), lineNumber);
+        if (ctx.STRING() != null) {
+            String text = ctx.STRING().getText();
+            String value = text.length() > 2 ? text.substring(1, text.length() - 1) : text;
+            return new StringLiteralNode(value, lineNumber);
+        }
+        if (ctx.FSTRING() != null) {
+            String text = ctx.FSTRING().getText();
+            String value = text.length() > 3 ? text.substring(2, text.length() - 1) : text;
+            return new StringLiteralNode(value, lineNumber);
+        }
+        if (ctx.TRUE() != null) return new BooleanLiteralNode(true, lineNumber);
+        if (ctx.FALSE() != null) return new BooleanLiteralNode(false, lineNumber);
+        if (ctx.NONE() != null) return new NoneLiteralNode(lineNumber);
+        if (ctx.listLit() != null) return visit(ctx.listLit());
+        if (ctx.dictLit() != null) return visit(ctx.dictLit());
+        if (ctx.expr() != null) return visit(ctx.expr());
+        return null;
+    }
 
     @Override
     public ASTNode visitListLit(PythonParser.ListLitContext ctx) {
         int lineNumber = ctx.start.getLine();
         List<ExpressionNode> elements = new ArrayList<>();
-
         if (ctx.expr() != null) {
             for (PythonParser.ExprContext exprCtx : ctx.expr()) {
                 ASTNode element = visit(exprCtx);
-                if (element instanceof ExpressionNode) {
-                    elements.add((ExpressionNode) element);
-                }
+                if (element instanceof ExpressionNode) elements.add((ExpressionNode) element);
             }
         }
-
-        return new ListLiteralNode(lineNumber);
+        return new ListLiteralNode(elements, lineNumber);
     }
 
     @Override
     public ASTNode visitDictLit(PythonParser.DictLitContext ctx) {
         int lineNumber = ctx.start.getLine();
-        java.util.Map<ExpressionNode, ExpressionNode> entries = new java.util.LinkedHashMap<>();
-
+        Map<ExpressionNode, ExpressionNode> entries = new LinkedHashMap<>();
         if (ctx.dictItem() != null) {
             for (PythonParser.DictItemContext itemCtx : ctx.dictItem()) {
-                // Get key
                 ExpressionNode key = null;
                 if (itemCtx.STRING() != null) {
                     String keyText = itemCtx.STRING().getText();
                     String keyValue = keyText.length() > 2 ? keyText.substring(1, keyText.length() - 1) : keyText;
                     key = new StringLiteralNode(keyValue, lineNumber);
                 } else if (itemCtx.NAME() != null) {
-                    String keyText = itemCtx.NAME().getText();
-                    key = new StringLiteralNode(keyText, lineNumber);
+                    key = new StringLiteralNode(itemCtx.NAME().getText(), lineNumber);
                 }
 
-                // Get value
                 ExpressionNode value = null;
                 if (itemCtx.expr() != null) {
                     ASTNode valueNode = visit(itemCtx.expr());
-                    if (valueNode instanceof ExpressionNode) {
-                        value = (ExpressionNode) valueNode;
-                    }
+                    if (valueNode instanceof ExpressionNode) value = (ExpressionNode) valueNode;
                 }
 
-                if (key != null && value != null) {
-                    entries.put(key, value);
-                }
+                if (key != null && value != null) entries.put(key, value);
             }
         }
-
         return new DictionaryLiteralNode(entries, lineNumber);
     }
 }

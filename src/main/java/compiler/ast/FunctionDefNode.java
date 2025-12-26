@@ -56,6 +56,14 @@ public class FunctionDefNode extends StatementNode {
         return decorators;
     }
 
+    public void setDecorators(List<DecoratorNode> decorators) {
+        this.decorators = decorators != null ? decorators : new ArrayList<>();
+        // Add decorators as children (at the beginning)
+        for (DecoratorNode decorator : this.decorators) {
+            addChild(decorator);
+        }
+    }
+
     public ExpressionNode getReturnType() {
         return returnType;
     }

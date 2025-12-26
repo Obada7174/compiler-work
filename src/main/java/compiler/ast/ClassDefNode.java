@@ -50,6 +50,14 @@ public class ClassDefNode extends StatementNode {
         return decorators;
     }
 
+    public void setDecorators(List<DecoratorNode> decorators) {
+        this.decorators = decorators != null ? decorators : new ArrayList<>();
+        // Add decorators as children (at the beginning)
+        for (DecoratorNode decorator : this.decorators) {
+            addChild(decorator);
+        }
+    }
+
     @Override
     public String getNodeType() {
         return "ClassDef";

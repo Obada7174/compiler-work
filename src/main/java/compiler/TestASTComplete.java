@@ -163,14 +163,14 @@ public class TestASTComplete {
                              <div class="header">
                                  <h1>{{ form_title }}</h1>
                                  <div class="breadcrumb">{{ store_name }} > Admin > Add New Product</div>
-                            
+
                                  {% if user.is_admin %}
                                      <p style="color: #28a745; margin-top: 10px;">✓ Authorized as {{ user.role }}</p>
                                  {% else %}
                                      <p style="color: #dc3545; margin-top: 10px;">✗ Access Denied: Admin privileges required</p>
                                  {% endif %}
                              </div>
-                            
+
                              {% if user.is_admin %}
                                  <form action="/products/add" method="POST" enctype="multipart/form-data">
                                      <div class="form-group">
@@ -178,7 +178,7 @@ public class TestASTComplete {
                                          <input type="text" id="name" name="name" placeholder="Enter product name" required>
                                          <div class="help-text">Enter a clear and descriptive product name</div>
                                      </div>
-                            
+
                                      <div class="form-row">
                                          <div class="form-group">
                                              <label for="category">Category <span class="required">*</span></label>
@@ -189,58 +189,58 @@ public class TestASTComplete {
                                                  {% endfor %}
                                              </select>
                                          </div>
-                            
+
                                          <div class="form-group">
                                              <label for="price">Price ($) <span class="required">*</span></label>
                                              <input type="number" id="price" name="price" step="0.01" min="0" placeholder="0.00" required>
                                          </div>
                                      </div>
-                            
+
                                      <div class="form-group">
                                          <label for="description">Description <span class="required">*</span></label>
                                          <textarea id="description" name="description" placeholder="Enter detailed product description" required></textarea>
                                          <div class="help-text">Minimum 50 characters, maximum 500 characters</div>
                                      </div>
-                            
+
                                      <div class="form-row">
                                          <div class="form-group">
                                              <label for="stock">Stock Quantity <span class="required">*</span></label>
                                              <input type="number" id="stock" name="stock" min="0" value="0" required>
                                          </div>
-                            
+
                                          <div class="form-group">
                                              <label for="sku">SKU Code</label>
                                              <input type="text" id="sku" name="sku" placeholder="e.g., PROD-001">
                                              <div class="help-text">Unique product identifier</div>
                                          </div>
                                      </div>
-                            
+
                                      <div class="form-group">
                                          <label for="image">Product Image</label>
                                          <input type="file" id="image" name="image" accept="image/*">
                                          <div class="help-text">Supported formats: JPG, PNG, WebP (Max 5MB)</div>
                                      </div>
-                            
+
                                      <div class="form-group">
                                          <label>
                                              <input type="checkbox" name="featured" value="1">
                                              Mark as featured product
                                          </label>
                                      </div>
-                            
+
                                      <div class="form-group">
                                          <label>
                                              <input type="checkbox" name="active" value="1" checked>
                                              Activate product immediately
                                          </label>
                                      </div>
-                            
+
                                      <div style="margin-top: 30px;">
                                          <button type="submit" class="btn btn-primary">Add Product</button>
                                          <button type="reset" class="btn btn-secondary">Reset Form</button>
                                      </div>
                                  </form>
-                            
+
                                  <div class="preview">
                                      <h3>Product Preview</h3>
                                      <p>Your product will appear like this:</p>
@@ -253,12 +253,12 @@ public class TestASTComplete {
                                          </span>
                                      </div>
                                  </div>
-                            
+
                                  <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
                                      <strong>Note:</strong> All fields marked with <span class="required">*</span> are required.
                                      Please ensure all information is accurate before submitting.
                                  </div>
-                            
+
                              {% else %}
                                  <div style="padding: 40px; text-align: center; color: #666;">
                                      <h2>Access Restricted</h2>
@@ -266,14 +266,14 @@ public class TestASTComplete {
                                      <p>Current role: {{ user.role }}</p>
                                  </div>
                              {% endif %}
-                            
+
                              <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #666;">
                                  <p>&copy; 2025 {{ store_name }} Admin Panel</p>
                              </footer>
                          </div>
                      </body>
                      </html>
-                            
+
                  """;
 
         // Run Python AST test
