@@ -7,9 +7,9 @@ import grammar.PythonLexer;
 import grammar.PythonParser;
 import org.antlr.v4.runtime.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 /**
  * Test class for building and displaying Python Abstract Syntax Tree
@@ -17,10 +17,10 @@ import java.nio.file.Paths;
 public class TestPythonAST {
 
     public static void main(String[] args) {
-        // Test files with SUPPORTED grammar features
+        // Test files inside resources/examples
         String[] testFiles = {
-            "test_python.py",
-            "examples/app.py"  // Flask app with decorators
+                "examples/test_python.py",
+                "examples/app.py"  // Flask app with decorators
         };
 
         for (String filename : testFiles) {
@@ -38,9 +38,22 @@ public class TestPythonAST {
         }
     }
 
-    private static void testPythonFile(String filename) throws IOException {
-        // Read the Python file
-        String pythonCode = new String(Files.readAllBytes(Paths.get(filename)));
+    private static void testPythonFile(String filename) throws Exception {
+        // Load file from resources using ClassLoader
+        InputStream is = TestPythonAST.class.getClassLoader().getResourceAsStream(filename);
+        if (is == null) {
+            System.err.println("ERROR: File not found in resources: " + filename);
+            return;
+        }
+
+        // Convert InputStream to String
+        Scanner scanner = new Scanner(is, StandardCharsets.UTF_8);
+        StringBuilder sb = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            sb.append(scanner.nextLine()).append("\n");
+        }
+        String pythonCode = sb.toString();
+        scanner.close();
 
         System.out.println("\n─────────────────────────────────────────────────────────────────");
         System.out.println("  SOURCE CODE");
@@ -52,34 +65,29 @@ public class TestPythonAST {
         CharStream input = CharStreams.fromString(pythonCode);
         PythonLexer lexer = new PythonLexer(input);
 
-        // Error listener
         lexer.removeErrorListeners();
         lexer.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                  int line, int charPositionInLine, String msg,
-                                  RecognitionException e) {
+                                    int line, int charPositionInLine, String msg,
+                                    RecognitionException e) {
                 System.err.println("LEXER ERROR at line " + line + ":" + charPositionInLine + " - " + msg);
             }
         });
 
-        // Create token stream
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-        // Create parser
         PythonParser parser = new PythonParser(tokens);
-
         parser.removeErrorListeners();
         parser.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                  int line, int charPositionInLine, String msg,
-                                  RecognitionException e) {
+                                    int line, int charPositionInLine, String msg,
+                                    RecognitionException e) {
                 System.err.println("PARSER ERROR at line " + line + ":" + charPositionInLine + " - " + msg);
             }
         });
 
-        // Parse
         PythonParser.File_inputContext tree = parser.file_input();
 
         System.out.println("✓ Parsing completed successfully");

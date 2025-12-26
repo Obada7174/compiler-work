@@ -10,9 +10,6 @@ import java.util.*;
  */
 public class SymbolTableEntry {
 
-    // ========== Core Attributes (Required by Compiler Design Theory) ==========
-
-    /** Name: identifier name (variable, function, class, etc.) */
     private String name;
 
     /** Type: data type (int, char, float, string, boolean, array, function, class, etc.) */

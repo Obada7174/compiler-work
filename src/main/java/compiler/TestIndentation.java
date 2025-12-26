@@ -2,13 +2,27 @@ package compiler;
 
 import org.antlr.v4.runtime.*;
 import grammar.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class TestIndentation {
     public static void main(String[] args) {
         try {
-            String pythonCode = new String(Files.readAllBytes(Paths.get("test_indentation.py")));
+            // قراءة الملف من resources مباشرة كـ InputStream
+            InputStream is = TestIndentation.class.getClassLoader()
+                    .getResourceAsStream("examples/test_indentation.py");
+
+            if (is == null) {
+                throw new RuntimeException("File not found in resources: examples/test_indentation.py");
+            }
+
+            // تحويل InputStream إلى String
+            String pythonCode;
+            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
+                scanner.useDelimiter("\\A"); // قراءة كل المحتوى
+                pythonCode = scanner.hasNext() ? scanner.next() : "";
+            }
 
             System.out.println("Testing Python Indentation Handling");
             System.out.println("====================================\n");
@@ -28,8 +42,9 @@ public class TestIndentation {
             });
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+            tokens.fill();
             System.out.println("Lexical Analysis:");
-            System.out.println("  Total tokens: " + tokens.getNumberOfOnChannelTokens());
+            System.out.println("  Total tokens: " + tokens.size());
 
             PythonParser parser = new PythonParser(tokens);
             parser.addErrorListener(new BaseErrorListener() {

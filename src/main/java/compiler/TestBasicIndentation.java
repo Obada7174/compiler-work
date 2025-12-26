@@ -2,19 +2,36 @@ package compiler;
 
 import org.antlr.v4.runtime.*;
 import grammar.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class TestBasicIndentation {
     public static void main(String[] args) {
         try {
-            String pythonCode = new String(Files.readAllBytes(Paths.get("test_basic_indentation.py")));
+            // Load file from Maven resources using ClassLoader
+            ClassLoader classLoader = TestBasicIndentation.class.getClassLoader();
+            InputStream inputStream = classLoader.getResourceAsStream(
+                    "examples/test_basic_indentation.py"
+            );
 
-            CharStream input = CharStreams.fromString(pythonCode);
+            if (inputStream == null) {
+                throw new RuntimeException(
+                        "Test file not found in resources: examples/test_basic_indentation.py"
+                );
+            }
+
+                     String pythonCode = new String(
+                    inputStream.readAllBytes(),
+                    StandardCharsets.UTF_8
+            );
+
+                      CharStream input = CharStreams.fromString(pythonCode);
             PythonLexer lexer = new PythonLexer(input);
             lexer.removeErrorListeners();
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+            tokens.fill();
             int tokenCount = tokens.getNumberOfOnChannelTokens();
 
             PythonParser parser = new PythonParser(tokens);
@@ -22,6 +39,7 @@ public class TestBasicIndentation {
 
             PythonParser.File_inputContext tree = parser.file_input();
 
+            // Output
             System.out.println("=====================================");
             System.out.println("  CPython Indentation Test");
             System.out.println("=====================================");

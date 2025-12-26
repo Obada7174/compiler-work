@@ -2,54 +2,52 @@ package compiler;
 
 import org.antlr.v4.runtime.*;
 import grammar.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class TestDetailedPython {
     public static void main(String[] args) {
-        String filename = "test_python.py";
-
-        System.out.println("Testing: " + filename);
-        System.out.println("===========================================\n");
-
         try {
-            String pythonCode = new String(Files.readAllBytes(Paths.get(filename)));
+            InputStream is = TestDetailedPython.class.getClassLoader()
+                    .getResourceAsStream("examples/test_python.py");
+
+            if (is == null) {
+                System.err.println("ERROR: File not found in resources/examples/test_python.py");
+                return;
+            }
+
+            Scanner scanner = new Scanner(is, StandardCharsets.UTF_8);
+            StringBuilder sb = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                sb.append(scanner.nextLine()).append("\n");
+            }
+            String pythonCode = sb.toString();
+            scanner.close();
+
+            System.out.println("Testing: test_python.py");
+            System.out.println("===========================================");
 
             CharStream input = CharStreams.fromString(pythonCode);
             PythonLexer lexer = new PythonLexer(input);
-
-            lexer.addErrorListener(new BaseErrorListener() {
-                @Override
-                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                        int line, int charPositionInLine, String msg,
-                                        RecognitionException e) {
-                    System.err.println("LEXER ERROR at line " + line + ":" + charPositionInLine + " - " + msg);
-                }
-            });
+            lexer.removeErrorListeners();
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            System.out.println("Tokens: " + tokens.getNumberOfOnChannelTokens());
+            int tokenCount = tokens.getNumberOfOnChannelTokens();
 
             PythonParser parser = new PythonParser(tokens);
-            parser.addErrorListener(new BaseErrorListener() {
-                @Override
-                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                        int line, int charPositionInLine, String msg,
-                                        RecognitionException e) {
-                    System.err.println("PARSER ERROR at line " + line + ":" + charPositionInLine + " - " + msg);
-                }
-            });
+            parser.removeErrorListeners();
 
             PythonParser.File_inputContext tree = parser.file_input();
 
+            System.out.println("Tokens: " + tokenCount);
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                System.out.println("\n✓ SUCCESS");
+                System.out.println("✓ PASSED");
             } else {
-                System.out.println("\n✗ FAILED with " + parser.getNumberOfSyntaxErrors() + " errors");
+                System.out.println("✗ FAILED (" + parser.getNumberOfSyntaxErrors() + " errors)");
             }
 
         } catch (Exception e) {
-            System.err.println("ERROR: " + e.getMessage());
             e.printStackTrace();
         }
     }

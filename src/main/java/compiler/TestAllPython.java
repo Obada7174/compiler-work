@@ -2,16 +2,16 @@ package compiler;
 
 import org.antlr.v4.runtime.*;
 import grammar.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class TestAllPython {
+
     public static void main(String[] args) {
+
         String[] testFiles = {
-            "test_indentation.py",
-            "test_python.py",
-            "examples/sample_python.txt",
-            "examples/app.py"
+                "examples/app.py"
         };
 
         int passCount = 0;
@@ -21,21 +21,31 @@ public class TestAllPython {
         System.out.println("  COMPREHENSIVE PYTHON PARSER TEST");
         System.out.println("===========================================\n");
 
-        for (String filename : testFiles) {
-            System.out.println("Testing: " + filename);
+        for (String resourcePath : testFiles) {
+            System.out.println("Testing: " + resourcePath);
             System.out.print("  ");
 
             try {
-                String pythonCode = new String(Files.readAllBytes(Paths.get(filename)));
+                // 🔹 Load file from resources
+                InputStream inputStream = TestAllPython.class
+                        .getClassLoader()
+                        .getResourceAsStream(resourcePath);
+
+                if (inputStream == null) {
+                    throw new RuntimeException("Resource not found: " + resourcePath);
+                }
+
+                String pythonCode = new String(
+                        inputStream.readAllBytes(),
+                        StandardCharsets.UTF_8
+                );
 
                 CharStream input = CharStreams.fromString(pythonCode);
                 PythonLexer lexer = new PythonLexer(input);
-
-                // Suppress error output for summary
                 lexer.removeErrorListeners();
 
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
-                int tokenCount = tokens.getNumberOfOnChannelTokens();
+                tokens.fill();
 
                 PythonParser parser = new PythonParser(tokens);
                 parser.removeErrorListeners();
@@ -43,7 +53,7 @@ public class TestAllPython {
                 PythonParser.File_inputContext tree = parser.file_input();
 
                 if (parser.getNumberOfSyntaxErrors() == 0) {
-                    System.out.println("✓ PASSED (" + tokenCount + " tokens)");
+                    System.out.println("✓ PASSED (" + tokens.size() + " tokens)");
                     passCount++;
                 } else {
                     System.out.println("✗ FAILED (" + parser.getNumberOfSyntaxErrors() + " errors)");
@@ -61,10 +71,6 @@ public class TestAllPython {
         System.out.println("===========================================");
         System.out.println("  Passed: " + passCount + "/" + testFiles.length);
         System.out.println("  Failed: " + failCount + "/" + testFiles.length);
-
-        if (failCount == 0) {
-            System.out.println("\n  ✓ ALL TESTS PASSED!");
-        }
         System.out.println("===========================================");
     }
 }

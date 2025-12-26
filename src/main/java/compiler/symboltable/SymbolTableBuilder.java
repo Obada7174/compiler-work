@@ -3,39 +3,18 @@ package compiler.symboltable;
 import compiler.ast.*;
 import java.util.*;
 
-/**
- * Symbol Table Builder
- * Traverses the AST and populates the symbol table following classical compiler design principles.
- *
- * This class performs semantic analysis by:
- * 1. Extracting declarations (variables, functions, classes, parameters)
- * 2. Recording usage of identifiers
- * 3. Detecting redeclaration errors
- * 4. Detecting undeclared identifier errors
- * 5. Managing scope entry/exit
- *
- * Usage:
- *   ClassicalSymbolTable symbolTable = ClassicalSymbolTable.allocate();
- *   SymbolTableBuilder builder = new SymbolTableBuilder(symbolTable);
- *   builder.build(astRootNode);
- *   symbolTable.printTable();
- */
+
 public class SymbolTableBuilder {
 
     private ClassicalSymbolTable symbolTable;
     private boolean isInDeclarationContext;
 
-    /**
-     * Constructor
-     */
     public SymbolTableBuilder(ClassicalSymbolTable symbolTable) {
         this.symbolTable = symbolTable;
         this.isInDeclarationContext = false;
     }
 
-    /**
-     * Build symbol table from AST root
-     */
+
     public void build(ASTNode root) {
         if (root == null) {
             return;

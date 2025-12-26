@@ -2,19 +2,28 @@ package compiler;
 
 import org.antlr.v4.runtime.*;
 import grammar.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class TestCPythonIndentation {
     public static void main(String[] args) {
         try {
-            String pythonCode = new String(Files.readAllBytes(Paths.get("test_cpython_indentation.py")));
+            InputStream is = TestCPythonIndentation.class
+                    .getClassLoader()
+                    .getResourceAsStream("examples/test_cpython_indentation.py");
+
+            if (is == null) {
+                throw new RuntimeException("File not found in resources: examples/test_cpython_indentation.py");
+            }
+
+            String pythonCode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
             System.out.println("Testing CPython-Style Indentation");
             System.out.println("=====================================\n");
 
             CharStream input = CharStreams.fromString(pythonCode);
             PythonLexer lexer = new PythonLexer(input);
+
 
             lexer.addErrorListener(new BaseErrorListener() {
                 @Override
@@ -29,6 +38,8 @@ public class TestCPythonIndentation {
             int tokenCount = tokens.getNumberOfOnChannelTokens();
 
             PythonParser parser = new PythonParser(tokens);
+
+            // إضافة Error Listener للـ Parser
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
                 public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
@@ -48,7 +59,7 @@ public class TestCPythonIndentation {
                 System.out.println("  - Nested indentation: ✓");
                 System.out.println("  - Implicit line continuation ([...]): ✓");
                 System.out.println("  - Implicit line continuation ({...}): ✓");
-                System.out.println("  - Implicit line continuation ((...): ✓");
+                System.out.println("  - Implicit line continuation ((...)): ✓");
                 System.out.println("  - Decorators with multiline: ✓");
                 System.out.println("  - if/elif/else with DEDENT: ✓");
                 System.out.println("  - for/else: ✓");

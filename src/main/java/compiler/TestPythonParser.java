@@ -1,18 +1,26 @@
 package compiler;
 
 import org.antlr.v4.runtime.*;
-// Generated parser classes
 import grammar.*;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class TestPythonParser {
+
     public static void main(String[] args) {
         try {
-            // Read the test Python file
-            String pythonCode = new String(Files.readAllBytes(Paths.get("test_python_full.py")));
+            // Use the resources folder: src/main/resources/test_python_full.py
+            String resourcePath = "/examples/app.py"; // leading '/' means root of resources
+            InputStream is = TestPythonParser.class.getResourceAsStream(resourcePath);
+
+            if (is == null) {
+                System.err.println("ERROR: File not found in resources: " + resourcePath);
+                return;
+            }
+
+            // Read the Python file from resources
+            String pythonCode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
             System.out.println("═══════════════════════════════════════════════════════════");
             System.out.println("  Testing Python Parser");
@@ -22,11 +30,10 @@ public class TestPythonParser {
             System.out.println(pythonCode);
             System.out.println("-----------------------------------------------------------\n");
 
-            // Create lexer
+            // Lexer
             CharStream input = CharStreams.fromString(pythonCode);
             PythonLexer lexer = new PythonLexer(input);
 
-            // Add error listener
             lexer.removeErrorListeners();
             lexer.addErrorListener(new BaseErrorListener() {
                 @Override
@@ -38,14 +45,12 @@ public class TestPythonParser {
             });
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-
             System.out.println("✓ Lexical Analysis completed");
             System.out.println("  Total tokens: " + tokens.getNumberOfOnChannelTokens());
 
-            // Create parser
+            // Parser
             PythonParser parser = new PythonParser(tokens);
 
-            // Add error listener
             parser.removeErrorListeners();
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
@@ -56,9 +61,7 @@ public class TestPythonParser {
                 }
             });
 
-            // Parse the code
             PythonParser.File_inputContext tree = parser.file_input();
-
             System.out.println("✓ Syntax Analysis completed");
             System.out.println("  Parse tree root: " + tree.getClass().getSimpleName());
 
@@ -67,7 +70,7 @@ public class TestPythonParser {
             System.out.println("═══════════════════════════════════════════════════════════\n");
 
         } catch (IOException e) {
-            System.err.println("ERROR: Could not read test_python.py - " + e.getMessage());
+            System.err.println("ERROR: Could not read Python file - " + e.getMessage());
         } catch (Exception e) {
             System.err.println("ERROR: " + e.getMessage());
             e.printStackTrace();
