@@ -14,7 +14,7 @@ products = [
         'category_id': 1,
         'category_name': 'Electronics',
         'stock': 45,
-        'image_url': '/static/images/headphones.jpg',
+        'image_url': '/static/images/headphones.png',
         'rating': 4,
         'reviews': 128,
         'review_count': 128,
@@ -56,7 +56,7 @@ products = [
         'category_id': 1,
         'category_name': 'Electronics',
         'stock': 23,
-        'image_url': '/static/images/smartwatch.jpg',
+        'image_url': '/static/images/smartwatch.png',
         'rating': 5,
         'reviews': 89,
         'review_count': 89,
@@ -91,7 +91,7 @@ products = [
         'category_id': 2,
         'category_name': 'Furniture',
         'stock': 67,
-        'image_url': '/static/images/office-chair.jpg',
+        'image_url': '/static/images/officeChair.jfif',
         'rating': 4,
         'reviews': 245,
         'review_count': 245,
@@ -133,7 +133,7 @@ products = [
         'category_id': 3,
         'category_name': 'Home & Kitchen',
         'stock': 156,
-        'image_url': '/static/images/water-bottle.jpg',
+        'image_url': '/static/images/watterBottle.jfif',
         'rating': 5,
         'reviews': 312,
         'review_count': 312,
@@ -248,12 +248,12 @@ def add_product():
     Template: test2_add_product.html
     """
     if request.method == 'POST':
-
+        # Handle form submission
         try:
-
+            # Get the next product ID
             next_id = max(p['id'] for p in products) + 1 if products else 1
 
-
+            # Get form data
             name = request.form.get('name', '').strip()
             category_id = int(request.form.get('category', 1))
             price = float(request.form.get('price', 0))
@@ -261,8 +261,10 @@ def add_product():
             stock = int(request.form.get('stock', 0))
             sku = request.form.get('sku', f'PROD-{next_id:03d}').strip()
 
+            # Find category name
             category_name = next((c['name'] for c in categories if c['id'] == category_id), 'Uncategorized')
 
+            # Create new product with complete data structure
             new_product = {
                 'id': next_id,
                 'name': name,
@@ -288,17 +290,23 @@ def add_product():
                 ],
                 'reviews': []
             }
+
+            # Add to products list
             products.append(new_product)
+
+            # Redirect to product list with success message
             flash('Product added successfully!', 'success')
             return redirect(url_for('product_list'))
 
         except ValueError as e:
+            # Handle invalid input
             flash(f'Error adding product: Invalid input. Please check your data.', 'error')
         except Exception as e:
-
+            # Handle other errors
             flash(f'Error adding product: {str(e)}', 'error')
 
-      return render_template(
+    # GET request - display the form
+    return render_template(
         'test2_add_product.html',
         page_title='Add New Product - ' + STORE_NAME,
         form_title='Add New Product',
@@ -315,9 +323,10 @@ def product_detail(id):
     Template: test3_product_details.html
     Error Handling: Returns 404 page if product not found
     """
-
+    # Find the product by ID
     product = next((p for p in products if p['id'] == id), None)
 
+    # Handle invalid product ID
     if product is None:
         return render_template(
             'error.html',
@@ -327,10 +336,11 @@ def product_detail(id):
             store_name=STORE_NAME
         ), 404
 
+    # Get related products from the same category (excluding current product)
     related_products = [
         p for p in products
         if p['category'] == product['category'] and p['id'] != product['id']
-    ][:4]
+    ][:4]  # Limit to 4 related products
 
     return render_template(
         'test3_product_details.html',
@@ -350,12 +360,14 @@ def delete_product(id):
     """
     global products
 
+    # Find the product
     product = next((p for p in products if p['id'] == id), None)
 
     if product is None:
         flash('Product not found. Unable to delete.', 'error')
         return redirect(url_for('product_list'))
 
+    # Remove the product
     products = [p for p in products if p['id'] != id]
 
     flash(f'Product "{product["name"]}" has been deleted successfully.', 'success')
@@ -387,6 +399,7 @@ def internal_server_error(e):
 
 
 
+# Sample data
 users = [
     {'name': 'Alice', 'email': 'alice@example.com'},
     {'name': 'Bob', 'email': 'bob@example.com'},
@@ -398,6 +411,31 @@ items = [
     {'title': 'Item 2', 'description': 'Second item', 'color': '#00ff00','price':3443},
     {'title': 'Item 3', 'description': 'Third item', 'color': '#0000ff','price':3443}
 ]
+
+@app.route('/')
+def index():
+    user = {
+        'name': 'John Doe',
+        'is_logged_in': True
+    }
+    return render_template('index.html',
+                         page_title='Home Page',
+                         heading='Welcome',
+                         user=user,
+                         items=items,
+                         theme_color='#007bff')
+
+@app.route('/about')
+def about():
+    return render_template('about.html',
+                         page_title='About Us',
+                         heading='About Our Company')
+
+@app.route('/users')
+def user_list():
+    return render_template('users.html',
+                         page_title='Users',
+                         users=users)
 
 def calculate_total(items):
     total = 0

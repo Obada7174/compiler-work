@@ -11,7 +11,7 @@ stylesheet
     ;
 
 atRule
-    : AT_KEYWORD atRulePrelude (SEMICOLON | LBRACE ruleSet* RBRACE)
+    : AT_KEYWORD atRulePrelude (SEMICOLON | LBRACE (keyframeRule | ruleSet)* RBRACE)
     ;
 
 atRulePrelude
@@ -19,13 +19,26 @@ atRulePrelude
        | CSS_VAR
        | STRING
        | NUMBER
+       | PERCENTAGE
        | UNIT
        | AND
        | LPAREN
        | RPAREN
        | COLON
+       | FROM
+       | TO
        | value
       )*
+    ;
+
+keyframeRule
+    : keyframeSelector (COMMA keyframeSelector)* LBRACE declaration* RBRACE
+    ;
+
+keyframeSelector
+    : FROM
+    | TO
+    | PERCENTAGE
     ;
 
 ruleSet
@@ -35,7 +48,6 @@ ruleSet
 selectorList
     : selector (COMMA selector)*
     ;
-
 selector
     : simpleSelector (combinator simpleSelector)* # SelectorNode
     ;
@@ -45,13 +57,29 @@ simpleSelector
     ;
 
 selectorPart
-    : PSEUDO_ELEMENT                               # PseudoElementSelector
-    | PSEUDO_CLASS                                 # PseudoClassSelector
-    | IDENTIFIER                                   # ElementSelector
-    | DOT IDENTIFIER                               # ClassSelector
-    | HASH IDENTIFIER                              # IdSelector
-    | STAR                                         # UniversalSelector
-    | LBRACKET IDENTIFIER (EQUALS value)? RBRACKET # AttributeSelector
+    : PSEUDO_ELEMENT                                              # PseudoElementSelector
+    | PSEUDO_CLASS                                                # PseudoClassSelector
+    | IDENTIFIER                                                  # ElementSelector
+    | DOT IDENTIFIER                                              # ClassSelector
+    | HASH IDENTIFIER                                             # IdSelector
+    | STAR                                                        # UniversalSelector
+    | LBRACKET IDENTIFIER (attributeOperator attributeValue)? RBRACKET  # AttributeSelector
+    ;
+
+attributeOperator
+    : EQUALS
+    | TILDE_EQUALS
+    | PIPE_EQUALS
+    | CARET_EQUALS
+    | DOLLAR_EQUALS
+    | STAR_EQUALS
+    ;
+
+attributeValue
+    : IDENTIFIER
+    | STRING
+    | NUMBER
+    | PERCENTAGE
     ;
 
 combinator
@@ -70,19 +98,20 @@ value
 
 valueComponent
     : functionCall        # FunctionValue
-    | NUMBER UNIT?        # NumberValue
-    | COLOR_HEX           # ColorValue
-    | STRING              # StringValue
-    | CSS_VAR             # CssVariableValue
-    | IDENTIFIER          # IdentifierValue
-    | URL                 # UrlValue
-    | LPAREN              # LeftParenValue
-    | RPAREN              # RightParenValue
-    | PLUS_OP             # PlusOperator
-    | MINUS_OP            # MinusOperator
-    | MULTIPLY            # MultiplyOperator
-    | DIVIDE              # DivideOperator
-    | COMMA               # CommaValue
+    | PERCENTAGE          # PercentageValue     // NEW: Explicit percentage support
+    | NUMBER UNIT?        # NumberValue         // Existing (unchanged)
+    | COLOR_HEX           # ColorValue          // Existing (unchanged)
+    | STRING              # StringValue         // Existing (unchanged)
+    | CSS_VAR             # CssVariableValue    // Existing (unchanged)
+    | IDENTIFIER          # IdentifierValue     // Existing (unchanged)
+    | URL                 # UrlValue            // Existing (unchanged)
+    | LPAREN              # LeftParenValue      // Existing (unchanged)
+    | RPAREN              # RightParenValue     // Existing (unchanged)
+    | PLUS_OP             # PlusOperator        // Existing (unchanged)
+    | MINUS_OP            # MinusOperator       // Existing (unchanged)
+    | MULTIPLY            # MultiplyOperator    // Existing (unchanged)
+    | DIVIDE              # DivideOperator      // Existing (unchanged)
+    | COMMA               # CommaValue          // Existing (unchanged)
     ;
 
 functionCall
@@ -98,6 +127,11 @@ expression
     | expression MINUS_OP expression      # SubExpr
     | expression MULTIPLY expression      # MulExpr
     | expression DIVIDE expression        # DivExpr
+    | functionCall                        # FunctionExpr
+    | IDENTIFIER                          # IdentifierExpr
+    | CSS_VAR                             # CssVarExpr
+    | STRING                              # StringExpr
+    | PERCENTAGE                          # PercentageExpr
     | NUMBER UNIT?                        # NumberExpr
     | LPAREN expression RPAREN            # ParenExpr
     ;

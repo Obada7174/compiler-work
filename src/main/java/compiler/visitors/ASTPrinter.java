@@ -34,9 +34,7 @@ public class ASTPrinter {
         }
     }
 
-    /**
-     * Print tree with box drawing for better visualization
-     */
+
     public static void printTreeBoxed(ASTNode root) {
         System.out.println("╔════════════════════════════════════════════════════════════╗");
         System.out.println("║                   ABSTRACT SYNTAX TREE                     ║");
@@ -50,9 +48,7 @@ public class ASTPrinter {
         System.out.println("────────────────────────────────────────────────────────────");
     }
 
-    /**
-     * Count total nodes in the tree
-     */
+
     public static int countNodes(ASTNode root) {
         if (root == null) {
             return 0;
@@ -64,9 +60,7 @@ public class ASTPrinter {
         return count;
     }
 
-    /**
-     * Calculate tree height
-     */
+
     public static int treeHeight(ASTNode root) {
         if (root == null || root.getChildren().isEmpty()) {
             return 1;
@@ -78,9 +72,6 @@ public class ASTPrinter {
         return 1 + maxHeight;
     }
 
-    /**
-     * Traverse tree and execute action on each node
-     */
     public static void traverse(ASTNode root, NodeVisitor visitor) {
         if (root == null || visitor == null) {
             return;
@@ -91,17 +82,12 @@ public class ASTPrinter {
         }
     }
 
-    /**
-     * Functional interface for node visitor
-     */
+
     @FunctionalInterface
     public interface NodeVisitor {
         void visit(ASTNode node);
     }
 
-    /**
-     * Print tree in linear format (useful for debugging)
-     */
     public static void printLinear(ASTNode root) {
         printLinear(root, 0);
     }
@@ -125,9 +111,7 @@ public class ASTPrinter {
         }
     }
 
-    /**
-     * Generate a compact summary of the tree
-     */
+
     public static String summarize(ASTNode root) {
         if (root == null) {
             return "(empty tree)";

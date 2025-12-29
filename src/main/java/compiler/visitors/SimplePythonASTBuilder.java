@@ -6,9 +6,6 @@ import grammar.PythonParserBaseVisitor;
 
 import java.util.*;
 
-/**
- * Python AST Builder compatible with labeled-alternative grammar
- */
 public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
 
     @Override
