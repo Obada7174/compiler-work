@@ -16,7 +16,10 @@ public class TestJinja2AST {
 
     public static void main(String[] args) {
         String[] testFiles = {
-                "examples/test1_display_products.html"
+                "examples/test1_display_products.html",
+                "examples/test2_add_product.html",
+                "examples/test3_product_details.html",
+
         };
 
         for (String filename : testFiles) {
@@ -35,10 +38,7 @@ public class TestJinja2AST {
         }
     }
 
-    /**
-     * Loads a Jinja2 template from classpath resources,
-     * parses it, builds AST and prints it.
-     */
+
     private static void testJinja2File(String resourcePath) throws IOException {
 
         // ---------------------------------------------------------------------
@@ -56,15 +56,6 @@ public class TestJinja2AST {
         }
 
         String jinja2Code = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
-        // ---------------------------------------------------------------------
-        // 2) Print source
-        // ---------------------------------------------------------------------
-        System.out.println("\n─────────────────────────────────────────────────────────────────");
-        System.out.println("  SOURCE CODE");
-        System.out.println("─────────────────────────────────────────────────────────────────");
-        System.out.println(jinja2Code);
-        System.out.println("─────────────────────────────────────────────────────────────────\n");
 
         // ---------------------------------------------------------------------
         // 3) Lexer

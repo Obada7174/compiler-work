@@ -16,9 +16,8 @@ public class TestCSSAST {
 
     public static void main(String[] args) {
         String[] testFiles = {
-                "css/test.css",
-                "css/advanced.css",
-                "css/responsive.css"
+                "css/add_products.css",
+
         };
 
         for (String filename : testFiles) {
@@ -52,13 +51,6 @@ public class TestCSSAST {
         }
 
         String cssCode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
-      System.out.println("\n─────────────────────────────────────────────────────────────────");
-        System.out.println("  SOURCE CODE");
-        System.out.println("─────────────────────────────────────────────────────────────────");
-        System.out.println(cssCode);
-        System.out.println("─────────────────────────────────────────────────────────────────\n");
-
      CharStream input = CharStreams.fromString(cssCode);
         CSSLexer lexer = new CSSLexer(input);
 

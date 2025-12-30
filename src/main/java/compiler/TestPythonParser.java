@@ -10,7 +10,6 @@ public class TestPythonParser {
 
     public static void main(String[] args) {
         try {
-            // Use the resources folder: src/main/resources/test_python_full.py
             String resourcePath = "/examples/app.py"; // leading '/' means root of resources
             InputStream is = TestPythonParser.class.getResourceAsStream(resourcePath);
 
@@ -25,10 +24,6 @@ public class TestPythonParser {
             System.out.println("═══════════════════════════════════════════════════════════");
             System.out.println("  Testing Python Parser");
             System.out.println("═══════════════════════════════════════════════════════════");
-            System.out.println("\nInput Python Code:");
-            System.out.println("-----------------------------------------------------------");
-            System.out.println(pythonCode);
-            System.out.println("-----------------------------------------------------------\n");
 
             // Lexer
             CharStream input = CharStreams.fromString(pythonCode);

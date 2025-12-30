@@ -1,7 +1,7 @@
 package compiler;
 
-import org.antlr.v4.runtime.*;
 import grammar.PythonLexer;
+import org.antlr.v4.runtime.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,7 +21,6 @@ public class TestTokenStream {
                 return;
             }
 
-            // تحويل URL إلى مسار صالح للقراءة على جميع الأنظمة
             String filePath = Paths.get(resource.toURI()).toString();
             String pythonCode = new String(Files.readAllBytes(Paths.get(filePath)));
 

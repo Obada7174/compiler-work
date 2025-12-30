@@ -105,11 +105,6 @@ public class TestCSSSymbolTable {
 
     private static void processCSS(String cssCode, String filename) {
         try {
-                  System.out.println("─────────────────────────────────────────────────────────────────");
-            System.out.println("  SOURCE CSS");
-            System.out.println("─────────────────────────────────────────────────────────────────");
-            System.out.println(cssCode);
-            System.out.println("─────────────────────────────────────────────────────────────────\n");
 
             CSSLexer lexer = new CSSLexer(CharStreams.fromString(cssCode));
             CommonTokenStream tokens = new CommonTokenStream(lexer);

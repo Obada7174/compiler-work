@@ -20,7 +20,7 @@ public class TestPythonAST {
         // Test files inside resources/examples
         String[] testFiles = {
                 "examples/test_python.py",
-                "examples/app.py"  // Flask app with decorators
+                "examples/app.py"
         };
 
         for (String filename : testFiles) {
@@ -54,13 +54,6 @@ public class TestPythonAST {
         }
         String pythonCode = sb.toString();
         scanner.close();
-
-        System.out.println("\n─────────────────────────────────────────────────────────────────");
-        System.out.println("  SOURCE CODE");
-        System.out.println("─────────────────────────────────────────────────────────────────");
-        System.out.println(pythonCode);
-        System.out.println("─────────────────────────────────────────────────────────────────\n");
-
         // Create lexer
         CharStream input = CharStreams.fromString(pythonCode);
         PythonLexer lexer = new PythonLexer(input);
