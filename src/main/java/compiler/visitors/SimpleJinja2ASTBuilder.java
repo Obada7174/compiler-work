@@ -31,7 +31,7 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
     }
 
 
-    @Override
+    // Note: content rule uses labeled alternatives, so there's no visitContent in base visitor
     public ASTNode visitContent(Jinja2Parser.ContentContext ctx) {
         if (ctx == null) return null;
 
@@ -227,9 +227,9 @@ public class SimpleJinja2ASTBuilder extends Jinja2ParserBaseVisitor<ASTNode> {
         return new StringLiteralNode(value, lineNumber);
     }
 
-    @Override
+    // Note: visitTemplate is not in base visitor because grammar labels it as #TemplateNode
+    // The actual entry point is visitTemplateNode above
     public ASTNode visitTemplate(Jinja2Parser.TemplateContext ctx) {
-        // This rule is never used because the grammar labels it as #TemplateNode
         return visitChildren(ctx);
     }
 

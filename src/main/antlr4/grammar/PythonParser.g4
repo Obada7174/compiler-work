@@ -28,6 +28,7 @@ small_stmt
     : assignment        # assignmentStmt
     | return_stmt       # returnStmt
     | import_stmt       # importStmt
+    | global_stmt       # globalStmt
     | expr_stmt         # exprStmt
     | PASS              # passStmt
     ;
@@ -92,12 +93,16 @@ try_stmt
 // ───────────────── SIMPLE STATEMENTS ─────────────────
 
 return_stmt
-    : RETURN expr?
+    : RETURN (expr (COMMA expr)*)?
     ;
 
 import_stmt
     : IMPORT dotted_name (COMMA dotted_name)*         # importNames
     | FROM dotted_name IMPORT (NAME (COMMA NAME)*)?  # importFrom
+    ;
+
+global_stmt
+    : GLOBAL NAME (COMMA NAME)*
     ;
 
 assignment
@@ -119,17 +124,49 @@ suite
 
 // ───────────────── EXPRESSIONS ─────────────────
 
+// Full expression with conditional (ternary)
 expr
-    : comparison
+    : or_test (IF or_test ELSE expr)?    # conditionalExpr
     ;
 
+// Logical OR
+or_test
+    : and_test (OR and_test)*            # orExpr
+    ;
+
+// Logical AND
+and_test
+    : not_test (AND not_test)*           # andExpr
+    ;
+
+// Logical NOT
+not_test
+    : NOT not_test                       # notExpr
+    | comparison                         # comparisonExpr
+    ;
+
+// Comparison with chaining support (e.g., a < b < c)
 comparison
-    : arith_expr                          # singleArithExpr
-    | arith_expr (EQ | NE | LT | GT | LE | GE) arith_expr # binaryComparison
+    : arith_expr (comp_op arith_expr)*
     ;
 
+comp_op
+    : EQ | NE | LT | GT | LE | GE
+    | IS NOT?                            // is / is not
+    | NOT? IN                            // in / not in
+    ;
+
+// Arithmetic expressions
 arith_expr
-    : atom_expr ((PLUS | MINUS | STAR | DIV | MOD) atom_expr)*
+    : term ((PLUS | MINUS) term)*
+    ;
+
+term
+    : factor ((STAR | DIV | MOD | FLOORDIV) factor)*
+    ;
+
+factor
+    : (PLUS | MINUS)? atom_expr
     ;
 
 atom_expr
@@ -137,9 +174,19 @@ atom_expr
     ;
 
 trailer
-    : call               # callTrailer
-    | DOT NAME           # memberAccessTrailer
-    | LBRACK expr RBRACK # indexAccessTrailer
+    : call                              # callTrailer
+    | DOT NAME                          # memberAccessTrailer
+    | LBRACK subscript RBRACK           # subscriptTrailer
+    ;
+
+// Subscript can be index or slice
+subscript
+    : expr                              # indexSubscript
+    | slice_arg? COLON slice_arg? (COLON slice_arg?)?  # sliceSubscript
+    ;
+
+slice_arg
+    : expr
     ;
 
 call
@@ -147,12 +194,13 @@ call
     ;
 
 arglist
-    : argument (COMMA argument)* COMMA?
+    : argument (COMMA argument)* COMMA?       # normalArgList      // Normal arguments (try first)
+    | expr comp_for                           # generatorArgList   // Generator as sole argument
     ;
 
 argument
-    : NAME ASSIGN expr   # keywordArg
-    | expr               # positionalArg
+    : NAME ASSIGN expr          # keywordArg
+    | expr                      # positionalArg
     ;
 
 // ───────────────── ATOMS ─────────────────
@@ -160,28 +208,56 @@ argument
 atom
     : NAME                       # nameAtom
     | NUMBER                     # numberAtom
-    | STRING                     # stringAtom
+    | STRING+                    # stringAtom
     | FSTRING                    # fstringAtom
     | TRUE                       # trueAtom
     | FALSE                      # falseAtom
     | NONE                       # noneAtom
-    | listLit                    # listAtom
+    | listDisplay                # listAtom
     | dictLit                    # dictAtom
-    | LPAREN expr? RPAREN        # parenAtom
+    | LPAREN tupleOrGenExp RPAREN # parenAtom
     ;
 
-// ───────────────── LITERALS ─────────────────
+// ───────────────── LITERALS & COMPREHENSIONS ─────────────────
 
-listLit
-    : LBRACK (expr (COMMA expr)*)? RBRACK
+// List: can be literal or comprehension
+listDisplay
+    : LBRACK RBRACK                                     # emptyList
+    | LBRACK expr (COMMA expr)* COMMA? RBRACK          # listLiteral
+    | LBRACK expr comp_for RBRACK                       # listComprehension
+    ;
+
+// Tuple or generator expression inside parentheses
+tupleOrGenExp
+    :                                                   # emptyParens
+    | expr                                              # singleExpr
+    | expr COMMA (expr (COMMA expr)*)? COMMA?          # tupleExpr
+    | expr comp_for                                     # generatorExpr
+    ;
+
+// Comprehension for clause
+comp_for
+    : FOR NAME IN or_test comp_iter?
+    ;
+
+// Comprehension iterator (optional if or nested for)
+comp_iter
+    : comp_for
+    | comp_if
+    ;
+
+// Comprehension if filter
+comp_if
+    : IF or_test comp_iter?
     ;
 
 dictLit
-    : LBRACE (dictItem (COMMA dictItem)*)? RBRACE
+    : LBRACE RBRACE
+    | LBRACE dictItem (COMMA dictItem)* COMMA? RBRACE
     ;
 
 dictItem
-    : (STRING | NAME) COLON expr
+    : expr COLON expr
     ;
 
 // ───────────────── PARAMETERS ─────────────────

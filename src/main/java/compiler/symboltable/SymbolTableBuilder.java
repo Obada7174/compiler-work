@@ -1,13 +1,49 @@
 package compiler.symboltable;
 
 import compiler.ast.*;
+import compiler.ast.flask.*;
 import java.util.*;
 
 
+/**
+ * Symbol Table Builder with Flask framework support.
+ *
+ * This builder traverses the AST and populates the symbol table with:
+ * - Standard Python symbols (variables, functions, classes, parameters)
+ * - Flask-specific symbols (app instances, route endpoints, Flask imports)
+ * - Framework-injected globals (request, g, session)
+ */
 public class SymbolTableBuilder {
 
     private ClassicalSymbolTable symbolTable;
     private boolean isInDeclarationContext;
+
+    // Flask-specific tracking
+    private final Set<String> flaskApps = new HashSet<>();
+    private final Map<String, RouteInfo> routeEndpoints = new LinkedHashMap<>();
+    private final Set<String> flaskImports = new HashSet<>();
+
+    /**
+     * Route information for Flask endpoints.
+     */
+    public static class RouteInfo {
+        public final String functionName;
+        public final String path;
+        public final List<String> methods;
+        public final int lineNumber;
+
+        public RouteInfo(String functionName, String path, List<String> methods, int lineNumber) {
+            this.functionName = functionName;
+            this.path = path;
+            this.methods = methods;
+            this.lineNumber = lineNumber;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s -> %s %s", functionName, methods, path);
+        }
+    }
 
     public SymbolTableBuilder(ClassicalSymbolTable symbolTable) {
         this.symbolTable = symbolTable;
@@ -59,7 +95,21 @@ public class SymbolTableBuilder {
      * Process a single node
      */
     private void processNode(ASTNode node) {
-        if (node instanceof AssignmentNode) {
+        // Flask-specific nodes (check these first)
+        if (node instanceof FlaskAppNode) {
+            processFlaskApp((FlaskAppNode) node);
+        }
+        else if (node instanceof FlaskRouteFunction) {
+            processFlaskRouteFunction((FlaskRouteFunction) node);
+        }
+        else if (node instanceof FlaskImportNode) {
+            processFlaskImport((FlaskImportNode) node);
+        }
+        else if (node instanceof FlaskRunNode) {
+            processFlaskRun((FlaskRunNode) node);
+        }
+        // Standard Python nodes
+        else if (node instanceof AssignmentNode) {
             processAssignment((AssignmentNode) node);
         }
         else if (node instanceof FunctionDefNode) {
@@ -79,6 +129,9 @@ public class SymbolTableBuilder {
         }
         else if (node instanceof JinjaForNode) {
             processJinjaFor((JinjaForNode) node);
+        }
+        else if (node instanceof ImportStatementNode) {
+            processImport((ImportStatementNode) node);
         }
         // Add more node types as needed
     }
@@ -394,5 +447,281 @@ public class SymbolTableBuilder {
      */
     public ClassicalSymbolTable getSymbolTable() {
         return symbolTable;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // FLASK-SPECIFIC PROCESSING
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Process Flask import: from flask import Flask, request, ...
+     */
+    private void processFlaskImport(FlaskImportNode node) {
+        int line = node.getLineNumber();
+
+        // Track all Flask imports
+        for (String importedName : node.getImportedNames()) {
+            flaskImports.add(importedName);
+
+            // Insert Flask components into symbol table
+            String type = determineFlaskType(importedName);
+            SymbolTableEntry entry = new SymbolTableEntry(importedName, type, line);
+            entry.setInitialized(true);
+
+            boolean success = symbolTable.insert(importedName, entry);
+            if (success) {
+                System.out.println(String.format(
+                    "  [FLASK] Imported '%s' (%s) at line %d",
+                    importedName, type, line
+                ));
+            }
+        }
+
+        // If 'request' is imported, inject Flask context globals
+        if (node.hasRequest()) {
+            injectFlaskRequestGlobal(line);
+        }
+    }
+
+    /**
+     * Determine the type for a Flask import.
+     */
+    private String determineFlaskType(String name) {
+        return switch (name) {
+            case "Flask" -> "flask.Flask";
+            case "request" -> "flask.Request";
+            case "Response" -> "flask.Response";
+            case "render_template" -> "function";
+            case "redirect" -> "function";
+            case "url_for" -> "function";
+            case "jsonify" -> "function";
+            case "flash" -> "function";
+            case "session" -> "flask.Session";
+            case "g" -> "flask.AppContext";
+            case "current_app" -> "flask.Flask";
+            case "abort" -> "function";
+            case "make_response" -> "function";
+            case "send_file", "send_from_directory" -> "function";
+            default -> "flask.unknown";
+        };
+    }
+
+    /**
+     * Inject Flask request object as a framework-provided global.
+     */
+    private void injectFlaskRequestGlobal(int line) {
+        // 'request' is a context local proxy - mark as framework-injected
+        SymbolTableEntry requestEntry = symbolTable.lookup("request");
+        if (requestEntry != null) {
+            requestEntry.setType("flask.LocalProxy<Request>");
+            symbolTable.set_attribute("request", "framework_injected", true);
+        }
+    }
+
+    /**
+     * Process Flask app instantiation: app = Flask(__name__)
+     */
+    private void processFlaskApp(FlaskAppNode node) {
+        String appName = node.getAppVariableName();
+        int line = node.getLineNumber();
+
+        // Register Flask app in symbol table
+        SymbolTableEntry entry = new SymbolTableEntry(appName, "flask.Flask", line);
+        entry.setInitialized(true);
+
+        boolean success = symbolTable.insert(appName, entry);
+        if (success) {
+            flaskApps.add(appName);
+            symbolTable.set_attribute(appName, "flask_app", true);
+            symbolTable.set_attribute(appName, "module_name", node.getModuleName());
+
+            System.out.println(String.format(
+                "  [FLASK] App '%s' = Flask(%s) declared at line %d",
+                appName, node.getModuleName(), line
+            ));
+        }
+    }
+
+    /**
+     * Process Flask route function: @app.route("/path") def handler(): ...
+     */
+    private void processFlaskRouteFunction(FlaskRouteFunction node) {
+        String functionName = node.getFunctionName();
+        int line = node.getLineNumber();
+
+        // Insert function into symbol table with route metadata
+        SymbolTableEntry entry = new SymbolTableEntry(functionName, "flask.route_handler", line);
+        entry.setInitialized(true);
+
+        boolean success = symbolTable.insert(functionName, entry);
+        if (success) {
+            // Store route metadata
+            symbolTable.set_attribute(functionName, "is_route_handler", true);
+            symbolTable.set_attribute(functionName, "routes", node.getRoutePaths());
+            symbolTable.set_attribute(functionName, "methods", node.getAllHttpMethods());
+
+            // Track route endpoints
+            for (RouteDecoratorNode routeDecorator : node.getRouteDecorators()) {
+                String path = routeDecorator.getRoutePath();
+                List<String> methods = routeDecorator.getHttpMethods();
+
+                RouteInfo routeInfo = new RouteInfo(functionName, path, methods, line);
+                routeEndpoints.put(path, routeInfo);
+
+                System.out.println(String.format(
+                    "  [FLASK] Route '%s' %s -> %s() at line %d",
+                    path, methods, functionName, line
+                ));
+            }
+        }
+
+        // Enter function scope and process parameters
+        symbolTable.enterScope();
+        System.out.println(String.format(
+            "  → Entering route handler '%s' scope (level %d)",
+            functionName, symbolTable.getCurrentScopeLevel()
+        ));
+
+        // Process URL path parameters as function parameters
+        for (RouteDecoratorNode routeDecorator : node.getRouteDecorators()) {
+            for (String pathParam : routeDecorator.getPathParameterNames()) {
+                SymbolTableEntry paramEntry = new SymbolTableEntry(pathParam, "url_param", line);
+                paramEntry.setInitialized(true);
+                symbolTable.insert(pathParam, paramEntry);
+
+                System.out.println(String.format(
+                    "  [FLASK] URL parameter '%s' injected from route path",
+                    pathParam
+                ));
+            }
+        }
+
+        // Process function parameters
+        FunctionDefNode funcDef = node.getFunctionDef();
+        for (ParameterNode param : funcDef.getParameters()) {
+            traverse(param);
+        }
+
+        // Process function body
+        for (ASTNode bodyNode : funcDef.getBody()) {
+            traverse(bodyNode);
+        }
+
+        // Exit function scope
+        symbolTable.exitScope();
+        System.out.println(String.format(
+            "  ← Exiting route handler '%s' scope (back to level %d)",
+            functionName, symbolTable.getCurrentScopeLevel()
+        ));
+    }
+
+    /**
+     * Process Flask app.run() call.
+     */
+    private void processFlaskRun(FlaskRunNode node) {
+        String appRef = node.getAppReference();
+        int line = node.getLineNumber();
+
+        // Record usage of Flask app
+        symbolTable.recordUsage(appRef, line);
+
+        System.out.println(String.format(
+            "  [FLASK] %s.run(debug=%s, port=%d) at line %d%s",
+            appRef, node.isDebugEnabled(), node.getPort(), line,
+            node.isInMainGuard() ? " (in __main__ guard)" : ""
+        ));
+    }
+
+    /**
+     * Process standard import statement.
+     */
+    private void processImport(ImportStatementNode node) {
+        int line = node.getLineNumber();
+
+        if (node.isFromImport()) {
+            // from module import name1, name2
+            for (String importedName : node.getImportedNames()) {
+                SymbolTableEntry entry = new SymbolTableEntry(importedName, "imported", line);
+                entry.setInitialized(true);
+
+                boolean success = symbolTable.insert(importedName, entry);
+                if (success) {
+                    System.out.println(String.format(
+                        "  [IMPORT] '%s' from '%s' at line %d",
+                        importedName, node.getModuleName(), line
+                    ));
+                }
+            }
+        } else {
+            // import module
+            String moduleName = node.getModuleName();
+            SymbolTableEntry entry = new SymbolTableEntry(moduleName, "module", line);
+            entry.setInitialized(true);
+
+            boolean success = symbolTable.insert(moduleName, entry);
+            if (success) {
+                System.out.println(String.format(
+                    "  [IMPORT] Module '%s' at line %d",
+                    moduleName, line
+                ));
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // FLASK ANALYSIS RESULTS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Get all registered Flask app names.
+     */
+    public Set<String> getFlaskApps() {
+        return new HashSet<>(flaskApps);
+    }
+
+    /**
+     * Get all route endpoints.
+     */
+    public Map<String, RouteInfo> getRouteEndpoints() {
+        return new LinkedHashMap<>(routeEndpoints);
+    }
+
+    /**
+     * Get all Flask imports.
+     */
+    public Set<String> getFlaskImports() {
+        return new HashSet<>(flaskImports);
+    }
+
+    /**
+     * Check if this is a Flask application.
+     */
+    public boolean isFlaskApplication() {
+        return !flaskApps.isEmpty() || flaskImports.contains("Flask");
+    }
+
+    /**
+     * Print Flask-specific analysis summary.
+     */
+    public void printFlaskSummary() {
+        if (!isFlaskApplication()) {
+            return;
+        }
+
+        System.out.println("\n╔═══════════════════════════════════════════════════════════╗");
+        System.out.println("║              FLASK APPLICATION SUMMARY                    ║");
+        System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
+
+        System.out.println("Flask Imports: " + flaskImports);
+        System.out.println("Flask Apps: " + flaskApps);
+        System.out.println("\nRoute Endpoints:");
+        System.out.println("─────────────────────────────────────────");
+        for (Map.Entry<String, RouteInfo> entry : routeEndpoints.entrySet()) {
+            RouteInfo info = entry.getValue();
+            System.out.println(String.format("  %-20s %s -> %s()",
+                info.path, info.methods, info.functionName));
+        }
+        System.out.println("─────────────────────────────────────────");
+        System.out.println("Total Routes: " + routeEndpoints.size());
     }
 }

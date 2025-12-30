@@ -1,11 +1,11 @@
 lexer grammar PythonLexer;
 
-options {
-    superClass = PythonLexerBase;
-}
-
 @header {
 package grammar;
+}
+
+options {
+    superClass = PythonLexerBase;
 }
 
 tokens { INDENT, DEDENT }
@@ -103,6 +103,17 @@ OR: 'or';
 NOT: 'not';
 IN: 'in';
 IS: 'is';
+GLOBAL: 'global';
+NONLOCAL: 'nonlocal';
+LAMBDA: 'lambda';
+YIELD: 'yield';
+RAISE: 'raise';
+ASSERT: 'assert';
+DEL: 'del';
+BREAK: 'break';
+CONTINUE: 'continue';
+ASYNC: 'async';
+AWAIT: 'await';
 NONE: 'None';
 TRUE: 'True';
 FALSE: 'False';

@@ -10,7 +10,7 @@ import grammar.Jinja2ParserBaseVisitor;
 public class Jinja2ExpressionBuilder
         extends Jinja2ParserBaseVisitor<ExpressionNode> {
 
-    @Override
+    // Note: visitTemplate not in base visitor - grammar uses #TemplateNode label
     public ExpressionNode visitTemplate(
             Jinja2Parser.TemplateContext ctx) {
         return null; // not handled here
@@ -46,8 +46,8 @@ public class Jinja2ExpressionBuilder
         return visit(ctx.getChild(0));
     }
 
-    @Override
-    public ASTNode visitContent(Jinja2Parser.ContentContext ctx) {
+    // Note: visitContent not in base visitor - grammar uses labeled alternatives
+    public ExpressionNode visitContent(Jinja2Parser.ContentContext ctx) {
         return null;
     }
 

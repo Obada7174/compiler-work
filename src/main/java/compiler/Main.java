@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 // ANTLR Runtime imports
 import compiler.visitors.SimpleJinja2ASTBuilder;
+import compiler.visitors.SimplePythonASTBuilder;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -53,62 +54,29 @@ public class Main {
         System.out.println("\n" + input + "\n");
         System.out.println("═══════════════════════════════════════════════════\n");
 
+        // Detect file type
+        String fileType = "jinja2"; // default
+        if (args.length > 0) {
+            String filePath = args[0].toLowerCase();
+            if (filePath.endsWith(".py")) {
+                fileType = "python";
+            } else if (filePath.endsWith(".css")) {
+                fileType = "css";
+            }
+        }
+
         try {
-            // ═══════════════════════════════════════════════════════════════
-            // STAGE 1: LEXICAL ANALYSIS
-            // ═══════════════════════════════════════════════════════════════
-            System.out.println("┌─ STAGE 1: Lexical Analysis ─────────────────┐");
-            CharStream charStream = CharStreams.fromString(input);
-            Jinja2Lexer lexer = new Jinja2Lexer(charStream);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            tokens.fill(); // Force lexing
-            System.out.println("│  ✓ Tokenization completed");
-            System.out.println("│  → Total tokens: " + tokens.size());
-            System.out.println("└──────────────────────────────────────────────┘\n");
+            ASTNode ast;
 
-            // ═══════════════════════════════════════════════════════════════
-            // STAGE 2: SYNTAX ANALYSIS
-            // ═══════════════════════════════════════════════════════════════
-            System.out.println("┌─ STAGE 2: Syntax Analysis ──────────────────┐");
-            Jinja2Parser parser = new Jinja2Parser(tokens);
-
-            // Add custom error listener
-            parser.removeErrorListeners();
-            parser.addErrorListener(new BaseErrorListener() {
-                @Override
-                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                      int line, int charPositionInLine, String msg,
-                                      RecognitionException e) {
-                    System.err.println("│  ✗ Syntax Error at line " + line + ":" + charPositionInLine);
-                    System.err.println("│    " + msg);
-                }
-            });
-
-            Jinja2Parser.TemplateContext parseTree = parser.template();
-
-            if (parser.getNumberOfSyntaxErrors() > 0) {
-                System.out.println("│  ✗ Parsing failed with " + parser.getNumberOfSyntaxErrors() + " error(s)");
-                System.out.println("└──────────────────────────────────────────────┘\n");
-                return;
+            if (fileType.equals("python")) {
+                ast = compilePython(input);
+            } else {
+                ast = compileJinja2(input);
             }
 
-            System.out.println("│  ✓ Parsing completed successfully");
-            System.out.println("│  → Parse tree root: " + parseTree.getClass().getSimpleName());
-            System.out.println("└──────────────────────────────────────────────┘\n");
-
-            // ═══════════════════════════════════════════════════════════════
-            // STAGE 3: AST CONSTRUCTION (Using Visitor Pattern)
-            // ═══════════════════════════════════════════════════════════════
-            System.out.println("┌─ STAGE 3: AST Construction ─────────────────┐");
-            System.out.println("│  Using Visitor Pattern...");
-
-             SimpleJinja2ASTBuilder astBuilder = new SimpleJinja2ASTBuilder();
-             ASTNode ast = astBuilder.visit(parseTree);
-
-             System.out.println("│  ✓ AST construction completed");
-             System.out.println("│  → Root node type: " + ast.getNodeType());
-             System.out.println("│  → Child count: " + ast.getChildren().size());
-            System.out.println("└──────────────────────────────────────────────┘\n");
+            if (ast == null) {
+                return;
+            }
 
             // ═══════════════════════════════════════════════════════════════
             // STAGE 4: AST VISUALIZATION
@@ -137,6 +105,116 @@ public class Main {
             System.err.println("\n✗ Error during compilation:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Compile Python source code
+     */
+    private static ASTNode compilePython(String input) {
+        // STAGE 1: LEXICAL ANALYSIS
+        System.out.println("┌─ STAGE 1: Lexical Analysis (Python) ────────┐");
+        CharStream charStream = CharStreams.fromString(input);
+        PythonLexer lexer = new PythonLexer(charStream);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        tokens.fill();
+        System.out.println("│  ✓ Tokenization completed");
+        System.out.println("│  → Total tokens: " + tokens.size());
+        System.out.println("└──────────────────────────────────────────────┘\n");
+
+        // STAGE 2: SYNTAX ANALYSIS
+        System.out.println("┌─ STAGE 2: Syntax Analysis (Python) ─────────┐");
+        PythonParser parser = new PythonParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                  int line, int charPositionInLine, String msg,
+                                  RecognitionException e) {
+                System.err.println("│  ✗ Syntax Error at line " + line + ":" + charPositionInLine);
+                System.err.println("│    " + msg);
+            }
+        });
+
+        PythonParser.File_inputContext parseTree = parser.file_input();
+
+        if (parser.getNumberOfSyntaxErrors() > 0) {
+            System.out.println("│  ✗ Parsing failed with " + parser.getNumberOfSyntaxErrors() + " error(s)");
+            System.out.println("└──────────────────────────────────────────────┘\n");
+            return null;
+        }
+
+        System.out.println("│  ✓ Parsing completed successfully");
+        System.out.println("│  → Parse tree root: " + parseTree.getClass().getSimpleName());
+        System.out.println("└──────────────────────────────────────────────┘\n");
+
+        // STAGE 3: AST CONSTRUCTION
+        System.out.println("┌─ STAGE 3: AST Construction (Python) ────────┐");
+        System.out.println("│  Using Visitor Pattern...");
+
+        SimplePythonASTBuilder astBuilder = new SimplePythonASTBuilder();
+        ASTNode ast = astBuilder.visit(parseTree);
+
+        System.out.println("│  ✓ AST construction completed");
+        System.out.println("│  → Root node type: " + ast.getNodeType());
+        System.out.println("│  → Child count: " + ast.getChildren().size());
+        System.out.println("└──────────────────────────────────────────────┘\n");
+
+        return ast;
+    }
+
+    /**
+     * Compile Jinja2/HTML template source code
+     */
+    private static ASTNode compileJinja2(String input) {
+        // STAGE 1: LEXICAL ANALYSIS
+        System.out.println("┌─ STAGE 1: Lexical Analysis (Jinja2) ────────┐");
+        CharStream charStream = CharStreams.fromString(input);
+        Jinja2Lexer lexer = new Jinja2Lexer(charStream);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        tokens.fill();
+        System.out.println("│  ✓ Tokenization completed");
+        System.out.println("│  → Total tokens: " + tokens.size());
+        System.out.println("└──────────────────────────────────────────────┘\n");
+
+        // STAGE 2: SYNTAX ANALYSIS
+        System.out.println("┌─ STAGE 2: Syntax Analysis (Jinja2) ─────────┐");
+        Jinja2Parser parser = new Jinja2Parser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                  int line, int charPositionInLine, String msg,
+                                  RecognitionException e) {
+                System.err.println("│  ✗ Syntax Error at line " + line + ":" + charPositionInLine);
+                System.err.println("│    " + msg);
+            }
+        });
+
+        Jinja2Parser.TemplateContext parseTree = parser.template();
+
+        if (parser.getNumberOfSyntaxErrors() > 0) {
+            System.out.println("│  ✗ Parsing failed with " + parser.getNumberOfSyntaxErrors() + " error(s)");
+            System.out.println("└──────────────────────────────────────────────┘\n");
+            return null;
+        }
+
+        System.out.println("│  ✓ Parsing completed successfully");
+        System.out.println("│  → Parse tree root: " + parseTree.getClass().getSimpleName());
+        System.out.println("└──────────────────────────────────────────────┘\n");
+
+        // STAGE 3: AST CONSTRUCTION
+        System.out.println("┌─ STAGE 3: AST Construction (Jinja2) ────────┐");
+        System.out.println("│  Using Visitor Pattern...");
+
+        SimpleJinja2ASTBuilder astBuilder = new SimpleJinja2ASTBuilder();
+        ASTNode ast = astBuilder.visit(parseTree);
+
+        System.out.println("│  ✓ AST construction completed");
+        System.out.println("│  → Root node type: " + ast.getNodeType());
+        System.out.println("│  → Child count: " + ast.getChildren().size());
+        System.out.println("└──────────────────────────────────────────────┘\n");
+
+        return ast;
     }
 
     /**
