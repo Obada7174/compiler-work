@@ -60,6 +60,9 @@ public class SymbolTableBuilder {
         System.out.println("║         BUILDING SYMBOL TABLE FROM AST                    ║");
         System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
 
+        // Initialize with Python built-ins
+        initializePythonBuiltins();
+
         traverse(root);
 
         System.out.println("\n╔═══════════════════════════════════════════════════════════╗");
@@ -69,6 +72,64 @@ public class SymbolTableBuilder {
         // Print any errors or warnings
         symbolTable.printErrors();
         symbolTable.printWarnings();
+    }
+
+    /**
+     * Initialize the symbol table with common Python built-in identifiers.
+     * These are available in all Python programs by default.
+     */
+    private void initializePythonBuiltins() {
+        System.out.println("  [INIT] Initializing Python built-in identifiers...\n");
+
+        // Python built-in exceptions
+        String[] builtinExceptions = {
+            "Exception", "ValueError", "TypeError", "KeyError", "IndexError",
+            "AttributeError", "NameError", "RuntimeError", "IOError",
+            "FileNotFoundError", "ZeroDivisionError", "ImportError",
+            "ModuleNotFoundError", "StopIteration", "AssertionError"
+        };
+
+        for (String exceptionName : builtinExceptions) {
+            SymbolTableEntry entry = new SymbolTableEntry(exceptionName, "builtin.exception", 0);
+            entry.setInitialized(true);
+            symbolTable.insert(exceptionName, entry);
+            symbolTable.set_attribute(exceptionName, "builtin", true);
+        }
+
+        // Python built-in functions
+        String[] builtinFunctions = {
+            "print", "len", "range", "int", "float", "str", "list", "dict",
+            "tuple", "set", "bool", "type", "isinstance", "issubclass",
+            "hasattr", "getattr", "setattr", "delattr", "dir", "vars",
+            "open", "input", "sum", "min", "max", "abs", "round",
+            "enumerate", "zip", "map", "filter", "sorted", "reversed",
+            "any", "all", "next", "iter", "chr", "ord", "hex", "oct", "bin"
+        };
+
+        for (String funcName : builtinFunctions) {
+            SymbolTableEntry entry = new SymbolTableEntry(funcName, "builtin.function", 0);
+            entry.setInitialized(true);
+            symbolTable.insert(funcName, entry);
+            symbolTable.set_attribute(funcName, "builtin", true);
+        }
+
+        // Python built-in constants
+        String[] builtinConstants = {
+            "__name__", "__file__", "__doc__", "__package__", "__loader__",
+            "True", "False", "None", "NotImplemented", "Ellipsis"
+        };
+
+        for (String constantName : builtinConstants) {
+            SymbolTableEntry entry = new SymbolTableEntry(constantName, "builtin.constant", 0);
+            entry.setInitialized(true);
+            symbolTable.insert(constantName, entry);
+            symbolTable.set_attribute(constantName, "builtin", true);
+        }
+
+        System.out.println(String.format(
+            "  [INIT] Added %d built-in exceptions, %d built-in functions, %d built-in constants\n",
+            builtinExceptions.length, builtinFunctions.length, builtinConstants.length
+        ));
     }
 
     /**
