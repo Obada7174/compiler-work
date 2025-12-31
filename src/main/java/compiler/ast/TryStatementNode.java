@@ -3,10 +3,6 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Statement node representing try-except-else-finally statement
- * try: ... except Exception: ... [else: ...] [finally: ...]
- */
 public class TryStatementNode extends StatementNode {
     private List<ASTNode> tryBlock;
     private List<ExceptClauseNode> exceptClauses;

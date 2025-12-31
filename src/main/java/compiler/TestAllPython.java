@@ -17,16 +17,13 @@ public class TestAllPython {
         int passCount = 0;
         int failCount = 0;
 
-        System.out.println("===========================================");
-        System.out.println("  COMPREHENSIVE PYTHON PARSER TEST");
-        System.out.println("===========================================\n");
+        System.out.println("COMPREHENSIVE PYTHON PARSER TEST");
 
         for (String resourcePath : testFiles) {
             System.out.println("Testing: " + resourcePath);
             System.out.print("  ");
 
             try {
-                // 🔹 Load file from resources
                 InputStream inputStream = TestAllPython.class
                         .getClassLoader()
                         .getResourceAsStream(resourcePath);
@@ -49,9 +46,6 @@ public class TestAllPython {
 
                 PythonParser parser = new PythonParser(tokens);
                 parser.removeErrorListeners();
-
-                PythonParser.File_inputContext tree = parser.file_input();
-
                 if (parser.getNumberOfSyntaxErrors() == 0) {
                     System.out.println("✓ PASSED (" + tokens.size() + " tokens)");
                     passCount++;
@@ -66,11 +60,9 @@ public class TestAllPython {
             }
         }
 
-        System.out.println("\n===========================================");
+        System.out.println();
         System.out.println("  RESULTS");
-        System.out.println("===========================================");
         System.out.println("  Passed: " + passCount + "/" + testFiles.length);
         System.out.println("  Failed: " + failCount + "/" + testFiles.length);
-        System.out.println("===========================================");
     }
 }

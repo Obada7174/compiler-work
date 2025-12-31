@@ -7,16 +7,7 @@ import grammar.PythonParserBaseVisitor;
 
 import java.util.*;
 
-/**
- * AST Builder for Python source code with Flask framework support.
- *
- * This visitor transforms ANTLR parse trees into a rich AST structure,
- * with special handling for Flask-specific patterns:
- * - Route decorators (@app.route)
- * - Flask app instantiation (Flask(__name__))
- * - Request object access
- * - app.run() calls
- */
+
 public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
 
     // Track Flask imports for semantic analysis
@@ -52,9 +43,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new AssignmentNode(List.of(target), value, line);
     }
 
-    /**
-     * Check if expression is Flask(__name__) instantiation.
-     */
     private boolean isFlaskAppInstantiation(ExpressionNode expr) {
         if (!(expr instanceof FunctionCallNode call)) return false;
 
@@ -65,9 +53,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return false;
     }
 
-    /**
-     * Extract module name from Flask() constructor call.
-     */
     private String extractFlaskModuleName(ExpressionNode expr) {
         if (!(expr instanceof FunctionCallNode call)) return "__name__";
 
@@ -160,14 +145,7 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new ClassDefNode(name, new ArrayList<>(), suite.getChildren(), new ArrayList<>(), line);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // DECORATOR HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Handle decorated function or class definitions.
-     * Grammar: decorated : decorator+ (funcdef | classdef)
-     */
     @Override
     public ASTNode visitDecorated(PythonParser.DecoratedContext ctx) {
         int line = ctx.start.getLine();
@@ -208,10 +186,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return null;
     }
 
-    /**
-     * Build a DecoratorNode from decorator context.
-     * Grammar: decorator : AT atom_expr call? NEWLINE
-     */
     private DecoratorNode buildDecorator(PythonParser.DecoratorContext ctx) {
         int line = ctx.start.getLine();
 
@@ -241,9 +215,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new DecoratorNode(decoratorExpr, args, line);
     }
 
-    /**
-     * Check if decorator expression is @app.route pattern.
-     */
     private boolean isFlaskRouteDecorator(ExpressionNode expr) {
         if (!(expr instanceof MemberAccessNode member)) return false;
 
@@ -259,9 +230,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return false;
     }
 
-    /**
-     * Build RouteDecoratorNode from route decorator pattern.
-     */
     private RouteDecoratorNode buildRouteDecorator(ExpressionNode decoratorExpr,
                                                    List<ExpressionNode> args,
                                                    int line) {
@@ -296,9 +264,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new RouteDecoratorNode(appRef, routePath, methods, args, line);
     }
 
-    /**
-     * Extract list of HTTP method strings from methods=[...] argument.
-     */
     private List<String> extractMethodsList(ExpressionNode expr) {
         List<String> methods = new ArrayList<>();
 
@@ -602,9 +567,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return visit(ctx.tupleOrGenExp());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // TUPLE / GENERATOR EXPRESSION HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitEmptyParens(PythonParser.EmptyParensContext ctx) {
@@ -636,9 +598,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new GeneratorExpressionNode(elementExpr, clause, ctx.start.getLine());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // LIST DISPLAY (LITERAL / COMPREHENSION) HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitListAtom(PythonParser.ListAtomContext ctx) {
@@ -666,9 +625,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new ListComprehensionNode(elementExpr, clause, ctx.start.getLine());
     }
 
-    /**
-     * Build comprehension clause from comp_for rule.
-     */
     private ComprehensionClause buildComprehensionClause(PythonParser.Comp_forContext ctx) {
         String target = ctx.NAME().getText();
         ExpressionNode iterable = (ExpressionNode) visit(ctx.or_test());
@@ -693,9 +649,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         // comp_for inside comp_iter is for nested comprehensions - simplified for now
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // DICTIONARY HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitDictAtom(PythonParser.DictAtomContext ctx) {
@@ -714,13 +667,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new DictionaryLiteralNode(map, ctx.start.getLine());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // ARGUMENT HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Handle keyword argument: name=value
-     */
     @Override
     public ASTNode visitKeywordArg(PythonParser.KeywordArgContext ctx) {
         String key = ctx.NAME().getText();
@@ -728,21 +674,11 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new KeywordArgNode(key, value, ctx.start.getLine());
     }
 
-    /**
-     * Handle positional argument: value
-     */
     @Override
     public ASTNode visitPositionalArg(PythonParser.PositionalArgContext ctx) {
         return visit(ctx.expr());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // IMPORT HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Handle: import module1, module2
-     */
     @Override
     public ASTNode visitImportNames(PythonParser.ImportNamesContext ctx) {
         int line = ctx.start.getLine();
@@ -761,10 +697,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         String firstModule = moduleNames.isEmpty() ? "" : moduleNames.get(0);
         return new ImportStatementNode(firstModule, moduleNames, new ArrayList<>(), false, line);
     }
-
-    /**
-     * Handle: from module import name1, name2
-     */
     @Override
     public ASTNode visitImportFrom(PythonParser.ImportFromContext ctx) {
         int line = ctx.start.getLine();
@@ -796,10 +728,6 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
 
         return new ImportStatementNode(module, importedNames, new ArrayList<>(), true, line);
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // TRY-EXCEPT HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitTryStmt(PythonParser.TryStmtContext ctx) {
@@ -869,18 +797,12 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
                 new ArrayList<>(), finallyBody, line);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // PASS STATEMENT
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitPassStmt(PythonParser.PassStmtContext ctx) {
         return new PassNode(ctx.start.getLine());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // F-STRING HANDLING
-    // ═══════════════════════════════════════════════════════════════════════════
 
     @Override
     public ASTNode visitFstringAtom(PythonParser.FstringAtomContext ctx) {
@@ -890,27 +812,16 @@ public class SimplePythonASTBuilder extends PythonParserBaseVisitor<ASTNode> {
         return new StringLiteralNode(content, ctx.start.getLine());
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // FLASK-SPECIFIC HELPERS
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Get all registered Flask app names.
-     */
     public Set<String> getFlaskAppNames() {
         return new HashSet<>(flaskAppNames);
     }
 
-    /**
-     * Get all Flask imports tracked during parsing.
-     */
+
     public Set<String> getFlaskImports() {
         return new HashSet<>(flaskImports);
     }
 
-    /**
-     * Check if Flask is imported.
-     */
+
     public boolean hasFlaskImport() {
         return !flaskImports.isEmpty();
     }

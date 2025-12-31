@@ -25,10 +25,8 @@ import java.util.*;
 public class TestSymbolTable {
 
     public static void main(String[] args) {
-        System.out.println("╔═══════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║      CLASSICAL SYMBOL TABLE - COMPILER DESIGN IMPLEMENTATION          ║");
-        System.out.println("║                     Academic Test Suite                               ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("CLASSICAL SYMBOL TABLE - COMPILER DESIGN IMPLEMENTATION");
+        System.out.println("Academic Test Suite");
 
         // Run all tests
         test1_BasicOperations();
@@ -39,14 +37,12 @@ public class TestSymbolTable {
         test6_ArrayDeclarations();
         test7_CompleteProgram();
 
-        System.out.println("\n╔═══════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                     ALL TESTS COMPLETED                               ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("ALL TESTS COMPLETED!!!!");
+
     }
 
-    /**
-     * TEST 1: Basic Operations
-     * Demonstrates: allocate, insert, lookup, free
+    /* TEST 1: Basic Operations
+     Demonstrates: allocate, insert, lookup, free
      */
     private static void test1_BasicOperations() {
         printTestHeader("TEST 1: Basic Symbol Table Operations");
@@ -91,9 +87,9 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * TEST 2: Scope Management
-     * Demonstrates: enterScope, exitScope, nested scopes
+    /*
+      TEST 2: Scope Management
+      Demonstrates: enterScope, exitScope, nested scopes
      */
     private static void test2_ScopeManagement() {
         printTestHeader("TEST 2: Nested Scope Management");
@@ -140,9 +136,9 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * TEST 3: Error Detection
-     * Demonstrates: redeclaration errors, undeclared identifier errors
+    /*
+     TEST 3: Error Detection
+     Demonstrates: redeclaration errors, undeclared identifier errors
      */
     private static void test3_ErrorDetection() {
         printTestHeader("TEST 3: Error Detection");
@@ -168,9 +164,9 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * TEST 4: Attribute Operations
-     * Demonstrates: set_attribute, get_attribute
+    /*
+     TEST 4: Attribute Operations
+     Demonstrates: set_attribute, get_attribute
      */
     private static void test4_AttributeOperations() {
         printTestHeader("TEST 4: Attribute Get/Set Operations");
@@ -212,9 +208,9 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * TEST 5: Usage Tracking
-     * Demonstrates: recording and tracking identifier usage across multiple lines
+    /*
+      TEST 5: Usage Tracking
+      Demonstrates: recording and tracking identifier usage across multiple lines
      */
     private static void test5_UsageTracking() {
         printTestHeader("TEST 5: Usage Tracking");
@@ -247,9 +243,9 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * TEST 6: Array Declarations
-     * Demonstrates: dimension and array size tracking
+    /*
+     TEST 6: Array Declarations
+     Demonstrates: dimension and array size tracking
      */
     private static void test6_ArrayDeclarations() {
         printTestHeader("TEST 6: Array Declarations");
@@ -299,9 +295,9 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * TEST 7: Complete Program Simulation
-     * Demonstrates: complete symbol table usage for a realistic program
+    /*
+     TEST 7: Complete Program Simulation
+     Demonstrates: complete symbol table usage for a realistic program
      */
     private static void test7_CompleteProgram() {
         printTestHeader("TEST 7: Complete Program Simulation");
@@ -385,8 +381,8 @@ public class TestSymbolTable {
         printTestFooter();
     }
 
-    /**
-     * Helper method to print test header
+    /*
+     Helper method to print test header
      */
     private static void printTestHeader(String testName) {
         System.out.println("\n" + "=".repeat(75));
@@ -394,8 +390,8 @@ public class TestSymbolTable {
         System.out.println("=".repeat(75) + "\n");
     }
 
-    /**
-     * Helper method to print test footer
+    /*
+      Helper method to print test footer
      */
     private static void printTestFooter() {
         System.out.println("─".repeat(75) + "\n");

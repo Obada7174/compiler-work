@@ -3,12 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Expression node representing list/set/dict comprehension
- * [expr for target in iterable if condition]
- * {expr for target in iterable if condition}
- * {key: value for target in iterable if condition}
- */
+
 public class ComprehensionNode extends ExpressionNode {
     public enum ComprehensionType {
         LIST,

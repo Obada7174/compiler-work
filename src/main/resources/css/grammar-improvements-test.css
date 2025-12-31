@@ -1,0 +1,235 @@
+/* ═══════════════════════════════════════════════════════════════
+   CSS Grammar Improvements Test File
+   Tests all new features added to the lexer and parser
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 1: Attribute Selector Operators
+   ─────────────────────────────────────────────────────────────── */
+
+/* Exact match: = */
+input[type="text"] {
+    border: 1px solid #ccc;
+}
+
+/* Contains word: ~= */
+div[class~="button"] {
+    display: inline-block;
+}
+
+/* Starts with (prefix): |= */
+html[lang|="en"] {
+    direction: ltr;
+}
+
+/* Starts with (substring): ^= */
+a[href^="https://"] {
+    color: green;
+}
+
+/* Ends with: $= */
+a[href$=".pdf"] {
+    background: url('pdf-icon.png');
+}
+
+/* Contains (substring): *= */
+img[src*="logo"] {
+    width: 100px;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 2: Negative Numbers & Decimals
+   ─────────────────────────────────────────────────────────────── */
+
+.negative-values {
+    margin: -10px;
+    left: -50%;
+    transform: translateX(-100px);
+    animation-delay: -2s;
+}
+
+.decimal-values {
+    opacity: 0.75;
+    line-height: 1.5;
+    font-size: 1.25rem;
+}
+
+.negative-decimals {
+    margin-top: -2.5rem;
+    letter-spacing: -0.05em;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 3: Percentages
+   ─────────────────────────────────────────────────────────────── */
+
+.percentages {
+    width: 50%;
+    height: 100%;
+    top: 25%;
+    opacity: 75%;
+}
+
+.negative-percentages {
+    margin-left: -50%;
+    transform: translateY(-100%);
+}
+
+.decimal-percentages {
+    width: 33.333%;
+    margin: 12.5%;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 4: CSS Functions with Complex Values
+   ─────────────────────────────────────────────────────────────── */
+
+.functions {
+    /* RGB/RGBA */
+    color: rgb(255, 0, 0);
+    background: rgba(0, 0, 0, 0.5);
+
+    /* HSL/HSLA */
+    border-color: hsl(120, 100%, 50%);
+    box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.3);
+
+    /* Calc with percentages */
+    width: calc(100% - 40px);
+    height: calc(50vh - 100px);
+    margin: calc(1rem + 2px);
+
+    /* Transform functions */
+    transform: translateX(-50%) translateY(-50%);
+    transform: rotate(45deg) scale(1.2);
+    transform: skew(-10deg, 5deg);
+
+    /* Min/Max/Clamp */
+    width: min(100%, 1200px);
+    font-size: max(16px, 1rem);
+    padding: clamp(1rem, 5%, 3rem);
+
+    /* CSS Variables in functions */
+    background: var(--bg-color, #fff);
+    padding: var(--spacing, 1rem);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 5: Media Queries with Percentages
+   ─────────────────────────────────────────────────────────────── */
+
+@media screen and (max-width: 768px) {
+    .responsive {
+        width: 100%;
+        padding: 5%;
+    }
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+    body {
+        font-size: 90%;
+    }
+}
+
+@media (orientation: portrait) {
+    .portrait-only {
+        display: block;
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 6: Keyframes with from/to and Percentages
+   ─────────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide {
+    0% {
+        left: 0%;
+        opacity: 0;
+    }
+    50% {
+        left: 50%;
+        opacity: 0.5;
+    }
+    100% {
+        left: 100%;
+        opacity: 1;
+    }
+}
+
+@keyframes complex {
+    from {
+        transform: translateX(-100%);
+    }
+    25% {
+        transform: translateX(-50%);
+    }
+    75% {
+        transform: translateX(50%);
+    }
+    to {
+        transform: translateX(0%);
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 7: Combined Advanced Features
+   ─────────────────────────────────────────────────────────────── */
+
+.advanced {
+    /* Negative with calc */
+    margin: calc(-1rem - 10px);
+
+    /* Percentage in calc */
+    width: calc(100% / 3 - 20px);
+    height: calc(50% + 2rem);
+
+    /* Multiple transforms with negative values */
+    transform: translateX(-50%) translateY(-50%) rotate(-45deg);
+
+    /* Clamp with percentages */
+    font-size: clamp(0.875rem, 2.5%, 1.5rem);
+
+    /* Complex gradient */
+    background: linear-gradient(45deg, rgba(255, 0, 0, 0.5) 0%, rgba(0, 0, 255, 0.5) 100%);
+}
+
+/* Attribute selectors with complex values */
+button[data-state="active"][aria-pressed="true"] {
+    background: #0066cc;
+}
+
+a[href^="https://example.com"][target="_blank"] {
+    text-decoration: none;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   TEST 8: Edge Cases
+   ─────────────────────────────────────────────────────────────── */
+
+.edge-cases {
+    /* Very small decimal */
+    opacity: 0.01;
+
+    /* Very large negative */
+    z-index: -9999;
+
+    /* Percentage in unusual contexts */
+    stroke-dashoffset: 100%;
+    background-size: 100% 100%;
+
+    /* Multiple percentages */
+    padding: 5% 10% 15% 20%;
+
+    /* Zero with unit */
+    margin: 0px 0% 0rem 0em;
+}

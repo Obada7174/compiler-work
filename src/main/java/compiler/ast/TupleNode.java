@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * AST node representing a Python tuple.
- * Tuples can be created explicitly with parentheses or implicitly with commas.
- */
+
 public class TupleNode extends ExpressionNode {
     private final List<ExpressionNode> elements;
 

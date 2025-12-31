@@ -1,10 +1,7 @@
 package compiler.ast.css;
 
-/**
- * AST node representing a CSS declaration.
- * Structure: property: value [!important]
- * Example: "color: red", "margin: 10px !important"
- */
+ // Example: "color: red", "margin: 10px !important"
+
 public class CSSDeclarationNode extends CSSASTNode {
     private String property;
     private CSSValueNode value;

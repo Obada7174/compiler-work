@@ -4,9 +4,9 @@ import org.antlr.v4.runtime.*;
 import grammar.*;
 import java.util.*;
 
-/**
- * VERIFICATION 1: Token Stream Analysis
- * Proves INDENT/DEDENT tokens are generated correctly
+/*
+  VERIFICATION 1: Token Stream Analysis
+  Proves INDENT/DEDENT tokens are generated correctly
  */
 public class VerifyTokenStream {
     public static void main(String[] args) {
@@ -22,9 +22,7 @@ public class VerifyTokenStream {
             "def func2():\n" +
             "    pass\n";
 
-        System.out.println("╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║  VERIFICATION 1: TOKEN STREAM ANALYSIS                       ║");
-        System.out.println("╚══════════════════════════════════════════════════════════════╝\n");
+        System.out.println("VERIFICATION 1: TOKEN STREAM ANALYSIS");
 
         System.out.println("Python Code:");
         System.out.println("─────────────────────────────────────────────────────────────");
@@ -74,7 +72,6 @@ public class VerifyTokenStream {
                 i, t.getLine(), tokenName, "'" + text + "'", marker);
         }
 
-        System.out.println("═════════════════════════════════════════════════════════════\n");
 
         // Verification Summary
         System.out.println("VERIFICATION RESULTS:");
@@ -90,14 +87,13 @@ public class VerifyTokenStream {
         System.out.println("\n✓ INDENT/DEDENT Balance: " + (balanced ? "CORRECT" : "INCORRECT"));
 
         if (balanced) {
-            System.out.println("✓ All indentation levels properly opened and closed");
+            System.out.println(" All indentation levels properly opened and closed");
         } else {
-            System.err.println("✗ FAILED: Unbalanced INDENT/DEDENT tokens!");
+            System.err.println(" FAILED: Unbalanced INDENT/DEDENT tokens!");
         }
 
         // Check token sequence
         System.out.println("\nTOKEN SEQUENCE VERIFICATION:");
-        System.out.println("─────────────────────────────────────────────────────────────");
         verifySequence(allTokens, lexer);
     }
 
@@ -121,6 +117,6 @@ public class VerifyTokenStream {
                 }
             }
         }
-        System.out.println("✓ Token sequence follows CPython rules");
+        System.out.println("Token sequence follows CPython rules");
     }
 }

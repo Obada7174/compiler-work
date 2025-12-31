@@ -1,8 +1,5 @@
 package compiler.ast;
 
-/**
- * Node representing a unary operation (-, not, ~)
- */
 public class UnaryOpNode extends ExpressionNode {
     private final String operator;
     private final ExpressionNode operand;

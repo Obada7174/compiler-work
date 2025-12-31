@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-/**
- * Expression node representing dictionary/map literals {key: value, ...}
- * Used by both Python and Jinja2
- */
 public class DictionaryLiteralNode extends ExpressionNode {
     private Map<ExpressionNode, ExpressionNode> entries;
 

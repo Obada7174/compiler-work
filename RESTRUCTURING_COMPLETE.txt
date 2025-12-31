@@ -230,6 +230,5 @@ The project is now READY FOR SUBMISSION:
 STATUS: ✅ RESTRUCTURING COMPLETE - PROJECT READY FOR GRADING
 ═══════════════════════════════════════════════════════════════════════════════
 
-Date: January 2025
 Project: ANTLR4-Based Compiler for University Assignment
 All academic requirements: IMPLEMENTED AND VERIFIED

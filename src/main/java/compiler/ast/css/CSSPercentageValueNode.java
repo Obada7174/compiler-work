@@ -1,9 +1,7 @@
 package compiler.ast.css;
 
-/**
- * AST node representing a CSS percentage value.
- * Example: "50%", "-100%", "12.5%"
- */
+  //Example: "50%", "-100%", "12.5%"
+
 public class CSSPercentageValueNode extends CSSValueComponentNode {
     private String percentage;
 

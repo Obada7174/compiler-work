@@ -1,8 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing CSS declaration: property: value
- */
+
 public class CSSDeclarationNode extends ASTNode {
     private String value;
     private boolean important;

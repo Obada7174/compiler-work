@@ -11,9 +11,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-/**
- * Test class for building and displaying Python Abstract Syntax Tree
- */
 public class TestPythonAST {
 
     public static void main(String[] args) {
@@ -24,15 +21,13 @@ public class TestPythonAST {
         };
 
         for (String filename : testFiles) {
-            System.out.println("\n\n");
-            System.out.println("╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║          TESTING PYTHON AST BUILDER: " + String.format("%-20s", filename) + "  ║");
-            System.out.println("╚════════════════════════════════════════════════════════════════╝");
+            System.out.println();
+            System.out.println("TESTING PYTHON AST BUILDER: " + String.format("%-20s", filename));
 
             try {
                 testPythonFile(filename);
             } catch (Exception e) {
-                System.err.println("✗ Error processing " + filename + ": " + e.getMessage());
+                System.err.println("Error processing " + filename + ": " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -72,7 +67,7 @@ public class TestPythonAST {
 
         PythonParser parser = new PythonParser(tokens);
         parser.removeErrorListeners();
-        parser.addErrorListener(new BaseErrorListener() {
+        parser .addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                                     int line, int charPositionInLine, String msg,
@@ -92,12 +87,12 @@ public class TestPythonAST {
         ASTNode ast = astBuilder.visit(tree);
 
         if (ast == null) {
-            System.err.println("✗ Failed to build AST - returned null");
+            System.err.println("Failed to build AST - returned null");
             return;
         }
 
-        System.out.println("✓ AST built successfully");
-        System.out.println("  AST root type: " + ast.getNodeType());
+        System.out.println("AST built successfully");
+        System.out.println("AST root type: " + ast.getNodeType());
         System.out.println();
 
         // Print the AST
@@ -106,6 +101,6 @@ public class TestPythonAST {
         // Print summary
         System.out.println("\n" + ASTPrinter.summarize(ast));
 
-        System.out.println("\n✓✓✓ Test completed successfully! ✓✓✓\n");
+        System.out.println("\nTest completed successfully!\n");
     }
 }

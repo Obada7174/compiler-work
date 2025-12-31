@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * Node representing a function/method call
- * Example: func(a, b)
- */
+
 public class CallNode extends ExpressionNode {
     private ExpressionNode function;         // The function being called
     private java.util.List<ExpressionNode> arguments; // List of arguments

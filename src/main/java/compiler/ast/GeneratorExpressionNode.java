@@ -1,9 +1,5 @@
 package compiler.ast;
 
-/**
- * AST node representing a generator expression.
- * Syntax: (expr for target in iterable if condition...)
- */
 public class GeneratorExpressionNode extends ExpressionNode {
     private final ExpressionNode element;
     private final ComprehensionClause clause;

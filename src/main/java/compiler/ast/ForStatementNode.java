@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Statement node representing for loop
- * for target in iterable: ...
- */
+
 public class ForStatementNode extends StatementNode {
     private ExpressionNode target;
     private ExpressionNode iterable;

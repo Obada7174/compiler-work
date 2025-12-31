@@ -2,10 +2,6 @@ package compiler.utils;
 
 import compiler.ast.*;
 
-/**
- * AST Printer - Displays the Abstract Syntax Tree in a readable format
- * Demonstrates tree traversal and visualization
- */
 public class ASTPrinter {
 
     private static final String INDENT = "  ";
@@ -14,13 +10,9 @@ public class ASTPrinter {
     private static final String VERTICAL = "│ ";
     private static final String SPACE = "  ";
 
-    /**
-     * Print the entire AST starting from root
-     */
+
     public static void print(ASTNode root) {
-        System.out.println("\n╔═══════════════════════════════════════════════╗");
-        System.out.println("║          ABSTRACT SYNTAX TREE                 ║");
-        System.out.println("╚═══════════════════════════════════════════════╝\n");
+        System.out.println("ABSTRACT SYNTAX TREE");
 
         if (root == null) {
             System.out.println("(empty tree)");
@@ -31,9 +23,7 @@ public class ASTPrinter {
         System.out.println();
     }
 
-    /**
-     * Recursively print a node and its children
-     */
+
     private static void printNode(ASTNode node, String prefix, boolean isLast) {
         if (node == null) {
             return;
@@ -56,9 +46,6 @@ public class ASTPrinter {
         }
     }
 
-    /**
-     * Print with statistics
-     */
     public static void printWithStats(ASTNode root) {
         print(root);
 
@@ -66,18 +53,14 @@ public class ASTPrinter {
         int totalNodes = countNodes(root);
         int maxDepth = calculateDepth(root);
 
-        System.out.println("╔═══════════════════════════════════════════════╗");
-        System.out.println("║          AST STATISTICS                       ║");
-        System.out.println("╠═══════════════════════════════════════════════╣");
-        System.out.printf("║  Total Nodes: %-32d║%n", totalNodes);
-        System.out.printf("║  Maximum Depth: %-29d║%n", maxDepth);
-        System.out.printf("║  Root Type: %-33s║%n", root.getNodeType());
-        System.out.println("╚═══════════════════════════════════════════════╝");
+        System.out.println("AST STATISTICS");
+        System.out.printf("Total Nodes: %-32d  %n", totalNodes);
+        System.out.printf("Maximum Depth: %-29d %n", maxDepth);
+        System.out.printf("Root Type: %-33s %n", root.getNodeType());
+
     }
 
-    /**
-     * Count total nodes in the tree
-     */
+
     private static int countNodes(ASTNode node) {
         if (node == null) {
             return 0;
@@ -90,9 +73,6 @@ public class ASTPrinter {
         return count;
     }
 
-    /**
-     * Calculate maximum depth of the tree
-     */
     private static int calculateDepth(ASTNode node) {
         if (node == null || node.getChildren().isEmpty()) {
             return 1;
@@ -109,14 +89,7 @@ public class ASTPrinter {
         return 1 + maxChildDepth;
     }
 
-    /**
-     * Print in compact format (single line per node)
-     */
-    public static void printCompact(ASTNode root) {
-        System.out.println("\n=== AST (Compact Format) ===\n");
-        printCompactNode(root, 0);
-        System.out.println();
-    }
+
 
     private static void printCompactNode(ASTNode node, int depth) {
         if (node == null) {
@@ -137,31 +110,4 @@ public class ASTPrinter {
         }
     }
 
-    /**
-     * Print only node types (for structural overview)
-     */
-    public static void printStructure(ASTNode root) {
-        System.out.println("\n=== AST Structure ===\n");
-        printStructureNode(root, "", true);
-        System.out.println();
-    }
-
-    private static void printStructureNode(ASTNode node, String prefix, boolean isLast) {
-        if (node == null) {
-            return;
-        }
-
-        System.out.print(prefix);
-        System.out.print(isLast ? LAST_BRANCH : BRANCH);
-        System.out.print(" ");
-        System.out.println(node.getNodeType());
-
-        int childCount = node.getChildren().size();
-        for (int i = 0; i < childCount; i++) {
-            ASTNode child = node.getChildren().get(i);
-            boolean isLastChild = (i == childCount - 1);
-            String newPrefix = prefix + (isLast ? SPACE : VERTICAL);
-            printStructureNode(child, newPrefix, isLastChild);
-        }
-    }
 }

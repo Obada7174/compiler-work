@@ -10,7 +10,7 @@ public class TestPythonParser {
 
     public static void main(String[] args) {
         try {
-            String resourcePath = "/examples/app.py"; // leading '/' means root of resources
+            String resourcePath = "/examples/app.py";
             InputStream is = TestPythonParser.class.getResourceAsStream(resourcePath);
 
             if (is == null) {
@@ -20,10 +20,7 @@ public class TestPythonParser {
 
             // Read the Python file from resources
             String pythonCode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
-            System.out.println("═══════════════════════════════════════════════════════════");
             System.out.println("  Testing Python Parser");
-            System.out.println("═══════════════════════════════════════════════════════════");
 
             // Lexer
             CharStream input = CharStreams.fromString(pythonCode);
@@ -57,12 +54,9 @@ public class TestPythonParser {
             });
 
             PythonParser.File_inputContext tree = parser.file_input();
-            System.out.println("✓ Syntax Analysis completed");
+            System.out.println("Syntax Analysis completed!!!!!");
             System.out.println("  Parse tree root: " + tree.getClass().getSimpleName());
-
-            System.out.println("\n═══════════════════════════════════════════════════════════");
             System.out.println("  Python Parser Test PASSED!");
-            System.out.println("═══════════════════════════════════════════════════════════\n");
 
         } catch (IOException e) {
             System.err.println("ERROR: Could not read Python file - " + e.getMessage());

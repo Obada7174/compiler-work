@@ -1,10 +1,8 @@
 package compiler.ast.css;
 
-/**
- * AST node representing a percentage in an expression context.
- * Used in calc() and other CSS functions.
- * Example: "50%", "100%", "-25%"
- */
+
+ // Example: "50%", "100%", "-25%"
+
 public class CSSPercentageExpressionNode extends CSSExpressionNode {
     private String percentage;
 

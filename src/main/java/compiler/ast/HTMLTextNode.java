@@ -1,8 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing plain text content in HTML
- */
+
 public class HTMLTextNode extends ASTNode {
     private String text;
 

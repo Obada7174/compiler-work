@@ -11,9 +11,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class CSSASTBuilderTest {
 
     public static void main(String[] args) {
-        System.out.println("╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                CSS AST BUILDER UNIT TESTS                      ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("CSS AST BUILDER UNIT TESTS :");
 
         int passed = 0;
         int failed = 0;

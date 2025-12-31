@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Expression node representing tuple literals (element1, element2, ...)
- * Python-specific immutable sequence type
- */
+
 public class TupleLiteralNode extends ExpressionNode {
     private List<ExpressionNode> elements;
 

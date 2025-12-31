@@ -4,9 +4,9 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import grammar.*;
 
-/**
- * VERIFICATION 2: Parse Tree Structure Analysis
- * Proves indentation creates correct nested blocks
+/*
+  VERIFICATION 2: Parse Tree Structure Analysis
+  Proves indentation creates correct nested blocks
  */
 public class VerifyParseTreeStructure {
     public static void main(String[] args) {
@@ -17,14 +17,10 @@ public class VerifyParseTreeStructure {
             "        y = 2\n" +
             "    print(x)\n";
 
-        System.out.println("╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║  VERIFICATION 2: PARSE TREE STRUCTURE                        ║");
-        System.out.println("╚══════════════════════════════════════════════════════════════╝\n");
+        System.out.println("VERIFICATION 2: PARSE TREE STRUCTURE");
 
         System.out.println("Python Code:");
-        System.out.println("─────────────────────────────────────────────────────────────");
         System.out.println(code);
-        System.out.println("─────────────────────────────────────────────────────────────\n");
 
         CharStream input = CharStreams.fromString(code);
         PythonLexer lexer = new PythonLexer(input);
@@ -50,24 +46,21 @@ public class VerifyParseTreeStructure {
             return;
         }
 
-        System.out.println("✓ PARSING SUCCEEDED\n");
+        System.out.println("PARSING SUCCEEDED\n");
 
         // Method 1: ANTLR's built-in tree representation
         System.out.println("PARSE TREE (toStringTree):");
-        System.out.println("═════════════════════════════════════════════════════════════");
         String treeStr = tree.toStringTree(parser);
         System.out.println(formatTree(treeStr));
-        System.out.println("═════════════════════════════════════════════════════════════\n");
 
         // Method 2: Structured tree walk
         System.out.println("PARSE TREE STRUCTURE (Hierarchical):");
-        System.out.println("═════════════════════════════════════════════════════════════");
+        System.out.println();
         printTree(tree, parser, "", 0);
         System.out.println("═════════════════════════════════════════════════════════════\n");
 
         // Verification checks
         System.out.println("STRUCTURE VERIFICATION:");
-        System.out.println("─────────────────────────────────────────────────────────────");
         verifyStructure(tree, parser);
     }
 

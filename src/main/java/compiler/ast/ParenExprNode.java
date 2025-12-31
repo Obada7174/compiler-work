@@ -1,8 +1,6 @@
 package compiler.ast;
 
-/**
- * Node representing a parenthesized expression
- */
+
 public class ParenExprNode extends ExpressionNode {
     private final ExpressionNode inner;
 

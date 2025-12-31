@@ -3,10 +3,6 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Statement node representing variable assignment
- * target = value or target1, target2 = value1, value2
- */
 public class AssignmentNode extends StatementNode {
     private List<ExpressionNode> targets;
     private ExpressionNode value;

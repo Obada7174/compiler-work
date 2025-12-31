@@ -3,9 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * AST node representing Jinja2 block {% block name %} ... {% endblock %}
- */
+
 public class BlockNode extends ASTNode {
     private String blockName;
     private List<ASTNode> content;

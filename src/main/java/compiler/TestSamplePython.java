@@ -13,10 +13,8 @@ public class TestSamplePython {
         };
 
         for (String filename : testFiles) {
-            System.out.println("\n===========================================");
             System.out.println("Testing: " + filename);
-            System.out.println("===========================================\n");
-
+            System.out.println();
             try {
                 String pythonCode = new String(Files.readAllBytes(Paths.get(filename)));
 
@@ -51,7 +49,7 @@ public class TestSamplePython {
                 if (parser.getNumberOfSyntaxErrors() == 0) {
                     System.out.println("\nSyntax Analysis: SUCCESS");
                     System.out.println("  Parse tree: " + tree.getClass().getSimpleName());
-                    System.out.println("\n✓ File parsed correctly!");
+                    System.out.println("\n File parsed correctly!");
                 } else {
                     System.out.println("\nSyntax Analysis: FAILED");
                     System.out.println("  Errors: " + parser.getNumberOfSyntaxErrors());

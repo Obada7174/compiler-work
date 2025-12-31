@@ -1,9 +1,7 @@
 package compiler.ast.css;
 
-/**
- * AST node representing an operator in CSS values.
- * Operators: +, -, *, /, , (comma)
- */
+ // Operators: +, -, *, /, , (comma)
+
 public class CSSOperatorNode extends CSSValueComponentNode {
     public enum OperatorType {
         PLUS("+"),

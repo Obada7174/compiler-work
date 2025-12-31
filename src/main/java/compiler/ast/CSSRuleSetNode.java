@@ -3,9 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * AST node representing CSS rule set: selector { declarations }
- */
+
 public class CSSRuleSetNode extends ASTNode {
     private List<CSSDeclarationNode> declarations;
 

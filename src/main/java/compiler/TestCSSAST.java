@@ -21,16 +21,13 @@ public class TestCSSAST {
         };
 
         for (String filename : testFiles) {
-            System.out.println("\n\n");
-            System.out.println("╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║          TESTING CSS AST BUILDER: "
-                    + String.format("%-30s", filename) + "║");
-            System.out.println("╚════════════════════════════════════════════════════════════════╝");
+            System.out.println("TESTING CSS AST BUILDER: "
+                    + String.format("%-30s", filename));
 
             try {
                 testCSSFile(filename);
             } catch (Exception e) {
-                System.err.println("✗ Error processing " + filename);
+                System.err.println("Error processing " + filename);
                 e.printStackTrace();
             }
         }
@@ -110,21 +107,17 @@ public class TestCSSAST {
         System.out.println();
 
       validateAST(ast);
-   System.out.println("─────────────────────────────────────────────────────────────────");
         System.out.println("  ABSTRACT SYNTAX TREE");
-        System.out.println("─────────────────────────────────────────────────────────────────");
         ast.print("");
         System.out.println("─────────────────────────────────────────────────────────────────");
 
      printSummary(ast);
 
-        System.out.println("\n✓✓✓ Test completed successfully! ✓✓✓\n");
+        System.out.println("\n Test completed successfully! \n");
     }
 
   private static void validateAST(CSSASTNode ast) {
-        System.out.println("─────────────────────────────────────────────────────────────────");
         System.out.println("  AST VALIDATION");
-        System.out.println("─────────────────────────────────────────────────────────────────");
 
         // Check 1: Root node is CSSStylesheetNode
         if (!(ast instanceof CSSStylesheetNode)) {

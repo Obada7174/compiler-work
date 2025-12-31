@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing a Python slice operation.
- * Syntax: obj[start:stop:step] where any part can be omitted
- */
+
 public class SliceNode extends ExpressionNode {
     private final ExpressionNode object;
     private final ExpressionNode start;
