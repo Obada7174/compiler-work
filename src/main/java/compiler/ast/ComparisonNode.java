@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * Expression node representing comparison operations (<, >, <=, >=, ==, !=, is, in, etc.)
- * Separate from BinaryOpNode to distinguish comparison operators
- */
+
 public class ComparisonNode extends ExpressionNode {
     private String operator;
     private ExpressionNode left;

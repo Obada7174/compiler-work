@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing a list comprehension.
- * Syntax: [expr for target in iterable if condition...]
- */
+
 public class ListComprehensionNode extends ExpressionNode {
     private final ExpressionNode element;
     private final ComprehensionClause clause;

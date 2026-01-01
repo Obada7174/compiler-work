@@ -3,9 +3,6 @@ package compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Node representing the entire program
- */
 public class ProgramNode extends ASTNode {
 
     private final List<ASTNode> children;

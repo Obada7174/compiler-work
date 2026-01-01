@@ -13,9 +13,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class TestCSSSymbolTable {
 
     public static void main(String[] args) {
-        System.out.println("╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║              CSS SYMBOL TABLE GENERATOR                        ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("CSS SYMBOL TABLE GENERATOR");
 
         // Example 1: User's provided example
         testExample1();
@@ -128,20 +126,15 @@ public class TestCSSSymbolTable {
 
             symbolTable.print();
 
-            System.out.println("\n════════════════════════════════════════════════════════════════");
-            System.out.println("                    SYMBOL TABLE (JSON)");
-            System.out.println("════════════════════════════════════════════════════════════════\n");
+            System.out.println("SYMBOL TABLE (JSON)");
             System.out.println(symbolTable.toJSON());
 
-            System.out.println("\n════════════════════════════════════════════════════════════════");
-            System.out.println("                       STATISTICS");
-            System.out.println("════════════════════════════════════════════════════════════════");
+            System.out.println("STATISTICS");
             symbolTable.getStatistics().forEach((key, value) ->
                     System.out.println(String.format("  %-20s: %d", key, value))
             );
-            System.out.println("════════════════════════════════════════════════════════════════");
 
-            System.out.println("\n✓✓✓ Symbol Table Generated Successfully! ✓✓✓\n");
+            System.out.println("\nSymbol Table Generated Successfully!\n");
 
         } catch (Exception e) {
             System.err.println("Error processing CSS: " + e.getMessage());
@@ -152,9 +145,7 @@ public class TestCSSSymbolTable {
 
     @SuppressWarnings("unused")
     private static void demonstrateLookup(CSSSymbolTable symbolTable) {
-        System.out.println("\n════════════════════════════════════════════════════════════════");
-        System.out.println("                    SYMBOL LOOKUP DEMO");
-        System.out.println("════════════════════════════════════════════════════════════════\n");
+        System.out.println("SYMBOL LOOKUP DEMO");
 
         // Look up a CSS variable
         var mainColorVars = symbolTable.lookup("--main-color");

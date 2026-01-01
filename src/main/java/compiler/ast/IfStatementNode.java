@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Statement node representing if/elif/else statement
- * if condition: ... [elif condition: ...] [else: ...]
- */
+
 public class IfStatementNode extends StatementNode {
     private ExpressionNode condition;
     private List<ASTNode> thenBlock;

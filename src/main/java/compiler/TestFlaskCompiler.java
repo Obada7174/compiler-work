@@ -14,25 +14,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Test harness for Flask app.py compilation using Maven-friendly ClassLoader
- *
- * Demonstrates the complete compilation pipeline:
- * 1. Lexical Analysis (ANTLR Lexer)
- * 2. Syntactic Analysis (ANTLR Parser)
- * 3. AST Construction (SimplePythonASTBuilder)
- * 4. Symbol Table Construction (SymbolTableBuilder)
- * 5. Semantic Analysis (FlaskSemanticAnalyzer)
- */
 public class TestFlaskCompiler {
 
     public static void main(String[] args) {
         String resourcePath = args.length > 0 ? args[0] : "examples/app.py";
 
-        System.out.println("╔═══════════════════════════════════════════════════════════╗");
-        System.out.println("║         FLASK APPLICATION COMPILER                        ║");
-        System.out.println("║         Python + Flask → AST → Symbol Table               ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
+        System.out.println("FLASK APPLICATION COMPILER");
+        System.out.println("Python + Flask → AST → Symbol Table");
 
         try {
             compileFlaskApp(resourcePath);
@@ -43,9 +31,7 @@ public class TestFlaskCompiler {
     }
 
     public static void compileFlaskApp(String resourcePath) throws Exception {
-        // ═══════════════════════════════════════════════════════════
         // LOAD SOURCE FILE VIA CLASSLOADER
-        // ═══════════════════════════════════════════════════════════
         InputStream is = TestFlaskCompiler.class.getClassLoader().getResourceAsStream(resourcePath);
         if (is == null) {
             throw new RuntimeException("Resource not found: " + resourcePath);
@@ -62,9 +48,7 @@ public class TestFlaskCompiler {
         System.out.println("Loaded resource: " + resourcePath);
         System.out.println("Source size: " + sourceCode.length() + " characters");
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 1: LEXICAL ANALYSIS
-        // ═══════════════════════════════════════════════════════════
         CharStream input = CharStreams.fromString(sourceCode);
         PythonLexer lexer = new PythonLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -84,9 +68,7 @@ public class TestFlaskCompiler {
                     token.getText().replace("\n", "\\n").replace("\r", "\\r"));
         }
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 2: SYNTACTIC ANALYSIS
-        // ═══════════════════════════════════════════════════════════
         tokens.reset();
         PythonParser parser = new PythonParser(tokens);
         parser.removeErrorListeners();
@@ -105,17 +87,12 @@ public class TestFlaskCompiler {
         System.out.println("Parse tree root: " + parseTree.getClass().getSimpleName());
         System.out.println("Syntax errors: " + syntaxErrors);
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 3: AST CONSTRUCTION
-        // ═══════════════════════════════════════════════════════════
         SimplePythonASTBuilder astBuilder = new SimplePythonASTBuilder();
         ASTNode ast = astBuilder.visit(parseTree);
 
         System.out.println("AST root: " + ast.getNodeType());
-
-        // ═══════════════════════════════════════════════════════════
         // STAGE 4: SYMBOL TABLE CONSTRUCTION
-        // ═══════════════════════════════════════════════════════════
         ClassicalSymbolTable symbolTable = ClassicalSymbolTable.allocate();
         SymbolTableBuilder stBuilder = new SymbolTableBuilder(symbolTable);
         stBuilder.build(ast);
@@ -123,9 +100,7 @@ public class TestFlaskCompiler {
         System.out.println("\nSymbol Table:");
         symbolTable.printTable();
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 5: FLASK SEMANTIC ANALYSIS
-        // ═══════════════════════════════════════════════════════════
         FlaskSemanticAnalyzer semanticAnalyzer = new FlaskSemanticAnalyzer();
         semanticAnalyzer.analyze(ast);
 

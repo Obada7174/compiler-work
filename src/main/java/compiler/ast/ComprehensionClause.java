@@ -3,9 +3,6 @@ package compiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents a comprehension clause (for/if structure in list/dict/gen comprehensions).
- */
 public class ComprehensionClause extends ASTNode {
     private final String target;
     private final ExpressionNode iterable;

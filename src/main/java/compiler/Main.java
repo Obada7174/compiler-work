@@ -43,16 +43,12 @@ public class Main {
                 return;
             }
         } else {
-            // Use default test program
             inputSource = "Built-in Example";
             input = getDefaultExample();
         }
 
-        System.out.println("╔═══════════════════════════════════════════════╗");
-        System.out.println("║  INPUT SOURCE: " + String.format("%-29s", inputSource) + "║");
-        System.out.println("╚═══════════════════════════════════════════════╝");
+        System.out.println("INPUT SOURCE: " + String.format("%-29s", inputSource));
         System.out.println("\n" + input + "\n");
-        System.out.println("═══════════════════════════════════════════════════\n");
 
         // Detect file type
         String fileType = "jinja2"; // default
@@ -193,33 +189,27 @@ public class Main {
         Jinja2Parser.TemplateContext parseTree = parser.template();
 
         if (parser.getNumberOfSyntaxErrors() > 0) {
-            System.out.println("│  ✗ Parsing failed with " + parser.getNumberOfSyntaxErrors() + " error(s)");
-            System.out.println("└──────────────────────────────────────────────┘\n");
+            System.out.println("Parsing failed with " + parser.getNumberOfSyntaxErrors() + " error(s)");
             return null;
         }
 
-        System.out.println("│  ✓ Parsing completed successfully");
-        System.out.println("│  → Parse tree root: " + parseTree.getClass().getSimpleName());
-        System.out.println("└──────────────────────────────────────────────┘\n");
+        System.out.println(" Parsing completed successfully");
+        System.out.println(" Parse tree root: " + parseTree.getClass().getSimpleName());
 
         // STAGE 3: AST CONSTRUCTION
-        System.out.println("┌─ STAGE 3: AST Construction (Jinja2) ────────┐");
-        System.out.println("│  Using Visitor Pattern...");
+        System.out.println(" STAGE 3: AST Construction (Jinja2) ");
+        System.out.println("Using Visitor Pattern...");
 
         SimpleJinja2ASTBuilder astBuilder = new SimpleJinja2ASTBuilder();
         ASTNode ast = astBuilder.visit(parseTree);
 
-        System.out.println("│  ✓ AST construction completed");
-        System.out.println("│  → Root node type: " + ast.getNodeType());
-        System.out.println("│  → Child count: " + ast.getChildren().size());
-        System.out.println("└──────────────────────────────────────────────┘\n");
+        System.out.println("AST construction completed ");
+        System.out.println("Root node type: " + ast.getNodeType());
+        System.out.println("Child count: " + ast.getChildren().size());
 
         return ast;
     }
 
-    /**
-     * Demonstrate Symbol Table operations for academic purposes
-     */
     private static void demonstrateSymbolTable() {
         SymbolTable symbolTable = new SymbolTable();
 
@@ -256,39 +246,29 @@ public class Main {
      * Print header
      */
     private static void printHeader() {
-        System.out.println("\n╔═══════════════════════════════════════════════╗");
-        System.out.println("║   Flask/Jinja2/HTML/CSS Compiler             ║");
-        System.out.println("║   ANTLR4-Based Compiler Project              ║");
-        System.out.println("╠═══════════════════════════════════════════════╣");
-        System.out.println("║  Academic Requirements:                       ║");
-        System.out.println("║  ✓ Language Definitions (Jinja2/HTML/CSS)    ║");
-        System.out.println("║  ✓ Lexer and Parser (ANTLR4)                 ║");
-        System.out.println("║  ✓ AST with OOP Principles                   ║");
-        System.out.println("║  ✓ Visitor Pattern for AST Construction      ║");
-        System.out.println("║  ✓ Symbol Table with Operations              ║");
-        System.out.println("║  ✓ AST Printer for Visualization             ║");
-        System.out.println("╚═══════════════════════════════════════════════╝\n");
+        System.out.println("Flask/Jinja2/HTML/CSS Compiler     ");
+        System.out.println("ANTLR4-Based Compiler Project    ");
+        System.out.println("Academic Requirements: ");
+        System.out.println(" Language Definitions (Jinja2/HTML/CSS) ");
+        System.out.println("Lexer and Parser (ANTLR4) ");
+        System.out.println("AST with OOP Principles  ");
+        System.out.println("Visitor Pattern for AST Construction  ");
+        System.out.println("Symbol Table with Operations");
+        System.out.println("AST Printer for Visualization");
     }
 
-    /**
-     * Print footer
-     */
     private static void printFooter() {
-        System.out.println("\n╔═══════════════════════════════════════════════╗");
-        System.out.println("║          COMPILATION COMPLETED                ║");
-        System.out.println("╠═══════════════════════════════════════════════╣");
-        System.out.println("║  All stages executed successfully:            ║");
-        System.out.println("║  1. Lexical Analysis                    ✓    ║");
-        System.out.println("║  2. Syntax Analysis                     ✓    ║");
-        System.out.println("║  3. AST Construction (Visitor)          ✓    ║");
-        System.out.println("║  4. AST Visualization                   ✓    ║");
-        System.out.println("║  5. Symbol Table Operations             ✓    ║");
-        System.out.println("╚═══════════════════════════════════════════════╝\n");
+        System.out.println("COMPILATION COMPLETED");
+        System.out.println("All stages executed successfully:");
+        System.out.println("1. Lexical Analysis");
+        System.out.println("2. Syntax Analysis");
+        System.out.println("3. AST Construction (Visitor)");
+        System.out.println("4. AST Visualization");
+        System.out.println("5. Symbol Table Operations  done");
+
     }
 
-    /**
-     * Default example template
-     */
+
     private static String getDefaultExample() {
         return """
                     {% for product in products %}

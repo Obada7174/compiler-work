@@ -1,8 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing <style> tag
- */
+
 public class StyleTagNode extends ASTNode {
 
     private final String cssContent;

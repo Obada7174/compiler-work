@@ -1,9 +1,7 @@
 package compiler.ast.css;
 
-/**
- * AST node representing an identifier value.
- * Example: "auto", "inherit", "solid", "red"
- */
+ // Example: "auto", "inherit", "solid", "red"
+
 public class CSSIdentifierValueNode extends CSSValueComponentNode {
     private String identifier;
 

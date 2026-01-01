@@ -1,8 +1,6 @@
 package compiler.ast;
 
-/**
- * Expression node representing None/null literal (Python None, Jinja2 none)
- */
+
 public class NoneLiteralNode extends ExpressionNode {
 
     public NoneLiteralNode(int lineNumber) {

@@ -8,8 +8,6 @@ public class TestSimple {
         String code = "def func():\n    x = 1\n";
 
         System.out.println("Testing simple code:");
-        System.out.println(code);
-        System.out.println("================");
 
         CharStream input = CharStreams.fromString(code);
         PythonLexer lexer = new PythonLexer(input);

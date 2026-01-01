@@ -8,15 +8,11 @@ import compiler.visitors.SimpleJinja2ASTBuilder;
 import grammar.*;
 import org.antlr.v4.runtime.*;
 
-/**
- * Comprehensive test class for AST building with inline content
- */
+
 public class TestASTComplete {
 
     public static void main(String[] args) {
-        System.out.println("╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║       COMPREHENSIVE AST AND SYMBOL TABLE TEST SUITE            ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("COMPREHENSIVE AST AND SYMBOL TABLE TEST SUITE");
 
         // Inline Python code
         String pythonCode = """
@@ -277,21 +273,15 @@ public class TestASTComplete {
                  """;
 
         // Run Python AST test
-        System.out.println("\n═══════════════════════════════════════════════════════════");
         System.out.println("  PART 1: PYTHON AST GENERATION");
-        System.out.println("═══════════════════════════════════════════════════════════\n");
         testPythonFromString(pythonCode);
 
         // Run Jinja2 AST test
-        System.out.println("\n═══════════════════════════════════════════════════════════");
         System.out.println("  PART 2: JINJA2 AST GENERATION");
-        System.out.println("═══════════════════════════════════════════════════════════\n");
         testJinja2FromString(jinjaCode);
 
         // Symbol table test
-        System.out.println("\n═══════════════════════════════════════════════════════════");
         System.out.println("  PART 3: SYMBOL TABLE FUNCTIONALITY");
-        System.out.println("═══════════════════════════════════════════════════════════\n");
         testSymbolTable();
     }
 

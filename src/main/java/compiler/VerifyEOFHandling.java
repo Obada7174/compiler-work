@@ -4,15 +4,13 @@ import org.antlr.v4.runtime.*;
 import grammar.*;
 import java.util.*;
 
-/**
- * VERIFICATION 3: EOF Indentation Flush
- * Proves all DEDENT tokens are emitted at EOF
+/*
+  VERIFICATION 3: EOF Indentation Flush
+  Proves all DEDENT tokens are emitted at EOF
  */
 public class VerifyEOFHandling {
     public static void main(String[] args) {
-        System.out.println("╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║  VERIFICATION 3: EOF INDENTATION FLUSH                       ║");
-        System.out.println("╚══════════════════════════════════════════════════════════════╝\n");
+        System.out.println("VERIFICATION 3: EOF INDENTATION FLUSH");
 
         // Test 1: Single level indentation
         testEOF("Test 1: Single indent level",
@@ -50,7 +48,6 @@ public class VerifyEOFHandling {
 
         List<Token> allTokens = tokens.getTokens();
 
-        // Find tokens near EOF
         System.out.println("\nTokens before EOF:");
         int eofIndex = -1;
         for (int i = allTokens.size() - 1; i >= 0; i--) {
@@ -62,7 +59,7 @@ public class VerifyEOFHandling {
         }
 
         if (eofIndex == -1) {
-            System.err.println("✗ No EOF token found!");
+            System.err.println("No EOF token found!");
             return;
         }
 
@@ -106,9 +103,9 @@ public class VerifyEOFHandling {
         System.out.println("  Total DEDENT:  " + totalDedents);
 
         if (totalIndents == totalDedents) {
-            System.out.println("  ✓ PASS: All indentation levels closed at EOF");
+            System.out.println("PASS: All indentation levels closed at EOF");
         } else {
-            System.err.println("  ✗ FAIL: Unbalanced INDENT/DEDENT");
+            System.err.println("FAIL: Unbalanced INDENT/DEDENT");
         }
     }
 }

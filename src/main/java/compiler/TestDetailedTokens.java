@@ -11,8 +11,7 @@ public class TestDetailedTokens {
             String code = new String(Files.readAllBytes(Paths.get("examples/sample_python.txt")));
 
             System.out.println("Testing: examples/sample_python.txt");
-            System.out.println("=====================================\n");
-
+            System.out.println();
             CharStream input = CharStreams.fromString(code);
             PythonLexer lexer = new PythonLexer(input);
 
@@ -68,9 +67,9 @@ public class TestDetailedTokens {
             PythonParser.File_inputContext tree = parser.file_input();
 
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                System.out.println("\n✓ PARSE SUCCESS");
+                System.out.println("PARSE SUCCESS");
             } else {
-                System.out.println("\n✗ PARSE FAILED (" + parser.getNumberOfSyntaxErrors() + " errors)");
+                System.out.println("PARSE FAILED (" + parser.getNumberOfSyntaxErrors() + " errors)");
             }
 
         } catch (Exception e) {

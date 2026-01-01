@@ -19,7 +19,6 @@ public class TestCPythonIndentation {
             String pythonCode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
             System.out.println("Testing CPython-Style Indentation");
-            System.out.println("=====================================\n");
 
             CharStream input = CharStreams.fromString(pythonCode);
             PythonLexer lexer = new PythonLexer(input);
@@ -54,16 +53,16 @@ public class TestCPythonIndentation {
             System.out.println("Tokens: " + tokenCount);
 
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                System.out.println("\n✓ SUCCESS - All CPython indentation rules working!");
-                System.out.println("  - Basic indentation: ✓");
-                System.out.println("  - Nested indentation: ✓");
-                System.out.println("  - Implicit line continuation ([...]): ✓");
-                System.out.println("  - Implicit line continuation ({...}): ✓");
-                System.out.println("  - Implicit line continuation ((...)): ✓");
-                System.out.println("  - Decorators with multiline: ✓");
-                System.out.println("  - if/elif/else with DEDENT: ✓");
-                System.out.println("  - for/else: ✓");
-                System.out.println("  - try/except/finally: ✓");
+                System.out.println("\n SUCCESS - All CPython indentation rules working!");
+                System.out.println("  - Basic indentation: Done");
+                System.out.println("  - Nested indentation: Done");
+                System.out.println("  - Implicit line continuation ([...]): Done");
+                System.out.println("  - Implicit line continuation ({...}): Done");
+                System.out.println("  - Implicit line continuation ((...)): Done");
+                System.out.println("  - Decorators with multiline: Done");
+                System.out.println("  - if/elif/else with DEDENT: Done");
+                System.out.println("  - for/else: Done");
+                System.out.println("  - try/except/finally: Done");
             } else {
                 System.out.println("\n✗ FAILED with " + parser.getNumberOfSyntaxErrors() + " errors");
             }

@@ -1,8 +1,5 @@
 package compiler.ast;
 
-/**
- * Node representing a keyword argument in a function call
- */
 public class KeywordArgNode extends ExpressionNode {
     private final String key;
     private final ExpressionNode value;

@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * AST node representing decorator
- * @decorator_name or @decorator_name(args)
- */
+
 public class DecoratorNode extends ASTNode {
     private ExpressionNode decoratorExpr;
     private List<ExpressionNode> arguments;

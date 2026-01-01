@@ -26,8 +26,7 @@ public class TestDetailedPython {
             scanner.close();
 
             System.out.println("Testing: test_python.py");
-            System.out.println("===========================================");
-
+            System.out.println();
             CharStream input = CharStreams.fromString(pythonCode);
             PythonLexer lexer = new PythonLexer(input);
             lexer.removeErrorListeners();
@@ -42,9 +41,9 @@ public class TestDetailedPython {
 
             System.out.println("Tokens: " + tokenCount);
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                System.out.println("✓ PASSED");
+                System.out.println("PASSED");
             } else {
-                System.out.println("✗ FAILED (" + parser.getNumberOfSyntaxErrors() + " errors)");
+                System.out.println("FAILED (" + parser.getNumberOfSyntaxErrors() + " errors)");
             }
 
         } catch (Exception e) {

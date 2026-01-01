@@ -3,24 +3,7 @@ package compiler;
 import compiler.ast.*;
 import compiler.visitors.ASTPrinter;
 
-/**
- * Comprehensive test to verify AST node structure and printing functionality.
- *
- * This test demonstrates:
- * 1. All AST nodes contain required fields (node type, line number, children)
- * 2. ASTPrinter functions work correctly for traversal and visualization
- * 3. Proper handling of nodes with and without children
- * 4. Custom printNode/printAST methods showing class names and line numbers
- */
 public class TestASTFunctionality {
-
-    /**
-     * Print a single AST node and all its children recursively.
-     * Shows the class name (using getClass().getSimpleName()), line number, and tree structure.
-     *
-     * @param node The AST node to print
-     * @param indent The indentation level (number of spaces)
-     */
     public static void printNode(ASTNode node, int indent) {
         if (node == null) {
             printIndent(indent);
@@ -38,16 +21,8 @@ public class TestASTFunctionality {
         }
     }
 
-    /**
-     * Print the entire AST starting from the root node.
-     * This is a convenience method that calls printNode with indent = 0.
-     *
-     * @param root The root node of the AST
-     */
     public static void printAST(ASTNode root) {
-        System.out.println("╔════════════════════════════════════════════════════════════╗");
-        System.out.println("║                 AST WITH CLASS NAMES                       ║");
-        System.out.println("╚════════════════════════════════════════════════════════════╝\n");
+        System.out.println("AST WITH CLASS NAMES");
 
         if (root == null) {
             System.out.println("(empty tree)");
@@ -58,11 +33,6 @@ public class TestASTFunctionality {
         System.out.println();
     }
 
-    /**
-     * Helper method to print indentation spaces.
-     *
-     * @param indent Number of spaces to print
-     */
     private static void printIndent(int indent) {
         for (int i = 0; i < indent; i++) {
             System.out.print(" ");
@@ -70,9 +40,7 @@ public class TestASTFunctionality {
     }
 
     public static void main(String[] args) {
-        System.out.println("╔════════════════════════════════════════════════════════════╗");
         System.out.println("║         AST FUNCTIONALITY VERIFICATION TEST                ║");
-        System.out.println("╚════════════════════════════════════════════════════════════╝\n");
 
         // Test 1: Verify AST Node Structure
         System.out.println("TEST 1: AST Node Structure Verification");
@@ -159,9 +127,7 @@ public class TestASTFunctionality {
         System.out.println("✓ PASSED: printAST() handles complex nested structures\n");
 
         // Final Summary
-        System.out.println("\n╔════════════════════════════════════════════════════════════╗");
-        System.out.println("║              ALL TESTS PASSED SUCCESSFULLY                 ║");
-        System.out.println("╚════════════════════════════════════════════════════════════╝");
+        System.out.println("              ALL TESTS PASSED SUCCESSFULLY                 ║");
         System.out.println("\nVerified Functionality:");
         System.out.println("  ✓ AST nodes contain: node type, line number, children list");
         System.out.println("  ✓ printNode(node, indent) - prints node with class name & line");
@@ -203,15 +169,8 @@ public class TestASTFunctionality {
         System.out.println("  ✓ addChild() works correctly");
     }
 
-    /**
-     * Test 2-6: Create a simple AST for testing
-     *
-     * Program
-     *   ├── Assignment: x = 5
-     *   └── FunctionDef: foo
-     *       └── ReturnStatement
-     *           └── Identifier: x
-     */
+
+     // Test 2-6: Create a simple AST for testing
     private static ASTNode createSimpleAST() {
         ProgramNode program = new ProgramNode(1);
 
@@ -240,9 +199,8 @@ public class TestASTFunctionality {
         return program;
     }
 
-    /**
-     * Test 8: Test null and empty node handling
-     */
+     // Test 8: Test null and empty node handling
+
     private static void testNullHandling() {
         // Test printNode with null
         System.out.println("  Testing printNode(null):");
@@ -263,19 +221,8 @@ public class TestASTFunctionality {
         System.out.println("  Result: " + summary);
     }
 
-    /**
-     * Test 9: Create a complex AST with nested structures
-     *
-     * Program
-     *   └── FunctionDef: calculate_total
-     *       ├── Parameter: items
-     *       ├── Assignment: total = 0
-     *       ├── ForStatement
-     *       │   ├── Identifier: item (target)
-     *       │   ├── Identifier: items (iterable)
-     *       │   └── Assignment: total = total + item['price']
-     *       └── ReturnStatement
-     *           └── Identifier: total
+    /*
+      Test 9: Create a complex AST with nested structures
      */
     private static ASTNode createComplexAST() {
         ProgramNode program = new ProgramNode(1);

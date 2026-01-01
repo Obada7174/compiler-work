@@ -17,26 +17,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Comprehensive Test Harness for Flask Python Compiler
- *
- * This harness performs the complete compilation pipeline:
- * 1. Lexical Analysis using ANTLR PythonLexer
- * 2. Syntactic Analysis using ANTLR PythonParser
- * 3. AST Construction with SimplePythonASTBuilder
- * 4. Symbol Table Construction with SymbolTableBuilder (with auto-import detection)
- * 5. Semantic Analysis with FlaskSemanticAnalyzer
- *
- * Features:
- * - Automatic inclusion of all imported identifiers in symbol table
- * - Pre-loaded Python built-ins (Exception, ValueError, __name__, etc.)
- * - Detailed symbol table output with scope levels
- * - Comprehensive error reporting
- *
- * Usage:
- *   java compiler.ComprehensiveFlaskCompilerTest [path-to-python-file]
- *   Default: examples/app.py from resources
- */
 public class ComprehensiveFlaskCompilerTest {
 
     private static final String SEPARATOR = "═══════════════════════════════════════════════════════════";
@@ -67,16 +47,11 @@ public class ComprehensiveFlaskCompilerTest {
         }
     }
 
-    /**
-     * Main compilation method that executes all stages.
-     */
+
     public static CompilationResult compileFlaskApplication(String resourcePath) throws Exception {
         CompilationResult result = new CompilationResult();
         result.resourcePath = resourcePath;
-
-        // ═══════════════════════════════════════════════════════════
         // STAGE 0: LOAD SOURCE FILE
-        // ═══════════════════════════════════════════════════════════
         printStageHeader("STAGE 0: SOURCE FILE LOADING");
 
         String sourceCode = loadSourceFile(resourcePath);
@@ -88,9 +63,7 @@ public class ComprehensiveFlaskCompilerTest {
         System.out.println("  Line count: " + result.sourceLines);
         System.out.println();
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 1: LEXICAL ANALYSIS
-        // ═══════════════════════════════════════════════════════════
         printStageHeader("STAGE 1: LEXICAL ANALYSIS (TOKENIZATION)");
 
         CharStream input = CharStreams.fromString(sourceCode);
@@ -129,9 +102,7 @@ public class ComprehensiveFlaskCompilerTest {
             return result;
         }
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 2: SYNTACTIC ANALYSIS (PARSING)
-        // ═══════════════════════════════════════════════════════════
         printStageHeader("STAGE 2: SYNTACTIC ANALYSIS (PARSING)");
 
         tokens.reset();
@@ -165,9 +136,7 @@ public class ComprehensiveFlaskCompilerTest {
             return result;
         }
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 3: AST CONSTRUCTION
-        // ═══════════════════════════════════════════════════════════
         printStageHeader("STAGE 3: ABSTRACT SYNTAX TREE CONSTRUCTION");
 
         SimplePythonASTBuilder astBuilder = new SimplePythonASTBuilder();
@@ -200,9 +169,7 @@ public class ComprehensiveFlaskCompilerTest {
         ASTClassNamePrinter.printAST(ast, "AST with Class Names");
         System.out.println();
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 4: SYMBOL TABLE CONSTRUCTION
-        // ═══════════════════════════════════════════════════════════
         printStageHeader("STAGE 4: SYMBOL TABLE CONSTRUCTION");
 
         ClassicalSymbolTable symbolTable = ClassicalSymbolTable.allocate();
@@ -235,9 +202,7 @@ public class ComprehensiveFlaskCompilerTest {
 
         System.out.println();
 
-        // ═══════════════════════════════════════════════════════════
         // STAGE 5: SEMANTIC ANALYSIS
-        // ═══════════════════════════════════════════════════════════
         printStageHeader("STAGE 5: SEMANTIC ANALYSIS");
 
         FlaskSemanticAnalyzer semanticAnalyzer = new FlaskSemanticAnalyzer();
@@ -269,9 +234,6 @@ public class ComprehensiveFlaskCompilerTest {
         return result;
     }
 
-    /**
-     * Load source file from resources or filesystem.
-     */
     private static String loadSourceFile(String resourcePath) throws Exception {
         // Try to load from resources first
         InputStream is = ComprehensiveFlaskCompilerTest.class.getClassLoader()
@@ -291,9 +253,6 @@ public class ComprehensiveFlaskCompilerTest {
         return new String(Files.readAllBytes(Paths.get(resourcePath)), StandardCharsets.UTF_8);
     }
 
-    /**
-     * Print a sample of tokens for inspection.
-     */
     private static void printTokenSample(CommonTokenStream tokens, int limit) {
         System.out.println("\n  Token Sample (first " + limit + "):");
         System.out.println("  " + LINE.substring(0, 50));
@@ -318,16 +277,10 @@ public class ComprehensiveFlaskCompilerTest {
         System.out.println("  " + LINE.substring(0, 50));
     }
 
-    /**
-     * Print symbol table statistics by scope and type.
-     */
     private static void printSymbolTableStatistics(ClassicalSymbolTable symbolTable) {
         System.out.println("Symbol Table Statistics:");
         System.out.println(LINE);
 
-        // Count symbols by type
-        java.util.Map<String, Integer> typeCounts = new java.util.HashMap<>();
-        java.util.Map<Integer, Integer> scopeCounts = new java.util.HashMap<>();
 
         // Use reflection or iterate through symbol table to gather stats
         // For now, provide a summary structure
@@ -349,9 +302,6 @@ public class ComprehensiveFlaskCompilerTest {
         System.out.println();
     }
 
-    /**
-     * Print final compilation summary.
-     */
     private static void printFinalSummary(CompilationResult result) {
         System.out.println("\n" + SEPARATOR);
         System.out.println("           COMPILATION SUMMARY");
@@ -393,9 +343,6 @@ public class ComprehensiveFlaskCompilerTest {
         System.out.println(SEPARATOR);
     }
 
-    /**
-     * Print header banner.
-     */
     private static void printHeader() {
         System.out.println("\n" + SEPARATOR);
         System.out.println("     COMPREHENSIVE FLASK COMPILER TEST HARNESS");
@@ -403,18 +350,11 @@ public class ComprehensiveFlaskCompilerTest {
         System.out.println(SEPARATOR + "\n");
     }
 
-    /**
-     * Print stage header.
-     */
     private static void printStageHeader(String stageName) {
         System.out.println("\n" + SEPARATOR);
         System.out.println("  " + stageName);
         System.out.println(SEPARATOR + "\n");
     }
-
-    /**
-     * Data class to hold compilation results.
-     */
     static class CompilationResult {
         String resourcePath;
         String sourceCode;

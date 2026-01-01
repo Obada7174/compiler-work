@@ -4,15 +4,6 @@ import compiler.ast.*;
 import compiler.ast.flask.*;
 import java.util.*;
 
-
-/**
- * Symbol Table Builder with Flask framework support.
- *
- * This builder traverses the AST and populates the symbol table with:
- * - Standard Python symbols (variables, functions, classes, parameters)
- * - Flask-specific symbols (app instances, route endpoints, Flask imports)
- * - Framework-injected globals (request, g, session)
- */
 public class SymbolTableBuilder {
 
     private ClassicalSymbolTable symbolTable;
@@ -23,9 +14,7 @@ public class SymbolTableBuilder {
     private final Map<String, RouteInfo> routeEndpoints = new LinkedHashMap<>();
     private final Set<String> flaskImports = new HashSet<>();
 
-    /**
-     * Route information for Flask endpoints.
-     */
+
     public static class RouteInfo {
         public final String functionName;
         public final String path;
@@ -56,28 +45,19 @@ public class SymbolTableBuilder {
             return;
         }
 
-        System.out.println("\n╔═══════════════════════════════════════════════════════════╗");
-        System.out.println("║         BUILDING SYMBOL TABLE FROM AST                    ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
+        System.out.println("BUILDING SYMBOL TABLE FROM AST");
 
         // Initialize with Python built-ins
         initializePythonBuiltins();
 
         traverse(root);
 
-        System.out.println("\n╔═══════════════════════════════════════════════════════════╗");
-        System.out.println("║         SYMBOL TABLE BUILD COMPLETED                      ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
+        System.out.println("SYMBOL TABLE BUILD COMPLETED");
 
         // Print any errors or warnings
         symbolTable.printErrors();
         symbolTable.printWarnings();
     }
-
-    /**
-     * Initialize the symbol table with common Python built-in identifiers.
-     * These are available in all Python programs by default.
-     */
     private void initializePythonBuiltins() {
         System.out.println("  [INIT] Initializing Python built-in identifiers...\n");
 
@@ -132,9 +112,6 @@ public class SymbolTableBuilder {
         ));
     }
 
-    /**
-     * Traverse AST node and its children recursively
-     */
     private void traverse(ASTNode node) {
         if (node == null) {
             return;
@@ -152,9 +129,6 @@ public class SymbolTableBuilder {
         postProcessNode(node);
     }
 
-    /**
-     * Process a single node
-     */
     private void processNode(ASTNode node) {
         // Flask-specific nodes (check these first)
         if (node instanceof FlaskAppNode) {
@@ -197,9 +171,7 @@ public class SymbolTableBuilder {
         // Add more node types as needed
     }
 
-    /**
-     * Post-process node after children are traversed
-     */
+
     private void postProcessNode(ASTNode node) {
         // Exit scope for function and class definitions
         if (node instanceof FunctionDefNode || node instanceof ClassDefNode) {
@@ -207,10 +179,7 @@ public class SymbolTableBuilder {
         }
     }
 
-    /**
-     * Process assignment: x = value
-     * This is a declaration if identifier doesn't exist, otherwise it's a usage
-     */
+
     private void processAssignment(AssignmentNode node) {
         List<ExpressionNode> targets = node.getTargets();
 
@@ -251,10 +220,6 @@ public class SymbolTableBuilder {
         // Mark that we're not in declaration context when processing the value
         isInDeclarationContext = false;
     }
-
-    /**
-     * Process function definition: def name(params): ...
-     */
     private void processFunctionDef(FunctionDefNode node) {
         String name = node.getFunctionName();
         int line = node.getLineNumber();
@@ -281,9 +246,6 @@ public class SymbolTableBuilder {
         // Parameters will be processed as children
     }
 
-    /**
-     * Process class definition: class Name: ...
-     */
     private void processClassDef(ClassDefNode node) {
         String name = node.getClassName();
         int line = node.getLineNumber();
@@ -308,9 +270,7 @@ public class SymbolTableBuilder {
         ));
     }
 
-    /**
-     * Process function parameter
-     */
+
     private void processParameter(ParameterNode node) {
         String name = node.getParameterName();
         int line = node.getLineNumber();
@@ -334,9 +294,7 @@ public class SymbolTableBuilder {
         }
     }
 
-    /**
-     * Process for statement: for var in iterable: ...
-     */
+
     private void processForStatement(ForStatementNode node) {
         ExpressionNode target = node.getTarget();
 
@@ -384,9 +342,7 @@ public class SymbolTableBuilder {
         ));
     }
 
-    /**
-     * Process Jinja2 for loop: {% for var in iterable %}
-     */
+
     private void processJinjaFor(JinjaForNode node) {
         String variableName = node.getTargetName();
         int line = node.getLineNumber();
@@ -426,9 +382,7 @@ public class SymbolTableBuilder {
         ));
     }
 
-    /**
-     * Process identifier (usage context)
-     */
+
     private void processIdentifier(IdentifierNode node) {
         // Skip if we're in a declaration context (handled elsewhere)
         if (isInDeclarationContext) {
@@ -449,9 +403,6 @@ public class SymbolTableBuilder {
         // If recordUsage returns false, an error was already logged
     }
 
-    /**
-     * Infer type from expression node
-     */
     private String inferType(ExpressionNode expr) {
         if (expr == null) {
             return "unknown";
@@ -503,20 +454,12 @@ public class SymbolTableBuilder {
         }
     }
 
-    /**
-     * Get the built symbol table
-     */
     public ClassicalSymbolTable getSymbolTable() {
         return symbolTable;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // FLASK-SPECIFIC PROCESSING
-    // ═══════════════════════════════════════════════════════════════════════════
+      // FLASK-SPECIFIC PROCESSING
 
-    /**
-     * Process Flask import: from flask import Flask, request, ...
-     */
     private void processFlaskImport(FlaskImportNode node) {
         int line = node.getLineNumber();
 
@@ -544,9 +487,7 @@ public class SymbolTableBuilder {
         }
     }
 
-    /**
-     * Determine the type for a Flask import.
-     */
+
     private String determineFlaskType(String name) {
         return switch (name) {
             case "Flask" -> "flask.Flask";
@@ -567,9 +508,6 @@ public class SymbolTableBuilder {
         };
     }
 
-    /**
-     * Inject Flask request object as a framework-provided global.
-     */
     private void injectFlaskRequestGlobal(int line) {
         // 'request' is a context local proxy - mark as framework-injected
         SymbolTableEntry requestEntry = symbolTable.lookup("request");
@@ -579,9 +517,6 @@ public class SymbolTableBuilder {
         }
     }
 
-    /**
-     * Process Flask app instantiation: app = Flask(__name__)
-     */
     private void processFlaskApp(FlaskAppNode node) {
         String appName = node.getAppVariableName();
         int line = node.getLineNumber();
@@ -603,9 +538,6 @@ public class SymbolTableBuilder {
         }
     }
 
-    /**
-     * Process Flask route function: @app.route("/path") def handler(): ...
-     */
     private void processFlaskRouteFunction(FlaskRouteFunction node) {
         String functionName = node.getFunctionName();
         int line = node.getLineNumber();
@@ -676,9 +608,7 @@ public class SymbolTableBuilder {
         ));
     }
 
-    /**
-     * Process Flask app.run() call.
-     */
+
     private void processFlaskRun(FlaskRunNode node) {
         String appRef = node.getAppReference();
         int line = node.getLineNumber();
@@ -693,9 +623,6 @@ public class SymbolTableBuilder {
         ));
     }
 
-    /**
-     * Process standard import statement.
-     */
     private void processImport(ImportStatementNode node) {
         int line = node.getLineNumber();
 
@@ -729,50 +656,33 @@ public class SymbolTableBuilder {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // FLASK ANALYSIS RESULTS
-    // ═══════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Get all registered Flask app names.
-     */
+
     public Set<String> getFlaskApps() {
         return new HashSet<>(flaskApps);
     }
 
-    /**
-     * Get all route endpoints.
-     */
+
     public Map<String, RouteInfo> getRouteEndpoints() {
         return new LinkedHashMap<>(routeEndpoints);
     }
 
-    /**
-     * Get all Flask imports.
-     */
+
     public Set<String> getFlaskImports() {
         return new HashSet<>(flaskImports);
     }
 
-    /**
-     * Check if this is a Flask application.
-     */
+
     public boolean isFlaskApplication() {
         return !flaskApps.isEmpty() || flaskImports.contains("Flask");
     }
 
-    /**
-     * Print Flask-specific analysis summary.
-     */
     public void printFlaskSummary() {
         if (!isFlaskApplication()) {
             return;
         }
 
-        System.out.println("\n╔═══════════════════════════════════════════════════════════╗");
-        System.out.println("║              FLASK APPLICATION SUMMARY                    ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
-
+        System.out.println("FLASK APPLICATION SUMMARY");
         System.out.println("Flask Imports: " + flaskImports);
         System.out.println("Flask Apps: " + flaskApps);
         System.out.println("\nRoute Endpoints:");

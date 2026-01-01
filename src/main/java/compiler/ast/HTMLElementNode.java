@@ -3,9 +3,6 @@ package compiler.ast;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * AST node representing HTML elements <tag>content</tag>
- */
 public class HTMLElementNode extends ASTNode {
     private String tagName;
     private Map<String, String> attributes;

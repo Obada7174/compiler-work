@@ -3,10 +3,6 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Statement node representing function definition
- * def name(parameters): ...
- */
 public class FunctionDefNode extends StatementNode {
     private String functionName;
     private List<ParameterNode> parameters;

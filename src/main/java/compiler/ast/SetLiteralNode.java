@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Expression node representing set literals {element1, element2, ...}
- * Python-specific unordered collection type
- */
+
 public class SetLiteralNode extends ExpressionNode {
     private List<ExpressionNode> elements;
 

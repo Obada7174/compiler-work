@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing a Python ternary conditional expression.
- * Syntax: value if condition else alternative
- */
+
 public class TernaryNode extends ExpressionNode {
     private final ExpressionNode condition;
     private final ExpressionNode thenValue;

@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Statement node representing class definition
- * class ClassName(bases): ...
- */
+
 public class ClassDefNode extends StatementNode {
     private String className;
     private List<ExpressionNode> baseClasses;

@@ -2,28 +2,11 @@ package compiler.symboltable;
 
 import java.util.*;
 
-/**
- * Classical Symbol Table Implementation
- * Following standard Compiler Design principles and theory.
- *
- * This implementation provides all core operations required for a compiler symbol table:
- * - allocate: create a new empty symbol table
- * - free: remove all entries and release resources
- * - lookup: search for an identifier and return its entry
- * - insert: insert a new identifier into the table
- * - set_attribute: associate a specific attribute with an entry
- * - get_attribute: retrieve a specific attribute from an entry
- *
- * The symbol table supports nested scopes and maintains proper scope hierarchy.
- */
 public class ClassicalSymbolTable {
 
-    // ========== Internal Data Structures ==========
+    // Internal Data Structures
 
-    /**
-     * Scope - represents a single scope level
-     * Each scope contains a mapping of identifier names to their entries
-     */
+
     private static class Scope {
         private final int level;
         private final Map<String, SymbolTableEntry> entries;
@@ -54,29 +37,26 @@ public class ClassicalSymbolTable {
         }
     }
 
-
-    // ========== Symbol Table State ==========
-
-    /** Stack of scopes (top = current scope, bottom = global scope) */
+    // Stack of scopes (top = current scope, bottom = global scope) */
     private Deque<Scope> scopeStack;
 
-    /** Current scope level (0 = global) */
+    // Current scope level (0 = global) */
     private int currentScopeLevel;
 
-    /** Next available memory address for allocation */
+    // Next available memory address for allocation */
     private int nextAddress;
 
-    /** Error tracking */
+    /* Error tracking */
     private List<String> errors;
 
-    /** Warning tracking */
+    /* Warning tracking */
     private List<String> warnings;
 
 
-    // ========== Constructor ==========
+    // Constructor
 
-    /**
-     * Private constructor - use allocate() to create instances
+    /*
+      Private constructor - use allocate() to create instances
      */
     private ClassicalSymbolTable() {
         this.scopeStack = new ArrayDeque<>();
@@ -92,21 +72,13 @@ public class ClassicalSymbolTable {
 
     // ========== Core Operations (Required by Classical Compiler Design) ==========
 
-    /**
-     * OPERATION 1: allocate
-     * Creates a new empty symbol table with global scope initialized.
-     *
-     * @return a new symbol table instance
-     */
+
+     // @return a new symbol table instance
+
     public static ClassicalSymbolTable allocate() {
         return new ClassicalSymbolTable();
     }
 
-    /**
-     * OPERATION 2: free
-     * Removes all entries and releases the symbol table.
-     * Clears all scopes and resets internal state.
-     */
     public void free() {
         scopeStack.clear();
         errors.clear();
@@ -115,14 +87,6 @@ public class ClassicalSymbolTable {
         nextAddress = 0;
     }
 
-    /**
-     * OPERATION 3: lookup
-     * Searches for an identifier name and returns its entry.
-     * Searches from current scope up to global scope (following scope rules).
-     *
-     * @param name the identifier name to search for
-     * @return the symbol table entry if found, null otherwise
-     */
     public SymbolTableEntry lookup(String name) {
         // Search from current scope upward to global scope
         for (Scope scope : scopeStack) {
@@ -133,15 +97,7 @@ public class ClassicalSymbolTable {
         return null; // Not found in any scope
     }
 
-    /**
-     * OPERATION 4: insert
-     * Inserts a new identifier into the symbol table in the current scope.
-     * Reports error if identifier already exists in current scope (redeclaration).
-     *
-     * @param name the identifier name
-     * @param entry the symbol table entry to insert
-     * @return true if insertion succeeded, false if redeclaration error
-     */
+
     public boolean insert(String name, SymbolTableEntry entry) {
         if (scopeStack.isEmpty()) {
             errors.add("ERROR: Cannot insert - no scope available");
@@ -175,16 +131,7 @@ public class ClassicalSymbolTable {
         return true;
     }
 
-    /**
-     * OPERATION 5: set_attribute
-     * Associates a specific attribute with an entry.
-     * The entry must already exist in the symbol table.
-     *
-     * @param name the identifier name
-     * @param attribute the attribute name to set
-     * @param value the attribute value
-     * @return true if attribute was set, false if identifier not found
-     */
+
     public boolean set_attribute(String name, String attribute, Object value) {
         SymbolTableEntry entry = lookup(name);
 
@@ -239,14 +186,7 @@ public class ClassicalSymbolTable {
         return true;
     }
 
-    /**
-     * OPERATION 6: get_attribute
-     * Retrieves a specific attribute from an entry.
-     *
-     * @param name the identifier name
-     * @param attribute the attribute name to retrieve
-     * @return the attribute value, or null if not found
-     */
+
     public Object get_attribute(String name, String attribute) {
         SymbolTableEntry entry = lookup(name);
 
@@ -300,20 +240,14 @@ public class ClassicalSymbolTable {
     }
 
 
-    // ========== Scope Management Operations ==========
+    // Scope Management Operations
 
-    /**
-     * Enter a new nested scope
-     */
+
     public void enterScope() {
         currentScopeLevel++;
         scopeStack.push(new Scope(currentScopeLevel));
     }
 
-    /**
-     * Exit current scope and return to parent scope
-     * Cannot exit global scope.
-     */
     public void exitScope() {
         if (scopeStack.size() <= 1) {
             warnings.add("WARNING: Cannot exit global scope");
@@ -324,24 +258,13 @@ public class ClassicalSymbolTable {
         currentScopeLevel--;
     }
 
-    /**
-     * Get current scope level
-     */
+
     public int getCurrentScopeLevel() {
         return currentScopeLevel;
     }
 
 
-    // ========== Usage Tracking ==========
-
-    /**
-     * Record usage of an identifier at a specific line
-     * Reports error if identifier is undeclared.
-     *
-     * @param name the identifier name
-     * @param line the line number where identifier is used
-     * @return true if usage recorded, false if identifier undeclared
-     */
+    //Usage Tracking
     public boolean recordUsage(String name, int line) {
         SymbolTableEntry entry = lookup(name);
 
@@ -358,11 +281,9 @@ public class ClassicalSymbolTable {
     }
 
 
-    // ========== Lookup Variants ==========
+    //Lookup Variants
 
-    /**
-     * Lookup identifier in current scope only
-     */
+
     public SymbolTableEntry lookupCurrentScope(String name) {
         if (scopeStack.isEmpty()) {
             return null;
@@ -370,26 +291,19 @@ public class ClassicalSymbolTable {
         return scopeStack.peek().get(name);
     }
 
-    /**
-     * Check if identifier exists in any scope
-     */
     public boolean contains(String name) {
         return lookup(name) != null;
     }
 
-    /**
-     * Check if identifier exists in current scope
-     */
+
     public boolean containsInCurrentScope(String name) {
         return lookupCurrentScope(name) != null;
     }
 
 
-    // ========== Retrieval Operations ==========
+    //Retrieval Operations
 
-    /**
-     * Get all entries from all scopes
-     */
+
     public List<SymbolTableEntry> getAllEntries() {
         List<SymbolTableEntry> allEntries = new ArrayList<>();
         for (Scope scope : scopeStack) {
@@ -398,19 +312,8 @@ public class ClassicalSymbolTable {
         return allEntries;
     }
 
-    /**
-     * Get all entries from current scope only
-     */
-    public List<SymbolTableEntry> getCurrentScopeEntries() {
-        if (scopeStack.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(scopeStack.peek().getEntries().values());
-    }
 
-    /**
-     * Get all entries at a specific scope level
-     */
+
     public List<SymbolTableEntry> getEntriesAtLevel(int level) {
         List<SymbolTableEntry> entries = new ArrayList<>();
         for (Scope scope : scopeStack) {
@@ -422,73 +325,42 @@ public class ClassicalSymbolTable {
     }
 
 
-    // ========== Error and Warning Management ==========
 
-    /**
-     * Get all errors
-     */
     public List<String> getErrors() {
         return new ArrayList<>(errors);
     }
 
-    /**
-     * Get all warnings
-     */
     public List<String> getWarnings() {
         return new ArrayList<>(warnings);
     }
 
-    /**
-     * Check if there are any errors
-     */
+
     public boolean hasErrors() {
         return !errors.isEmpty();
     }
 
-    /**
-     * Check if there are any warnings
-     */
-    public boolean hasWarnings() {
-        return !warnings.isEmpty();
-    }
-
-    /**
-     * Clear all errors and warnings
-     */
-    public void clearMessages() {
-        errors.clear();
-        warnings.clear();
-    }
-
-    /**
-     * Print all errors to console
-     */
     public void printErrors() {
         if (errors.isEmpty()) {
             System.out.println("No errors.");
             return;
         }
 
-        System.out.println("\n╔════════════════════════════════════════════════╗");
-        System.out.println("║                   ERRORS                       ║");
-        System.out.println("╚════════════════════════════════════════════════╝");
+        System.out.println("ERRORS");
+
         for (String error : errors) {
             System.out.println("  " + error);
         }
         System.out.println();
     }
 
-    /**
-     * Print all warnings to console
-     */
+
     public void printWarnings() {
         if (warnings.isEmpty()) {
             return;
         }
 
-        System.out.println("\n╔════════════════════════════════════════════════╗");
-        System.out.println("║                  WARNINGS                      ║");
-        System.out.println("╚════════════════════════════════════════════════╝");
+        System.out.println("WARNINGS");
+
         for (String warning : warnings) {
             System.out.println("  " + warning);
         }
@@ -496,15 +368,10 @@ public class ClassicalSymbolTable {
     }
 
 
-    // ========== Display and Formatting ==========
+    // Display and Formatting
 
-    /**
-     * Print the entire symbol table with all scopes
-     */
     public void printTable() {
-        System.out.println("\n╔═══════════════════════════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                                    SYMBOL TABLE                                           ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════════════════════════════════════╝");
+           System.out.println("SYMBOL TABLE");
 
         if (scopeStack.isEmpty()) {
             System.out.println("  (empty)");
@@ -516,7 +383,6 @@ public class ClassicalSymbolTable {
         System.out.println("│ Name          │ Type       │ Size    │ Dim  │ Decl   │ Address  │ Scope  │ Usage Lines  │");
         System.out.println("├───────────────┼────────────┼─────────┼──────┼────────┼──────────┼────────┼──────────────┤");
 
-        // Print entries for each scope (from global to current)
         List<Scope> scopeList = new ArrayList<>(scopeStack);
         Collections.reverse(scopeList); // Reverse to print global scope first
 
@@ -575,9 +441,6 @@ public class ClassicalSymbolTable {
         System.out.println(entry.toDetailedString());
     }
 
-    /**
-     * Get statistics about the symbol table
-     */
     public String getStatistics() {
         int totalEntries = getAllEntries().size();
         int totalScopes = scopeStack.size();
@@ -590,12 +453,6 @@ public class ClassicalSymbolTable {
         );
     }
 
-
-    // ========== Helper Methods ==========
-
-    /**
-     * Truncate string to specified length
-     */
     private String truncate(String str, int maxLength) {
         if (str.length() <= maxLength) {
             return str;

@@ -7,10 +7,6 @@ import grammar.CSSParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-/**
- * Example demonstrating CSS AST Builder usage.
- * This example parses CSS code and prints the resulting Abstract Syntax Tree.
- */
 public class CSSASTExample {
 
     public static void main(String[] args) {
@@ -69,9 +65,7 @@ public class CSSASTExample {
         System.out.println("-".repeat(80));
     }
 
-    /**
-     * Parses CSS code and returns the AST root node.
-     */
+
     public static CSSASTNode parseCSS(String cssCode) {
         try {
             // Create lexer

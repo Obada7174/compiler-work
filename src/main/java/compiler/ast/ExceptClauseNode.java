@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * AST node representing except clause in try-except
- * except [ExceptionType [as name]]: ...
- */
+
 public class ExceptClauseNode extends ASTNode {
     private ExpressionNode exceptionType;
     private String alias;

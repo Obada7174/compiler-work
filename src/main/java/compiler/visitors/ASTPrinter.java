@@ -36,9 +36,7 @@ public class ASTPrinter {
 
 
     public static void printTreeBoxed(ASTNode root) {
-        System.out.println("╔════════════════════════════════════════════════════════════╗");
-        System.out.println("║                   ABSTRACT SYNTAX TREE                     ║");
-        System.out.println("╚════════════════════════════════════════════════════════════╝");
+        System.out.println("ABSTRACT SYNTAX TREE");
         System.out.println();
         printTree(root);
         System.out.println();

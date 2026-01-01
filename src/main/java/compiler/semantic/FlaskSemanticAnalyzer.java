@@ -6,16 +6,7 @@ import compiler.symboltable.*;
 
 import java.util.*;
 
-/**
- * Flask-specific semantic analyzer.
- *
- * Performs compile-time validation of Flask application patterns:
- * - HTTP method validation
- * - Route path syntax validation
- * - Decorator usage validation
- * - Request context access validation
- * - Endpoint naming conventions
- */
+
 public class FlaskSemanticAnalyzer {
 
     // Valid HTTP methods according to HTTP/1.1 and common extensions
@@ -33,9 +24,6 @@ public class FlaskSemanticAnalyzer {
     private final Set<String> registeredEndpoints = new HashSet<>();
     private final Map<String, Set<String>> routeMethodMap = new HashMap<>();
 
-    /**
-     * Represents a semantic error.
-     */
     public static class SemanticError {
         public final String message;
         public final int lineNumber;
@@ -53,9 +41,6 @@ public class FlaskSemanticAnalyzer {
         }
     }
 
-    /**
-     * Represents a semantic warning.
-     */
     public static class SemanticWarning {
         public final String message;
         public final int lineNumber;
@@ -73,24 +58,16 @@ public class FlaskSemanticAnalyzer {
         }
     }
 
-    /**
-     * Analyze the AST for Flask-specific semantic issues.
-     */
     public void analyze(ASTNode root) {
         if (root == null) return;
 
-        System.out.println("\n╔═══════════════════════════════════════════════════════════╗");
-        System.out.println("║         FLASK SEMANTIC ANALYSIS                           ║");
-        System.out.println("╚═══════════════════════════════════════════════════════════╝\n");
+            System.out.println("FLASK SEMANTIC ANALYSIS");
 
         traverseAndAnalyze(root);
 
         printAnalysisResults();
     }
 
-    /**
-     * Traverse AST and perform semantic analysis.
-     */
     private void traverseAndAnalyze(ASTNode node) {
         if (node == null) return;
 
@@ -113,9 +90,6 @@ public class FlaskSemanticAnalyzer {
         }
     }
 
-    /**
-     * Analyze Flask route function.
-     */
     private void analyzeRouteFunction(FlaskRouteFunction node) {
         String funcName = node.getFunctionName();
         int line = node.getLineNumber();
@@ -129,7 +103,6 @@ public class FlaskSemanticAnalyzer {
             registeredEndpoints.add(funcName);
         }
 
-        // Check route decorator count
         if (node.getRouteDecorators().isEmpty()) {
             addWarning("FLASK101", String.format(
                 "Function '%s' appears to be a route handler but has no @app.route decorator.",
@@ -154,16 +127,12 @@ public class FlaskSemanticAnalyzer {
             }
         }
 
-        // Analyze each route decorator
-        for (RouteDecoratorNode decorator : node.getRouteDecorators()) {
+           for (RouteDecoratorNode decorator : node.getRouteDecorators()) {
             analyzeRouteDecorator(decorator);
         }
     }
 
-    /**
-     * Analyze route decorator.
-     */
-    private void analyzeRouteDecorator(RouteDecoratorNode node) {
+     private void analyzeRouteDecorator(RouteDecoratorNode node) {
         String path = node.getRoutePath();
         int line = node.getLineNumber();
 
@@ -178,8 +147,6 @@ public class FlaskSemanticAnalyzer {
                     method, VALID_HTTP_METHODS), line);
             }
         }
-
-        // Check for route conflicts
         String normalizedPath = normalizePath(path);
         Set<String> existingMethods = routeMethodMap.getOrDefault(normalizedPath, new HashSet<>());
 
@@ -196,9 +163,6 @@ public class FlaskSemanticAnalyzer {
                       .addAll(node.getHttpMethods());
     }
 
-    /**
-     * Validate route path syntax.
-     */
     private void validateRoutePath(String path, int line) {
         if (path == null || path.isEmpty()) {
             addError("FLASK004", "Route path cannot be empty.", line);
@@ -251,22 +215,17 @@ public class FlaskSemanticAnalyzer {
         }
     }
 
-    /**
-     * Normalize path for conflict detection.
-     */
+
     private String normalizePath(String path) {
         // Replace path parameters with placeholder for comparison
         return path.replaceAll("<[^>]+>", "<param>");
     }
 
-    /**
-     * Analyze Flask app instantiation.
-     */
     private void analyzeFlaskApp(FlaskAppNode node) {
         String moduleName = node.getModuleName();
         int line = node.getLineNumber();
 
-        // Warn if not using __name__
+
         if (!"__name__".equals(moduleName)) {
             addWarning("FLASK104", String.format(
                 "Flask app initialized with '%s' instead of '__name__'. " +
@@ -275,9 +234,7 @@ public class FlaskSemanticAnalyzer {
         }
     }
 
-    /**
-     * Analyze Flask imports.
-     */
+
     private void analyzeFlaskImport(FlaskImportNode node) {
         // Check for commonly needed but missing imports
         Set<FlaskImportNode.FlaskComponent> components = node.getImportedComponents();
@@ -291,9 +248,6 @@ public class FlaskSemanticAnalyzer {
         }
     }
 
-    /**
-     * Analyze Flask request access.
-     */
     private void analyzeFlaskRequest(FlaskRequestNode node) {
         int line = node.getLineNumber();
 
@@ -304,10 +258,6 @@ public class FlaskSemanticAnalyzer {
                 node.getPropertyName()), line);
         }
     }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // ERROR AND WARNING MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════════════════
 
     private void addError(String code, String message, int line) {
         errors.add(new SemanticError(code, message, line));
@@ -329,13 +279,6 @@ public class FlaskSemanticAnalyzer {
         return !errors.isEmpty();
     }
 
-    public boolean hasWarnings() {
-        return !warnings.isEmpty();
-    }
-
-    /**
-     * Print analysis results.
-     */
     private void printAnalysisResults() {
         if (errors.isEmpty() && warnings.isEmpty()) {
             System.out.println("  ✓ No Flask semantic issues found.\n");
@@ -365,13 +308,10 @@ public class FlaskSemanticAnalyzer {
             errors.size(), warnings.size()));
     }
 
-    /**
-     * Get formatted error report.
-     */
+
     public String getErrorReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("Flask Semantic Analysis Report\n");
-        sb.append("==============================\n\n");
 
         if (errors.isEmpty() && warnings.isEmpty()) {
             sb.append("No issues found.\n");

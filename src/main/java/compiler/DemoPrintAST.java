@@ -11,24 +11,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-/**
- * Demonstration: Print AST with class names and line numbers
- *
- * This class shows how to:
- * 1. Compile a Python file to AST
- * 2. Print the entire AST with printAST()
- * 3. Print specific subtrees with printNode()
- *
- * Usage: java compiler.DemoPrintAST [path-to-python-file]
- */
+
 public class DemoPrintAST {
 
     public static void main(String[] args) {
         String resourcePath = args.length > 0 ? args[0] : "examples/app.py";
 
-        System.out.println("╔════════════════════════════════════════════════════════════╗");
-        System.out.println("║        DEMO: Print AST with Class Names                    ║");
-        System.out.println("╚════════════════════════════════════════════════════════════╝\n");
+        System.out.println("DEMO: Print AST with Class Names");
 
         try {
             // Load source file
@@ -91,9 +80,6 @@ public class DemoPrintAST {
         }
     }
 
-    /**
-     * Compile Python source code to AST.
-     */
     private static ASTNode compileToAST(String sourceCode) throws Exception {
         // Lexical analysis
         CharStream input = CharStreams.fromString(sourceCode);
@@ -110,9 +96,6 @@ public class DemoPrintAST {
         return astBuilder.visit(parseTree);
     }
 
-    /**
-     * Load source file from resources or filesystem.
-     */
     private static String loadSourceFile(String resourcePath) throws Exception {
         // Try to load from resources first
         InputStream is = DemoPrintAST.class.getClassLoader()

@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Expression node representing lambda expression
- * lambda params: expression
- */
+
 public class LambdaNode extends ExpressionNode {
     private List<ParameterNode> parameters;
     private ExpressionNode body;

@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * AST node representing function parameter
- * param_name [: type] [= default_value]
- */
+
 public class ParameterNode extends ASTNode {
     private String parameterName;
     private ExpressionNode typeAnnotation;

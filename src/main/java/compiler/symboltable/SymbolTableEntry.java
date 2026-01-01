@@ -2,51 +2,28 @@ package compiler.symboltable;
 
 import java.util.*;
 
-/**
- * Symbol Table Entry
- * Represents a single entry in the symbol table following classical Compiler Design principles.
- *
- * Each entry contains all attributes necessary for identifier management during compilation.
- */
+
 public class SymbolTableEntry {
 
     private String name;
 
-    /** Type: data type (int, char, float, string, boolean, array, function, class, etc.) */
     private String type;
-
-    /** Size: storage size in bytes */
     private int size;
-
-    /** Dimension: number of dimensions (0 for scalar, 1+ for arrays) */
     private int dimension;
-
-    /** Line of Declaration: source code line where identifier is first declared */
     private int lineOfDeclaration;
 
-    /** Lines of Usage: all source code lines where identifier is used/referenced */
     private List<Integer> linesOfUsage;
 
-    /** Address: virtual memory address or offset (for code generation phase) */
     private int address;
 
-    // ========== Additional Attributes for Enhanced Tracking ==========
-
-    /** Scope Level: nesting depth (0 = global, 1+ = nested scopes) */
     private int scopeLevel;
-
-    /** Is Initialized: whether the identifier has been assigned a value */
     private boolean isInitialized;
 
-    /** Array Dimensions: specific size of each dimension (e.g., [10][20] for 2D array) */
     private List<Integer> arrayDimensions;
 
 
     // ========== Constructors ==========
 
-    /**
-     * Default constructor - creates entry with minimal information
-     */
     public SymbolTableEntry(String name, String type, int lineOfDeclaration) {
         this.name = name;
         this.type = type;
@@ -61,26 +38,6 @@ public class SymbolTableEntry {
         this.scopeLevel = 0;
         this.isInitialized = false;
     }
-
-    /**
-     * Full constructor - creates entry with all attributes specified
-     */
-    public SymbolTableEntry(String name, String type, int size, int dimension,
-                           int lineOfDeclaration, int address) {
-        this.name = name;
-        this.type = type;
-        this.size = size;
-        this.dimension = dimension;
-        this.lineOfDeclaration = lineOfDeclaration;
-        this.address = address;
-        this.linesOfUsage = new ArrayList<>();
-        this.arrayDimensions = new ArrayList<>();
-        this.scopeLevel = 0;
-        this.isInitialized = false;
-    }
-
-
-    // ========== Core Getters and Setters ==========
 
     public String getName() {
         return name;
@@ -127,17 +84,13 @@ public class SymbolTableEntry {
     }
 
     public List<Integer> getLinesOfUsage() {
-        return new ArrayList<>(linesOfUsage); // Return copy to prevent external modification
+        return new ArrayList<>(linesOfUsage);
     }
 
     public void addLineOfUsage(int line) {
         if (!linesOfUsage.contains(line)) {
             linesOfUsage.add(line);
         }
-    }
-
-    public void setLinesOfUsage(List<Integer> lines) {
-        this.linesOfUsage = new ArrayList<>(lines);
     }
 
     public int getAddress() {
@@ -147,9 +100,6 @@ public class SymbolTableEntry {
     public void setAddress(int address) {
         this.address = address;
     }
-
-
-    // ========== Additional Getters and Setters ==========
 
     public int getScopeLevel() {
         return scopeLevel;
@@ -189,13 +139,6 @@ public class SymbolTableEntry {
         this.dimension = this.arrayDimensions.size();
     }
 
-
-    // ========== Helper Methods ==========
-
-    /**
-     * Calculate default storage size based on type
-     * Following typical compiler conventions (in bytes)
-     */
     private int calculateDefaultSize(String type) {
         if (type == null) {
             return 0;
@@ -237,24 +180,13 @@ public class SymbolTableEntry {
     public boolean isArray() {
         return dimension > 0;
     }
-
-    /**
-     * Check if this entry represents a scalar variable
-     */
     public boolean isScalar() {
         return dimension == 0;
     }
-
-    /**
-     * Get total number of usages
-     */
     public int getUsageCount() {
         return linesOfUsage.size();
     }
 
-    /**
-     * Get formatted string representation of array dimensions
-     */
     public String getArrayDimensionsString() {
         if (arrayDimensions.isEmpty()) {
             return "";
@@ -267,11 +199,7 @@ public class SymbolTableEntry {
     }
 
 
-    // ========== Display Methods ==========
-
-    /**
-     * Get detailed string representation of the entry
-     */
+    // Display Methods
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -290,16 +218,9 @@ public class SymbolTableEntry {
         return sb.toString();
     }
 
-    /**
-     * Get compact string representation
-     */
     public String toCompactString() {
         return String.format("%s (%s) @ line %d", name, type, lineOfDeclaration);
     }
-
-    /**
-     * Get detailed multi-line representation
-     */
     public String toDetailedString() {
         StringBuilder sb = new StringBuilder();
         sb.append("┌─ Symbol Entry ─────────────────────────\n");
@@ -330,7 +251,7 @@ public class SymbolTableEntry {
     }
 
 
-    // ========== Equality and Hashing ==========
+    // Equality and Hashing
 
     @Override
     public boolean equals(Object obj) {

@@ -1,9 +1,6 @@
 package compiler.ast;
 
-/**
- * Statement node representing return statement
- * return [expression]
- */
+
 public class ReturnStatementNode extends StatementNode {
     private ExpressionNode value;
 

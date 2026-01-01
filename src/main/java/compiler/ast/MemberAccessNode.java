@@ -1,8 +1,6 @@
 package compiler.ast;
 
-/**
- * Expression node representing member access (object.property)
- */
+
 public class MemberAccessNode extends ExpressionNode {
     private ExpressionNode object;
     private String memberName;

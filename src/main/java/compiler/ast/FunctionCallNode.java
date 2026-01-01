@@ -3,10 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Expression node representing function calls func(arg1, arg2, ...)
- * Used by both Python and Jinja2
- */
+
 public class FunctionCallNode extends ExpressionNode {
     private ExpressionNode function;
     private List<ExpressionNode> arguments;
