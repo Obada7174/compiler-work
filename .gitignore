@@ -41,3 +41,6 @@ grammar/gen/
 gen/
 *.interp
 *.tokens
+
+venv
+flask-jinja2-compiler.iml
