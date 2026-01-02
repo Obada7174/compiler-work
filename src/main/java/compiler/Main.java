@@ -18,7 +18,7 @@ import grammar.*;
 
 // Compiler internal imports
 // import compiler.visitors.Jinja2ASTBuilder;
-import compiler.ast.ASTNode;
+import compiler.ast.core.ASTNode;
 import compiler.utils.ASTPrinter;
 import compiler.symboltable.SymbolTable;
 

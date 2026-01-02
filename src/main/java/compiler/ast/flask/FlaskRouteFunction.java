@@ -1,6 +1,9 @@
 package compiler.ast.flask;
 
-import compiler.ast.*;
+import compiler.ast.core.ParameterNode;
+import compiler.ast.python.FunctionDefNode;
+import compiler.ast.python.StatementNode;
+
 import java.util.List;
 import java.util.ArrayList;
 

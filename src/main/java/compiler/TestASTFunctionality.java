@@ -1,6 +1,12 @@
 package compiler;
 
-import compiler.ast.*;
+import compiler.ast.core.ASTNode;
+import compiler.ast.core.ParameterNode;
+import compiler.ast.core.ProgramNode;
+import compiler.ast.core.expressions.IdentifierNode;
+import compiler.ast.core.expressions.NumberLiteralNode;
+import compiler.ast.core.expressions.StringLiteralNode;
+import compiler.ast.python.*;
 import compiler.visitors.ASTPrinter;
 
 public class TestASTFunctionality {

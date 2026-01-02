@@ -1,6 +1,10 @@
 package compiler.ast.flask;
 
-import compiler.ast.*;
+import compiler.ast.core.DecoratorNode;
+import compiler.ast.core.ExpressionNode;
+import compiler.ast.core.expressions.IdentifierNode;
+import compiler.ast.core.expressions.MemberAccessNode;
+
 import java.util.List;
 import java.util.ArrayList;
 

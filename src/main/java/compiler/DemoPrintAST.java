@@ -1,6 +1,6 @@
 package compiler;
 
-import compiler.ast.ASTNode;
+import compiler.ast.core.ASTNode;
 import compiler.utils.ASTClassNamePrinter;
 import compiler.visitors.SimplePythonASTBuilder;
 import grammar.PythonLexer;

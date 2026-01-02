@@ -1,6 +1,6 @@
 package compiler.ast.css;
 
-import compiler.ast.ASTNode;
+import compiler.ast.core.ASTNode;
 
 import java.util.ArrayList;
 import java.util.List;

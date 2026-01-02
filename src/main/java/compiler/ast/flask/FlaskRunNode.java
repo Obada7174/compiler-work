@@ -1,6 +1,7 @@
 package compiler.ast.flask;
 
-import compiler.ast.*;
+import compiler.ast.python.StatementNode;
+
 import java.util.Map;
 import java.util.HashMap;
 

@@ -1,6 +1,6 @@
 package compiler.ast.flask;
 
-import compiler.ast.*;
+import compiler.ast.core.ExpressionNode;
 
 /**
  * AST node representing Flask request object access.

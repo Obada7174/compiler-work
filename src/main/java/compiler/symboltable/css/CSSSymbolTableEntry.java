@@ -77,10 +77,6 @@ public class CSSSymbolTableEntry {
         }
     }
 
-    public String getFullSelector() {
-        return fullSelector;
-    }
-
     public void setFullSelector(String fullSelector) {
         this.fullSelector = fullSelector;
     }

@@ -1,6 +1,7 @@
 package compiler.ast.flask;
 
-import compiler.ast.*;
+import compiler.ast.python.StatementNode;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;

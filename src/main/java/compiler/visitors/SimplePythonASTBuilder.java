@@ -1,7 +1,12 @@
 package compiler.visitors;
 
-import compiler.ast.*;
+import compiler.ast.core.*;
+import compiler.ast.core.expressions.IdentifierNode;
+import compiler.ast.core.expressions.MemberAccessNode;
+import compiler.ast.core.expressions.NumberLiteralNode;
+import compiler.ast.core.expressions.StringLiteralNode;
 import compiler.ast.flask.*;
+import compiler.ast.python.*;
 import grammar.PythonParser;
 import grammar.PythonParserBaseVisitor;
 

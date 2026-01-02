@@ -1,6 +1,6 @@
 package compiler;
 
-import compiler.ast.*;
+import compiler.ast.core.ASTNode;
 import compiler.symboltable.SymbolTable;
 import compiler.visitors.ASTPrinter;
 import compiler.visitors.SimplePythonASTBuilder;

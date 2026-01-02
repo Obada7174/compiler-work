@@ -16,12 +16,6 @@ public class CSSSymbolTable {
         this.sourceFile = null;
     }
 
-    public CSSSymbolTable(String sourceFile) {
-        this();
-        this.sourceFile = sourceFile;
-    }
-
-
     public void addSymbol(CSSSymbolTableEntry entry) {
         entries.add(entry);
 

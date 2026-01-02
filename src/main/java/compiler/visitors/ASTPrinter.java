@@ -1,6 +1,6 @@
 package compiler.visitors;
 
-import compiler.ast.ASTNode;
+import compiler.ast.core.ASTNode;
 
 
 public class ASTPrinter {

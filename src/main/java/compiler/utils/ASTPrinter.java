@@ -1,6 +1,6 @@
 package compiler.utils;
 
-import compiler.ast.*;
+import compiler.ast.core.ASTNode;
 
 public class ASTPrinter {
 

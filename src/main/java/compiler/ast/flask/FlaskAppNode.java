@@ -1,6 +1,7 @@
 package compiler.ast.flask;
 
-import compiler.ast.*;
+import compiler.ast.core.ExpressionNode;
+import compiler.ast.python.StatementNode;
 
 /**
  * AST node representing Flask application instantiation.

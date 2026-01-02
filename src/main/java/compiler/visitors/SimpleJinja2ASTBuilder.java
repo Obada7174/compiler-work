@@ -1,6 +1,14 @@
 package compiler.visitors;
 
-import compiler.ast.*;
+import compiler.ast.core.ASTNode;
+import compiler.ast.core.BlockNode;
+import compiler.ast.core.ExpressionNode;
+import compiler.ast.core.ProgramNode;
+import compiler.ast.jinjaHtml.*;
+import compiler.ast.core.expressions.IdentifierNode;
+import compiler.ast.core.expressions.MemberAccessNode;
+import compiler.ast.core.expressions.NumberLiteralNode;
+import compiler.ast.core.expressions.StringLiteralNode;
 import grammar.*;
 
 import java.util.ArrayList;

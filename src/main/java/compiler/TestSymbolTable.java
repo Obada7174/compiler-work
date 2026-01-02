@@ -1,27 +1,8 @@
 package compiler;
 
 import compiler.symboltable.*;
-import compiler.ast.*;
-
 import java.util.*;
 
-/**
- * Test Class for Classical Symbol Table Implementation
- *
- * This class demonstrates all symbol table operations following classical Compiler Design principles:
- * 1. allocate() - create new symbol table
- * 2. free() - release symbol table
- * 3. lookup() - search for identifiers
- * 4. insert() - add new identifiers
- * 5. set_attribute() - modify entry attributes
- * 6. get_attribute() - retrieve entry attributes
- *
- * Also demonstrates:
- * - Nested scope management
- * - Redeclaration error detection
- * - Undeclared identifier error detection
- * - Usage tracking
- */
 public class TestSymbolTable {
 
     public static void main(String[] args) {

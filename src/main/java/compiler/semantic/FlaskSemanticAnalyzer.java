@@ -1,8 +1,9 @@
 package compiler.semantic;
 
-import compiler.ast.*;
+import compiler.ast.core.ASTNode;
+import compiler.ast.core.ParameterNode;
 import compiler.ast.flask.*;
-import compiler.symboltable.*;
+import compiler.ast.python.FunctionDefNode;
 
 import java.util.*;
 
