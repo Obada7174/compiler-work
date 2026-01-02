@@ -48,7 +48,7 @@ public class VerifyJinja2AST {
         String content = "";
         if (node instanceof HTMLTextNode htmlText) content = "Text: " + htmlText.getText().trim();
         else if (node instanceof Jinja2VarNode varNode) content = "VarExpr -> " + varNode.getExpression();
-        else if (node instanceof TemplateNode) content = "TemplateNode";
+//        else if (node instanceof TemplateNode) content = "TemplateNode";
         else if (node instanceof BlockNode blockNode) content = "Block: " + blockNode.getName();
         else if (node instanceof HTMLElementNode elemNode) content = "HTML Element: " + elemNode.getTagName();
         else if (node instanceof IdentifierNode idNode) content = "Identifier: " + idNode.getName();
