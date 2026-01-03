@@ -69,6 +69,8 @@ JINJA_VAR_LT: '<';
 JINJA_VAR_GT: '>';
 JINJA_VAR_LTE: '<=';
 JINJA_VAR_GTE: '>=';
+JINJA_VAR_LBRACE: '{';
+JINJA_VAR_RBRACE: '}';
 
 JINJA_VAR_NUMBER: [0-9]+ ('.' [0-9]+)?;
 JINJA_VAR_STRING: '\'' (~['\r\n\\])* ( '\\' . ~['\r\n\\]* )* '\'' | '"' (~["\r\n\\])* ( '\\' . ~["\r\n\\]* )* '"' ;

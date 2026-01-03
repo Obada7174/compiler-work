@@ -5,15 +5,6 @@ import compiler.ast.python.StatementNode;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * AST node representing Flask application run call.
- *
- * Pattern: app.run(debug=True, host='0.0.0.0', port=5000)
- *
- * Typically found in:
- * if __name__ == "__main__":
- *     app.run(debug=True)
- */
 public class FlaskRunNode extends StatementNode {
     private final String appReference;
     private final Map<String, Object> runConfig;

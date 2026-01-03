@@ -7,19 +7,6 @@ import compiler.ast.python.StatementNode;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * AST node representing a Flask route handler function.
- *
- * This wraps a FunctionDefNode with Flask-specific route metadata:
- * - Route path and HTTP methods
- * - URL parameters extracted from the path
- * - Response type information
- *
- * Example:
- * @app.route("/users/<int:id>", methods=["GET", "POST"])
- * def get_user(id):
- *     return render_template("user.html", user=user)
- */
 public class FlaskRouteFunction extends StatementNode {
     private final FunctionDefNode functionDef;
     private final List<RouteDecoratorNode> routeDecorators;

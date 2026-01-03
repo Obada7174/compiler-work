@@ -3,14 +3,6 @@ package grammar;
 import org.antlr.v4.runtime.*;
 import java.util.*;
 
-/**
- * Base class for Python lexer - handles indentation-sensitive lexing.
- *
- * Python uses indentation (whitespace) to delimit blocks instead of braces.
- * This requires special handling to emit synthetic INDENT and DEDENT tokens.
- *
- * Based on the official ANTLR Python grammar approach.
- */
 public abstract class PythonLexerBase extends Lexer {
 
     // Indentation stack - tracks nesting levels
@@ -91,10 +83,6 @@ public abstract class PythonLexerBase extends Lexer {
         return next;
     }
 
-    /**
-     * Handle indentation at the start of a line.
-     * Called from NEWLINE token action in the grammar.
-     */
     protected void handleNewline(String indentText) {
         // Skip if inside parentheses/brackets/braces
         if (parenDepth > 0) {
@@ -139,10 +127,6 @@ public abstract class PythonLexerBase extends Lexer {
         atLineStart = false;
     }
 
-    /**
-     * Calculate indentation length from spaces/tabs.
-     * Tabs are worth 8 spaces (Python standard).
-     */
     private int getIndentationLength(String indent) {
         int length = 0;
         for (char c : indent.toCharArray()) {
@@ -156,9 +140,6 @@ public abstract class PythonLexerBase extends Lexer {
         return length;
     }
 
-    /**
-     * Create a synthetic token.
-     */
     private Token createToken(int type, String text) {
         CommonToken token = new CommonToken(_tokenFactorySourcePair, type, DEFAULT_TOKEN_CHANNEL, -1, -1);
         token.setLine(getLine());
@@ -167,23 +148,13 @@ public abstract class PythonLexerBase extends Lexer {
         return token;
     }
 
-    /**
-     * Check if inside parentheses/brackets/braces.
-     */
     protected boolean isInsideParens() {
         return parenDepth > 0;
     }
 
-    /**
-     * Increment paren depth (for (, [, {).
-     */
     protected void incParenDepth() {
         parenDepth++;
     }
-
-    /**
-     * Decrement paren depth (for ), ], }).
-     */
     protected void decParenDepth() {
         parenDepth--;
     }

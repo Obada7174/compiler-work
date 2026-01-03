@@ -7,15 +7,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 
-/**
- * AST node representing Flask-specific imports.
- *
- * Patterns:
- * - from flask import Flask, request, render_template, jsonify
- * - from flask import redirect, url_for, flash
- *
- * This node tracks which Flask components are imported for semantic analysis.
- */
+
 public class FlaskImportNode extends StatementNode {
 
     public enum FlaskComponent {

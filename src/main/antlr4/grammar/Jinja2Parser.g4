@@ -3,6 +3,55 @@ parser grammar Jinja2Parser;
 package grammar;
 }
 
+@members {
+    private static final java.util.Set<String> VALID_HTML_ELEMENTS = new java.util.HashSet<>(java.util.Arrays.asList(
+        // Document structure
+        "html", "head", "body", "title", "meta", "link", "base",
+        // Sectioning
+        "header", "footer", "nav", "main", "section", "article", "aside", "address",
+        // Block elements
+        "div", "p", "pre", "blockquote", "figure", "figcaption", "hr",
+        // Headings
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        // Lists
+        "ul", "ol", "li", "dl", "dt", "dd", "menu",
+        // Tables
+        "table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption", "col", "colgroup",
+        // Forms
+        "form", "input", "button", "select", "option", "optgroup", "textarea",
+        "label", "fieldset", "legend", "datalist", "output", "progress", "meter",
+        // Inline/text semantics
+        "span", "a", "em", "strong", "small", "s", "cite", "q", "dfn", "abbr",
+        "code", "var", "samp", "kbd", "sub", "sup", "i", "b", "u", "mark",
+        "ruby", "rt", "rp", "bdi", "bdo", "br", "wbr",
+        // Edits
+        "ins", "del",
+        // Embedded content
+        "img", "picture", "video", "audio", "source", "track",
+        "iframe", "embed", "object", "param", "canvas", "svg", "math", "map", "area",
+        // Interactive
+        "details", "summary", "dialog",
+        // Scripting (handled separately but listed for completeness)
+        "script", "noscript", "template", "slot", "style",
+        // Time and data
+        "time", "data"
+    ));
+
+    public boolean isValidHtmlElement(String tagName) {
+        if (tagName == null || tagName.isEmpty()) {
+            return false;
+        }
+        String lowerName = tagName.toLowerCase();
+        if (VALID_HTML_ELEMENTS.contains(lowerName)) {
+            return true;
+        }
+        if (lowerName.contains("-")) {
+            return true;
+        }
+        return false;
+    }
+}
+
 options { tokenVocab = Jinja2Lexer; }
 
 template
@@ -24,12 +73,12 @@ htmlStyleTag: HTML_STYLE_OPEN HTML_STYLE_CONTENT;
 htmlScriptTag: HTML_SCRIPT_OPEN HTML_SCRIPT_CONTENT;
 
 htmlElement
-    : HTML_OPEN HTML_TAG_NAME htmlAttribute* HTML_TAG_CLOSE htmlContent* htmlCloseTag?
-    | HTML_OPEN HTML_TAG_NAME htmlAttribute* HTML_TAG_SLASH_CLOSE
+    : HTML_OPEN tag=HTML_TAG_NAME {isValidHtmlElement($tag.text)}? htmlAttribute* HTML_TAG_CLOSE htmlContent* htmlCloseTag?
+    | HTML_OPEN tag=HTML_TAG_NAME {isValidHtmlElement($tag.text)}? htmlAttribute* HTML_TAG_SLASH_CLOSE
     ;
 
 htmlCloseTag
-    : HTML_OPEN HTML_TAG_SLASH HTML_TAG_NAME HTML_TAG_CLOSE
+    : HTML_OPEN HTML_TAG_SLASH tag=HTML_TAG_NAME {isValidHtmlElement($tag.text)}? HTML_TAG_CLOSE
     ;
 
 htmlAttribute
@@ -53,7 +102,9 @@ attrValueSQContent
     ;
 
 htmlContent
-    : htmlElement
+    : htmlStyleTag
+    | htmlScriptTag
+    | htmlElement
     | jinjaVar
     | jinjaControl
     | HTML_COMMENT

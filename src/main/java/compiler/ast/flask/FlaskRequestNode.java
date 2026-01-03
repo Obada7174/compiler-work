@@ -2,18 +2,6 @@ package compiler.ast.flask;
 
 import compiler.ast.core.ExpressionNode;
 
-/**
- * AST node representing Flask request object access.
- *
- * Patterns:
- * - request.args.get("param")
- * - request.form["field"]
- * - request.json
- * - request.method
- *
- * This node captures the semantic meaning of Flask request access,
- * enabling validation and type inference.
- */
 public class FlaskRequestNode extends ExpressionNode {
 
     public enum RequestProperty {

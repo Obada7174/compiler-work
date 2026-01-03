@@ -3,16 +3,7 @@ package compiler.ast.flask;
 import compiler.ast.core.ExpressionNode;
 import compiler.ast.python.StatementNode;
 
-/**
- * AST node representing Flask application instantiation.
- *
- * Pattern: app = Flask(__name__)
- *
- * This node captures:
- * - The variable name (e.g., "app")
- * - The module name passed to Flask constructor (typically "__name__")
- * - Configuration options if present
- */
+
 public class FlaskAppNode extends StatementNode {
     private final String appVariableName;
     private final String moduleName;

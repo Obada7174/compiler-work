@@ -8,17 +8,6 @@ import compiler.ast.core.expressions.MemberAccessNode;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * AST node representing Flask route decorator.
- *
- * Pattern: @app.route("/path", methods=["GET", "POST"])
- *
- * This specialized decorator node captures:
- * - The Flask app reference (e.g., "app")
- * - The route path (e.g., "/users/<int:id>")
- * - HTTP methods allowed (default: ["GET"])
- * - Additional route options (strict_slashes, etc.)
- */
 public class RouteDecoratorNode extends DecoratorNode {
     private final String appReference;
     private final String routePath;
